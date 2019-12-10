@@ -50,11 +50,10 @@ class notice_form extends moodleform {
         if ($readonly) {
             $mform->addElement('static', 'content', get_string('notice:content', 'local_sitenotice'));
         } else {
-            $mform->addElement('htmleditor', 'content', get_string('notice:content', 'local_sitenotice'), ['rows'=> '10', 'cols'=>'30']);
+            $mform->addElement('htmleditor', 'content', get_string('notice:content', 'local_sitenotice'), [], ['class' => 'noticecontent']);
         }
         $mform->setType('content', PARAM_RAW);
         $mform->addRule('content', get_string('required'), 'required', null, 'client');
-
 
         $mform->addElement('selectyesno', 'reqack', get_string('notice:reqack', 'local_sitenotice'), $attributes);
         $mform->setDefault('reqack', 0);

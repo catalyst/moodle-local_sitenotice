@@ -32,6 +32,7 @@ require_login();
 require_capability('moodle/site:config', context_system::instance());
 require_sesskey();
 $PAGE->set_context(context_system::instance());
+$PAGE->requires->css('/local/sitenotice/styles.css');
 
 $thispage = '/local/sitenotice/editnotice.php';
 $managenoticepage = '/local/sitenotice/managenotice.php';
@@ -63,18 +64,18 @@ if (empty($noticeid)) {
             helper::enable_notice($noticeid);
             redirect(new moodle_url($managenoticepage));
             break;
-        case 'edit':
+        case 'view':
             $notice = helper::retrieve_notice($noticeid);
             $notice->noticeid = $noticeid;
             $mform = new notice_form(null, ['readonly' => true]);
             $mform->set_data($notice);
             echo $OUTPUT->header();
+            echo $OUTPUT->heading(get_string('notice:view', 'local_sitenotice'));
             $mform->display();
             echo $OUTPUT->footer();
             break;
         default:
             redirect(new moodle_url($managenoticepage));
-
     }
 }
 

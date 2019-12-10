@@ -50,15 +50,15 @@ $table->head = array(
     get_string('actions'),
 );
 
-$notices = helper::retrieve_notices('enabled DESC, timemodified DESC');
+$notices = helper::retrieve_all_notices('enabled DESC, timemodified DESC');
 foreach ($notices as $notice) {
     $row = array();
     $row[] = $notice->title;
     $links = null;
     // View/Edit.
-    $editparams = ['noticeid' => $notice->id, 'action' => 'edit', 'sesskey' => sesskey()];
+    $editparams = ['noticeid' => $notice->id, 'action' => 'view', 'sesskey' => sesskey()];
     $editurl = new moodle_url($editnotice, $editparams);
-    $icon = $OUTPUT->pix_icon('t/edit', get_string('edit'));
+    $icon = $OUTPUT->pix_icon('t/edit', get_string('view'));
     $editlink = html_writer::link($editurl, $icon);
     $links .= ' ' . $editlink;
 

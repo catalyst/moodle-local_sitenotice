@@ -16,7 +16,7 @@
 
 /**
  *
- * @package package
+ * @package local_sitenotice
  * @author  Nathan Nguyen <nathannguyen@catalyst-au.net>
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -24,10 +24,23 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use local_sitenotice\helper;
+
+
 function dismiss_notice_handler($eventdata) {
 
 }
 
 function acknowledge_notice_handler($eventdata) {
 
+}
+
+function local_sitenotice_extend_navigation(global_navigation $navigation) {
+    global $CFG, $USER, $PAGE;
+    $usernotices = helper::retrieve_user_notices($USER->id);
+
+    if (!empty($usernotices)) {
+        $PAGE->requires->css('/local/sitenotice/styles.css');
+        $PAGE->requires->js_call_amd('local_sitenotice/notice', 'init', array(json_encode($usernotices)));
+    }
 }

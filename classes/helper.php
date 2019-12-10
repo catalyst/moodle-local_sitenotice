@@ -54,9 +54,22 @@ class helper {
         return $DB->get_record('local_sitenotice', ['id' => $noticeid]);
     }
 
-    public static function retrieve_notices($sort = '') {
+    public static function retrieve_all_notices($sort = '') {
         global $DB;
         return $DB->get_records('local_sitenotice', null, $sort);
+    }
+
+    public static function retrieve_enabled_notices($sort = '') {
+        global $DB;
+        return $DB->get_records('local_sitenotice', ['enabled' => 1], $sort);
+    }
+
+    public static function retrieve_user_notices($userid) {
+        $notices = self::retrieve_enabled_notices();
+        // Todo: check ack
+
+        return $notices;
+
     }
 
     public static function disable_notice($noticeid) {
