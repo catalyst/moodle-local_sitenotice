@@ -16,7 +16,7 @@
 
 /**
  *
- * @package package
+ * @package local_sitenotice
  * @author  Nathan Nguyen <nathannguyen@catalyst-au.net>
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -28,3 +28,14 @@ $string['pluginname'] = 'Site Notice';
 
 // Settings.
 $string['setting:managenotice'] = 'Manage Notice';
+
+// Notice Management.
+$string['notice:title'] = 'Title';
+$string['notice:content'] = 'Content';
+$string['notice:audience'] = 'Audience';
+$string['notice:enable'] = 'Enable notice';
+$string['notice:reqack'] = 'Requires Acknowledgement';
+$string['notice:disable'] = 'Disable notice';
+$string['notice:create'] = 'Create new notice';
+$string['notice:view'] = 'View notice';
+$string['notice:report'] = 'View report';

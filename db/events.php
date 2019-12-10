@@ -25,6 +25,21 @@
 defined('MOODLE_INTERNAL') || die();
 
 $handlers = array (
+
+    'create_notice' => array (
+        'handlerfile'      => '/local/sitenotice/lib.php',
+        'handlerfunction'  => 'create_notice_handler',
+        'schedule'         => 'instant',
+        'internal'         => 1,
+    ),
+
+    'change_notice' => array (
+        'handlerfile'      => '/local/sitenotice/lib.php',
+        'handlerfunction'  => 'change_notice_handler',
+        'schedule'         => 'instant',
+        'internal'         => 1,
+    ),
+
     'dismiss_notice' => array (
         'handlerfile'      => '/local/sitenotice/lib.php',
         'handlerfunction'  => 'dismiss_notice_handler',
