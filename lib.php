@@ -37,10 +37,16 @@ function acknowledge_notice_handler($eventdata) {
 
 function local_sitenotice_extend_navigation(global_navigation $navigation) {
     global $CFG, $USER, $PAGE;
+
+    if (!isset($USER)) {
+        return;
+    }
+
     $usernotices = helper::retrieve_user_notices($USER->id);
 
     if (!empty($usernotices)) {
+        $USER->sitenotices = array_keys($usernotices);
         $PAGE->requires->css('/local/sitenotice/styles.css');
-        $PAGE->requires->js_call_amd('local_sitenotice/notice', 'init', array(json_encode($usernotices)));
+        $PAGE->requires->js_call_amd('local_sitenotice/notice', 'init', array(json_encode($usernotices), $USER->id));
     }
 }

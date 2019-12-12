@@ -22,20 +22,24 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+$functions = array(
+    'local_sitenotice_dismiss' => array(
+        'classname' => 'local_sitenotice_external',
+        'methodname' => 'dismiss_notice',
+        'classpath' => 'local/sitenotice/classes/external.php',
+        'description' => 'Dismiss a notice',
+        'type' => 'write',
+        'loginrequired' => true,
+        'ajax' => true,
+    ),
 
-$string['pluginname'] = 'Site Notice';
-
-// Settings.
-$string['setting:managenotice'] = 'Manage Notice';
-
-// Notice Management.
-$string['notice:title'] = 'Title';
-$string['notice:content'] = 'Content';
-$string['notice:audience'] = 'Audience';
-$string['notice:enable'] = 'Enable notice';
-$string['notice:reqack'] = 'Requires Acknowledgement';
-$string['notice:disable'] = 'Disable notice';
-$string['notice:create'] = 'Create new notice';
-$string['notice:view'] = 'View notice';
-$string['notice:report'] = 'View report';
+    'local_sitenotice_acknowledge' => array(
+        'classname' => 'local_sitenotice_external',
+        'methodname' => 'acknowledge_notice',
+        'classpath' => 'local/sitenotice/classes/external.php',
+        'description' => 'Acknowledge a notice',
+        'type' => 'write',
+        'loginrequired' => true,
+        'ajax' => true,
+    ),
+);

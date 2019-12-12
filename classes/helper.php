@@ -23,6 +23,8 @@
  */
 namespace local_sitenotice;
 
+use core_competency\url;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/cohort/lib.php');
@@ -65,11 +67,15 @@ class helper {
     }
 
     public static function retrieve_user_notices($userid) {
+        global $USER;
+        if (!$userid) {
+            return [];
+        }
         $notices = self::retrieve_enabled_notices();
-        // Todo: check ack
-
+        if (isset($USER->viewednotices)) {
+            $notices = array_diff_key($notices, $USER->viewednotices);
+        }
         return $notices;
-
     }
 
     public static function disable_notice($noticeid) {
@@ -95,5 +101,33 @@ class helper {
             $option[$cohort->id] = $cohort->name;
         }
         return $option;
+    }
+
+    public static function dismiss_notice($noticeid) {
+        global $USER;
+        $USER->viewednotices[$noticeid] = $noticeid;
+
+        $result = array();
+
+        $notice = self::retrieve_notice($noticeid);
+        if ($notice && $notice->reqack) {
+            require_logout();
+            $loginpage = new \moodle_url("/login/index.php");
+            $result['redirecturl'] = $loginpage->out();
+        }
+        // TODO: Log dismiss event.
+
+        $result['status'] = true;
+        return $result;
+    }
+
+    public static function acknowledge_notice($noticeid) {
+        global $USER;
+        $USER->viewednotices[$noticeid] = $noticeid;
+        // TODO: ACK DB
+        // TODO: Log ack event.
+        $result = array();
+        $result['status'] = true;
+        return $result;
     }
 }

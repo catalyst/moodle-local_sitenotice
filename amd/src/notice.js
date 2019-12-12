@@ -9,80 +9,116 @@
 define(
     ['jquery', 'core/ajax'],
     function ($, ajax) {
-
         var notice = {};
         var notices = {};
+        var viewednotices = [];
 
-        function first(p) {
-            for (let i in p) {
-                return p[i];
+        function getNotice() {
+            for (var i in notices) {
+                if (!viewednotices.includes(i)) {
+                    viewednotices.push(i);
+                    return notices[i];
+                }
             }
-        };
+            return false;
+        }
 
-        function buildModal(notices) {
-            var modal = document.createElement("DIV");
-            var modalcontent = document.createElement("DIV");
-            var modalcontentheadder = document.createElement("DIV");
-            var modalcontentbody = document.createElement("DIV");
-            var modalcontentfooter = document.createElement("DIV");
-            var closebutton = document.createElement("BUTTON");
-            var ackbutton = document.createElement("BUTTON");
-            var paragraph = document.createElement("p");
+        function buildModal(userid) {
+            var notice = getNotice();
 
-            modal.setAttribute("id", "sitenotice-modal");
+            if (notice == false) {
+                return false;
+            }
 
-            modalcontent.setAttribute("id", "sitenotice-modal-content");
-            modalcontentheadder.setAttribute("id", "sitenotice-modal-content-header");
-            modalcontentbody.setAttribute("id", "sitenotice-modal-content-body");
-            modalcontentfooter.setAttribute("id", "sitenotice-modal-content-footer");
+            var $modal = $("<div>", {id: "sitenotice-modal", "tabindex": "0"});
+            var $content = $("<div>", {id: "sitenotice-modal-content"});
+            var $header = $("<div>", {id: "sitenotice-modal-content-header"});
+            var $body = $("<div>", {id: "sitenotice-modal-content-body"});
+            var $footer = $("<div>", {id: "sitenotice-modal-content-footer"});
 
-            closebutton.innerHTML = "Close";
-            ackbutton.innerHTML = "I acknowledge";
-            closebutton.setAttribute("id", "sitenotice-modal-content-footer-closebutton");
-            ackbutton.setAttribute("id", "sitenotice-modal-content-footer-ackbutton");
+            var $closebutton = $("<button>", {id: "sitenotice-modal-content-footer-closebutton"});
+            var $ackbutton = $("<button>", {id: "sitenotice-modal-content-footer-ackbutton"});
+            var $paragraph = $("<p>");
 
-            modalcontentheadder.innerHTML = "<h2>" + notices.title + "</h2>";
-            modalcontentbody.innerHTML = notices.content;
+            $modal.attr("data-noticeid", notice.id);
+            $modal.attr("data-userid", userid);
+            $header.html("<h2>" + notice.title + "</h2>");
+            $body.html(notice.content);
 
-            paragraph.appendChild(closebutton);
-            paragraph.appendChild(ackbutton);
-            modalcontentfooter.appendChild(paragraph);
+            $closebutton.html('Close');
+            $ackbutton.html('I acknowledge');
+            $paragraph.append($closebutton);
+            $paragraph.append($ackbutton);
+            $footer.append($paragraph);
 
-            modalcontent.appendChild(modalcontentheadder);
-            modalcontent.appendChild(modalcontentbody);
-            modalcontent.appendChild(modalcontentfooter);
+            $content.append($header);
+            $content.append($body);
+            $content.append($footer);
 
-            modal.appendChild(modalcontent);
-            document.getElementsByTagName("BODY")[0].appendChild(modal);
+            $modal.append($content);
+            $("body").append($modal);
 
             $('body').on('click', '#sitenotice-modal-content-footer-closebutton', function() {
-                modal.style.display = "none";
-                dismissNotice();
+                var noticeid = $("#sitenotice-modal").attr('data-noticeid');
+                dismissNotice(noticeid);
+                nextNotice();
             });
 
             $('body').on('click', '#sitenotice-modal-content-footer-ackbutton', function() {
-                modal.style.display = "none";
-            });
-        };
-
-        function dismissNotice() {
-            var promises = ajax.call([
-                { methodname: 'core_get_string', args: { component: 'local_sitenotice', stringid: 'pluginname' } }
-            ]);
-
-            promises[0].done(function(response) {
-                console.log('Test: ' + response);
-            }).fail(function(ex) {
-
+                var noticeid = $("#sitenotice-modal").attr('data-noticeid');
+                acknowledgeNotice(noticeid);
+                nextNotice();
             });
         }
 
-        notice.init = function(data) {
-            notices = JSON.parse(data);
-            buildModal(first(notices));
+        function nextNotice() {
+            $("#sitenotice-modal").fadeOut("slow", function() {
+                var notice = getNotice();
+                if (notice != false) {
+                    $("#sitenotice-modal").attr("data-noticeid", notice.id);
+                    $("#sitenotice-modal-content-header").html("<h2>" + notice.title + "</h2>");
+                    $("#sitenotice-modal-content-body").html(notice.content);
+                    $("#sitenotice-modal").fadeIn("slow");
+                }
+            });
+        }
+
+        function dismissNotice(noticeid) {
+            var promises = ajax.call([
+                { methodname: 'local_sitenotice_dismiss', args: { noticeid: noticeid} }
+            ]);
+
+            promises[0].done(function(response) {
+                if(response.redirecturl) {
+                    window.open(response.redirecturl,"_parent", "");
+                }
+            }).fail(function(ex) {
+                // TODO: Log fail event.
+                this.console.log(ex);
+            });
+        }
+
+        function acknowledgeNotice(noticeid) {
+            var promises = ajax.call([
+                { methodname: 'local_sitenotice_acknowledge', args: { noticeid: noticeid} }
+            ]);
+
+            promises[0].done(function(response) {
+                if(response.redirecturl) {
+                    window.open(response.redirecturl,"_parent", "");
+                }
+            }).fail(function(ex) {
+                // TODO: Log fail event.
+                this.console.log(ex);
+            });
+        }
+
+        notice.init = function(jsnotices, userid) {
+            notices = JSON.parse(jsnotices);
+            buildModal(userid);
             $(document).ready(function() {
-                var modal = document.getElementById("sitenotice-modal");
-                modal.style.display = "block";
+                $("#sitenotice-modal").fadeIn("slow");
+                $("#sitenotice-modal").focus();
             });
         };
 
