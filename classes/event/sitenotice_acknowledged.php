@@ -35,7 +35,7 @@ class sitenotice_acknowledged extends \core\event\base {
     }
 
     public function get_description() {
-        return "The user with id '$this->relateduserid' acknowledge the notice of id '$this->objectid'";
+        return "The user with id '$this->relateduserid' acknowledged the notice with id '$this->objectid'";
     }
 
     public static function get_name() {

@@ -35,7 +35,7 @@ class sitenotice_created extends \core\event\base {
     }
 
     public function get_description() {
-        return "The user with id '$this->relateduserid' create the notice of id '$this->objectid'";
+        return "The user with id '$this->relateduserid' created the notice with id '$this->objectid'";
     }
 
     public static function get_name() {

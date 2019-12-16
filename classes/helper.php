@@ -32,7 +32,7 @@ require_once($CFG->dirroot.'/cohort/lib.php');
 class helper {
 
     public static function create_new_notice($data) {
-        global $DB;
+        global $DB, $USER;
         $data->timecreated = time();
         $data->timemodified = time();
         $transaction = $DB->start_delegated_transaction();
@@ -49,7 +49,17 @@ class helper {
                 $node->setAttribute('data-linkid', $linkid);
             }
             $content = $dom->saveHTML();
-            $DB->set_field('local_sitenotice', 'content', $content, ['id' => $noticeid]);
+            $result = $DB->set_field('local_sitenotice', 'content', $content, ['id' => $noticeid]);
+            if ($result) {
+                // Log created event.
+                $params = array(
+                    'context' => \context_system::instance(),
+                    'objectid' => $noticeid,
+                    'relateduserid' => $USER->id,
+                );
+                $event = \local_sitenotice\event\sitenotice_created::create($params);
+                $event->trigger();
+            }
         }
         $transaction->allow_commit();
     }
@@ -81,20 +91,24 @@ class helper {
         return $notices;
     }
 
-    public static function disable_notice($noticeid) {
-        global $DB;
+    public static function toogle_notice($noticeid, $enabled) {
+        global $DB, $USER;
         $notice = self::retrieve_notice($noticeid);
-        $notice->enabled = 0;
+        $notice->enabled = $enabled;
         $notice->timemodified = time();
-        return $DB->update_record('local_sitenotice', $notice);
-    }
-
-    public static function enable_notice($noticeid) {
-        global $DB;
-        $notice = self::retrieve_notice($noticeid);
-        $notice->enabled = 1;
-        $notice->timemodified = time();
-        return $DB->update_record('local_sitenotice', $notice);
+        $result = $DB->update_record('local_sitenotice', $notice);
+        if ($result) {
+            // Log disabled event.
+            $params = array(
+                'context' => \context_system::instance(),
+                'objectid' => $noticeid,
+                'relateduserid' => $USER->id,
+                'other' => array('action' => $enabled ? 'enabled' : 'disabled'),
+            );
+            $event = \local_sitenotice\event\sitenotice_updated::create($params);
+            $event->trigger();
+        }
+        return $result;
     }
 
     public static function built_audience_option() {
@@ -115,7 +129,7 @@ class helper {
             $loginpage = new \moodle_url("/login/index.php");
             $result['redirecturl'] = $loginpage->out();
         }
-        // Log dismiss event.
+        // Log dismissed event.
         $params = array(
             'context' => \context_system::instance(),
             'objectid' => $noticeid,
@@ -132,6 +146,16 @@ class helper {
     public static function acknowledge_notice($noticeid) {
         global $USER, $DB;
         $USER->viewednotices[$noticeid] = $noticeid;
+
+        // Log acknowledged event.
+        $params = array(
+            'context' => \context_system::instance(),
+            'objectid' => $noticeid,
+            'relateduserid' => $USER->id,
+        );
+        $event = \local_sitenotice\event\sitenotice_acknowledged::create($params);
+        $event->trigger();
+
         // Acknowledgement Record.
         $notice = self::retrieve_notice($noticeid);
         $record = new \stdClass();
@@ -145,7 +169,6 @@ class helper {
         $record->timecreated = time();
         $DB->insert_record('local_sitenotice_ack', $record);
 
-        // TODO: Log ack event.
         $result = array();
         $result['status'] = true;
         return $result;
@@ -169,5 +192,4 @@ class helper {
         $result['status'] = true;
         return $result;
     }
-
 }

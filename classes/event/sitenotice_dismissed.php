@@ -35,7 +35,7 @@ class sitenotice_dismissed extends \core\event\base {
     }
 
     public function get_description() {
-        return "The user with id '$this->relateduserid' dismiss the notice of id '$this->objectid'";
+        return "The user with id '$this->relateduserid' dismissed the notice with id '$this->objectid'";
     }
 
     public static function get_name() {

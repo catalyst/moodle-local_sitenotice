@@ -57,11 +57,11 @@ if (empty($noticeid)) {
 } else {
     switch ($action) {
         case 'disable':
-            helper::disable_notice($noticeid);
+            helper::toogle_notice($noticeid, 0);
             redirect(new moodle_url($managenoticepage));
             break;
         case 'enable':
-            helper::enable_notice($noticeid);
+            helper::toogle_notice($noticeid, 1);
             redirect(new moodle_url($managenoticepage));
             break;
         case 'view':
