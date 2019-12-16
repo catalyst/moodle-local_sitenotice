@@ -58,17 +58,23 @@ define(
             $modal.append($content);
             $("body").append($modal);
 
-            $('body').on('click', '#sitenotice-modal-content-footer-closebutton', function() {
+            $modal.on('click', '#sitenotice-modal-content-footer-closebutton', function() {
                 var noticeid = $("#sitenotice-modal").attr('data-noticeid');
                 dismissNotice(noticeid);
                 nextNotice();
             });
 
-            $('body').on('click', '#sitenotice-modal-content-footer-ackbutton', function() {
+            $modal.on('click', '#sitenotice-modal-content-footer-ackbutton', function() {
                 var noticeid = $("#sitenotice-modal").attr('data-noticeid');
                 acknowledgeNotice(noticeid);
                 nextNotice();
             });
+
+            $modal.on('click', 'a', function() {
+                var linkid = $(this).attr("data-linkid");
+                trackLink(linkid);
+            });
+
         }
 
         function nextNotice() {
@@ -109,6 +115,20 @@ define(
                 }
             }).fail(function(ex) {
                 // TODO: Log fail event.
+                this.console.log(ex);
+            });
+        }
+
+        function trackLink(linkid) {
+            var promises = ajax.call([
+                { methodname: 'local_sitenotice_tracklink', args: {linkid: linkid} }
+            ]);
+
+            promises[0].done(function(response) {
+                if(response.redirecturl) {
+                    window.open(response.redirecturl,"_parent", "");
+                }
+            }).fail(function(ex) {
                 this.console.log(ex);
             });
         }

@@ -45,8 +45,11 @@ class helper {
                 $link->noticeid = $noticeid;
                 $link->text = trim($node->nodeValue);
                 $link->link = trim($node->getAttribute("href"));
-                $DB->insert_record('local_sitenotice_hlinks', $link);
+                $linkid = $DB->insert_record('local_sitenotice_hlinks', $link);
+                $node->setAttribute('data-linkid', $linkid);
             }
+            $content = $dom->saveHTML();
+            $DB->set_field('local_sitenotice', 'content', $content, ['id' => $noticeid]);
         }
         $transaction->allow_commit();
     }
@@ -130,4 +133,24 @@ class helper {
         $result['status'] = true;
         return $result;
     }
+
+    public static function track_link($linkid) {
+        global $DB, $USER;
+        $record = $DB->get_record('local_sitenotice_hlinks_his', [ 'userid' => $USER->id, 'hlinkid' => $linkid]);
+        if (empty($record)) {
+            $record = new \stdClass();
+            $record->hlinkid = $linkid;
+            $record->userid = $USER->id;
+            $record->timeclicked = 1;
+            $DB->insert_record('local_sitenotice_hlinks_his', $record);
+        } else {
+            $record->timeclicked += 1;
+            $DB->update_record('local_sitenotice_hlinks_his', $record);
+        }
+
+        $result = array();
+        $result['status'] = true;
+        return $result;
+    }
+
 }

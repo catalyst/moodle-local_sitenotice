@@ -74,4 +74,27 @@ class local_sitenotice_external extends external_api {
             )
         );
     }
+
+    public static function track_link_parameters() {
+        return new external_function_parameters (
+            array(
+                'linkid' => new external_value(PARAM_INT, 'link id', VALUE_REQUIRED),
+            )
+        );
+    }
+
+    public static function track_link($linkid) {
+        $params = self::validate_parameters(self::track_link_parameters(),
+            array('linkid' => $linkid,));
+        return helper::track_link($params['linkid']);
+    }
+
+    public static function track_link_returns() {
+        return new external_single_structure(
+            array(
+                'status' => new external_value(PARAM_BOOL, 'status: true if success', VALUE_DEFAULT, "0"),
+                'redirecturl' => new external_value(PARAM_TEXT, 'redirect url', VALUE_DEFAULT, ""),
+            )
+        );
+    }
 }

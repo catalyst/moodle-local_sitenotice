@@ -42,4 +42,14 @@ $functions = array(
         'loginrequired' => true,
         'ajax' => true,
     ),
+
+    'local_sitenotice_tracklink' => array(
+        'classname' => 'local_sitenotice_external',
+        'methodname' => 'track_link',
+        'classpath' => 'local/sitenotice/classes/external.php',
+        'description' => 'Record link clicks',
+        'type' => 'write',
+        'loginrequired' => true,
+        'ajax' => true,
+    ),
 );
