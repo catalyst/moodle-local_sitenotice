@@ -16,28 +16,33 @@
 
 /**
  *
- * @package local_sitenotice
+ * @package package
  * @author  Nathan Nguyen <nathannguyen@catalyst-au.net>
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_sitenotice\event;
+
 defined('MOODLE_INTERNAL') || die();
 
-use local_sitenotice\helper;
+class sitenotice_created extends \core\event\base {
 
-function local_sitenotice_extend_navigation(global_navigation $navigation) {
-    global $CFG, $USER, $PAGE;
-
-    if (!isset($USER)) {
-        return;
+    protected function init() {
+        $this->data['objecttable'] = 'sitenotice';
+        $this->data['crud'] = 'u';
+        $this->data['edulevel'] = self::LEVEL_OTHER;
     }
 
-    $usernotices = helper::retrieve_user_notices($USER->id);
+    public function get_description() {
+        return "The user with id '$this->relateduserid' create the notice of id '$this->objectid'";
+    }
 
-    if (!empty($usernotices)) {
-        $USER->sitenotices = array_keys($usernotices);
-        $PAGE->requires->css('/local/sitenotice/styles.css');
-        $PAGE->requires->js_call_amd('local_sitenotice/notice', 'init', array(json_encode($usernotices), $USER->id));
+    public static function get_name() {
+        return get_string('event:create', 'local_sitenotice');
+    }
+
+    public function get_url() {
+        return new \moodle_url('/local/sitenotice/editnotice.php', array('noticeid' => $this->objectid, 'action' => 'view', 'sesskey' => sesskey()));
     }
 }

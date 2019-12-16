@@ -39,3 +39,9 @@ $string['notice:disable'] = 'Disable notice';
 $string['notice:create'] = 'Create new notice';
 $string['notice:view'] = 'View notice';
 $string['notice:report'] = 'View report';
+
+// Event.
+$string['event:dismiss'] = 'Notice dismission';
+$string['event:acknowledgement'] = 'Notice acknowledgement';
+$string['event:create'] = 'Notice creation';
+$string['event:update'] = 'Notice update';

@@ -118,7 +118,14 @@ class helper {
             $loginpage = new \moodle_url("/login/index.php");
             $result['redirecturl'] = $loginpage->out();
         }
-        // TODO: Log dismiss event.
+        // Log dismiss event.
+        $params = array(
+            'context' => \context_system::instance(),
+            'objectid' => $noticeid,
+            'relateduserid' => $USER->id,
+        );
+        $event = \local_sitenotice\event\sitenotice_dismissed::create($params);
+        $event->trigger();
 
         $result['status'] = true;
         return $result;

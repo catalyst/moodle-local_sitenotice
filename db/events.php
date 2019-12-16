@@ -24,33 +24,24 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$handlers = array (
-
-    'create_notice' => array (
-        'handlerfile'      => '/local/sitenotice/lib.php',
-        'handlerfunction'  => 'create_notice_handler',
-        'schedule'         => 'instant',
-        'internal'         => 1,
+$observers = array (
+    array(
+        'eventname'   => '\local_sitenotice\event\sitenotice_created',
+        'callback'    => '\local_sitenotice\eventobservers::sitenotice_created',
     ),
 
-    'change_notice' => array (
-        'handlerfile'      => '/local/sitenotice/lib.php',
-        'handlerfunction'  => 'change_notice_handler',
-        'schedule'         => 'instant',
-        'internal'         => 1,
+    array(
+        'eventname'   => '\local_sitenotice\event\sitenotice_updated',
+        'callback'    => '\local_sitenotice\eventobservers::sitenotice_updated',
     ),
 
-    'dismiss_notice' => array (
-        'handlerfile'      => '/local/sitenotice/lib.php',
-        'handlerfunction'  => 'dismiss_notice_handler',
-        'schedule'         => 'instant',
-        'internal'         => 1,
+    array(
+        'eventname'   => '\local_sitenotice\event\sitenotice_dismissed',
+        'callback'    => '\local_sitenotice\eventobservers::sitenotice_dismissed',
     ),
 
-    'acknowledge_notice' => array (
-        'handlerfile'      => '/local/sitenotice/lib.php',
-        'handlerfunction'  => 'acknowledge_notice_handler',
-        'schedule'         => 'instant',
-        'internal'         => 1,
+    array(
+        'eventname'   => '\local_sitenotice\event\sitenotice_acknowledged',
+        'callback'    => '\local_sitenotice\eventobservers::sitenotice_acknowledged',
     ),
 );
