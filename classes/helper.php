@@ -125,9 +125,21 @@ class helper {
     }
 
     public static function acknowledge_notice($noticeid) {
-        global $USER;
+        global $USER, $DB;
         $USER->viewednotices[$noticeid] = $noticeid;
-        // TODO: ACK DB
+        // Acknowledgement Record.
+        $notice = self::retrieve_notice($noticeid);
+        $record = new \stdClass();
+        $record->userid = $USER->id;
+        $record->username = $USER->username;
+        $record->firstname = $USER->firstname;
+        $record->lastname = $USER->lastname;
+        $record->idnumber = $USER->idnumber;
+        $record->noticeid = $noticeid;
+        $record->noticetitle = $notice->title;
+        $record->timecreated = time();
+        $DB->insert_record('local_sitenotice_ack', $record);
+
         // TODO: Log ack event.
         $result = array();
         $result['status'] = true;
