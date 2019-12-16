@@ -109,9 +109,6 @@ class helper {
     public static function dismiss_notice($noticeid) {
         global $USER;
         $USER->viewednotices[$noticeid] = $noticeid;
-
-        $result = array();
-
         $notice = self::retrieve_notice($noticeid);
         if ($notice && $notice->reqack) {
             require_logout();
@@ -127,6 +124,7 @@ class helper {
         $event = \local_sitenotice\event\sitenotice_dismissed::create($params);
         $event->trigger();
 
+        $result = array();
         $result['status'] = true;
         return $result;
     }
