@@ -27,9 +27,9 @@ defined('MOODLE_INTERNAL') || die();
 use local_sitenotice\helper;
 
 function local_sitenotice_extend_navigation(global_navigation $navigation) {
-    global $CFG, $USER, $PAGE;
+    global $USER, $PAGE;
 
-    if (!isset($USER)) {
+    if (!get_config('local_sitenotice', 'enabled')) {
         return;
     }
 

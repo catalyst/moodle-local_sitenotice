@@ -27,7 +27,10 @@ defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'Site Notice';
 
 // Settings.
+$string['setting:settings'] = 'Settings';
 $string['setting:managenotice'] = 'Manage Notice';
+$string['setting:enabled'] = 'Enabled';
+$string['setting:enableddesc'] = 'Enable site notice';
 
 // Notice Management.
 $string['notice:title'] = 'Title';
