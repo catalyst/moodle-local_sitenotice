@@ -68,9 +68,25 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="hlinkid" TYPE="foreign" FIELDS="hlinkid" REFTABLE="local_sitenotice_hlinks" REFFIELDS="id"/>
-        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="user_hlink_uq" UNIQUE="true" FIELDS="userid, hlinkid"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="local_sitenotice_lastview" COMMENT="Track user viewed notices">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="noticeid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of the notice"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User ID"/>
+        <FIELD NAME="timeviewed" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp of the latest view"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="user_notice_uq" UNIQUE="true" FIELDS="userid, noticeid"/>
+      </INDEXES>
     </TABLE>
 
   </TABLES>

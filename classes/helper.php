@@ -23,8 +23,6 @@
  */
 namespace local_sitenotice;
 
-use core_competency\url;
-
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/cohort/lib.php');
@@ -79,18 +77,6 @@ class helper {
         return $DB->get_records('local_sitenotice', ['enabled' => 1], $sort);
     }
 
-    public static function retrieve_user_notices($userid) {
-        global $USER;
-        if (!$userid) {
-            return [];
-        }
-        $notices = self::retrieve_enabled_notices();
-        if (isset($USER->viewednotices)) {
-            $notices = array_diff_key($notices, $USER->viewednotices);
-        }
-        return $notices;
-    }
-
     public static function reset_notice($noticeid, $enabled = null) {
         global $DB, $USER;
         $notice = self::retrieve_notice($noticeid);
@@ -124,15 +110,60 @@ class helper {
         return $option;
     }
 
+    public static function retrieve_user_notices($userid) {
+        global $USER, $DB;
+        if (!$userid) {
+            return [];
+        }
+        $notices = self::retrieve_enabled_notices();
+        if (!isset($USER->viewednotices)) {
+            list($insql, $inparams) = $DB->get_in_or_equal(array_keys($notices), SQL_PARAMS_NAMED);
+            $sql = "SELECT sn.id 
+                      FROM {local_sitenotice} sn
+                      JOIN {local_sitenotice_lastview} lv
+                        ON sn.id = lv.noticeid
+                     WHERE lv.timeviewed > sn.timemodified
+                       AND lv.userid = :userid
+                       AND lv.noticeid $insql";
+            $params = array_merge($inparams, ['userid' => $USER->id]);
+            $records = $DB->get_records_sql($sql, $params);
+            if (empty($records)) {
+                $USER->viewednotices = [];
+            } else {
+                $USER->viewednotices = $records;
+            }
+        }
+        $notices = array_diff_key($notices, $USER->viewednotices);
+        return $notices;
+    }
+
+    public static function update_viewed_noticed($noticeid) {
+        global $USER, $DB;
+        // Update viewed notices.
+        $currenttime = time();
+        $USER->viewednotices[$noticeid] = $currenttime;
+        $record = $DB->get_record('local_sitenotice_lastview', ['userid' => $USER->id, 'noticeid' => $noticeid]);
+        if (!$record) {
+            $record = new \stdClass();
+            $record->noticeid = $noticeid;
+            $record->userid = $USER->id;
+            $record->timeviewed = $currenttime;
+            $DB->insert_record('local_sitenotice_lastview', $record);
+        } else {
+            $record->timeviewed = $currenttime;
+            $DB->update_record('local_sitenotice_lastview', $record);
+        }
+    }
+
     public static function dismiss_notice($noticeid) {
         global $USER;
-        $USER->viewednotices[$noticeid] = time();
         $notice = self::retrieve_notice($noticeid);
         if ($notice && $notice->reqack) {
             require_logout();
             $loginpage = new \moodle_url("/login/index.php");
             $result['redirecturl'] = $loginpage->out();
         }
+
         // Log dismissed event.
         $params = array(
             'context' => \context_system::instance(),
@@ -149,16 +180,6 @@ class helper {
 
     public static function acknowledge_notice($noticeid) {
         global $USER, $DB;
-        $USER->viewednotices[$noticeid] = time();
-
-        // Log acknowledged event.
-        $params = array(
-            'context' => \context_system::instance(),
-            'objectid' => $noticeid,
-            'relateduserid' => $USER->id,
-        );
-        $event = \local_sitenotice\event\sitenotice_acknowledged::create($params);
-        $event->trigger();
 
         // Acknowledgement Record.
         $notice = self::retrieve_notice($noticeid);
@@ -171,7 +192,18 @@ class helper {
         $record->noticeid = $noticeid;
         $record->noticetitle = $notice->title;
         $record->timecreated = time();
-        $DB->insert_record('local_sitenotice_ack', $record);
+        $result = $DB->insert_record('local_sitenotice_ack', $record);
+
+        if ($result) {
+            // Log acknowledged event.
+            $params = array(
+                'context' => \context_system::instance(),
+                'objectid' => $noticeid,
+                'relateduserid' => $USER->id,
+            );
+            $event = \local_sitenotice\event\sitenotice_acknowledged::create($params);
+            $event->trigger();
+        }
 
         $result = array();
         $result['status'] = true;
@@ -185,10 +217,10 @@ class helper {
             $record = new \stdClass();
             $record->hlinkid = $linkid;
             $record->userid = $USER->id;
-            $record->timeclicked = 1;
+            $record->timeclicked = time();
             $DB->insert_record('local_sitenotice_hlinks_his', $record);
         } else {
-            $record->timeclicked += 1;
+            $record->timeclicked = time();
             $DB->update_record('local_sitenotice_hlinks_his', $record);
         }
 
