@@ -29,7 +29,7 @@ use local_sitenotice\helper;
 function local_sitenotice_extend_navigation(global_navigation $navigation) {
     global $USER, $PAGE;
 
-    if (!get_config('local_sitenotice', 'enabled')) {
+    if (!isloggedin() || !get_config('local_sitenotice', 'enabled')) {
         return;
     }
 

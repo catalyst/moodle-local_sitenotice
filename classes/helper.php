@@ -126,7 +126,7 @@ class helper {
 
     public static function dismiss_notice($noticeid) {
         global $USER;
-        $USER->viewednotices[$noticeid] = $noticeid;
+        $USER->viewednotices[$noticeid] = time();
         $notice = self::retrieve_notice($noticeid);
         if ($notice && $notice->reqack) {
             require_logout();
@@ -149,7 +149,7 @@ class helper {
 
     public static function acknowledge_notice($noticeid) {
         global $USER, $DB;
-        $USER->viewednotices[$noticeid] = $noticeid;
+        $USER->viewednotices[$noticeid] = time();
 
         // Log acknowledged event.
         $params = array(

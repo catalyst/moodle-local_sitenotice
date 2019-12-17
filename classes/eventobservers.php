@@ -22,22 +22,29 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_sitenotice;
+
 defined('MOODLE_INTERNAL') || die();
 
 class eventobservers {
     public static function sitenotice_created(\local_sitenotice\event\sitenotice_created $event) {
-
+        global $DB, $USER;
+        $tmp = $USER;
     }
 
     public static function sitenotice_updated(\local_sitenotice\event\sitenotice_updated $event) {
+        global $DB, $USER;
+        $tmp = $USER;
 
     }
 
     public static function sitenotice_dismissed(\local_sitenotice\event\sitenotice_dismissed $event) {
-
+        global $DB, $USER;
+        $tmp = $USER;
     }
 
     public static function sitenotice_acknowledged(\local_sitenotice\event\sitenotice_acknowledged $event) {
-
+        global $DB, $USER;
+        $tmp = $USER;
     }
 }
