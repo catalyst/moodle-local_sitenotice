@@ -74,7 +74,13 @@ foreach ($notices as $notice) {
         $icon = $OUTPUT->pix_icon('t/show', get_string('notice:enable', 'local_sitenotice'));
         $editlink = html_writer::link($editurl, $icon);
     }
+    $links .= ' ' . $editlink;
 
+    // Reset.
+    $editparams = ['noticeid' => $notice->id, 'action' => 'reset', 'sesskey' => sesskey()];
+    $editurl = new moodle_url($editnotice, $editparams);
+    $icon = $OUTPUT->pix_icon('t/reset', get_string('notice:reset', 'local_sitenotice'));
+    $editlink = html_writer::link($editurl, $icon);
     $links .= ' ' . $editlink;
 
     // Report.

@@ -91,19 +91,23 @@ class helper {
         return $notices;
     }
 
-    public static function toogle_notice($noticeid, $enabled) {
+    public static function reset_notice($noticeid, $enabled = null) {
         global $DB, $USER;
         $notice = self::retrieve_notice($noticeid);
-        $notice->enabled = $enabled;
+        $action = 'reset';
+        if (isset($enabled)) {
+            $notice->enabled = $enabled;
+            $action = $enabled ? 'enabled' : 'disabled';
+        }
         $notice->timemodified = time();
         $result = $DB->update_record('local_sitenotice', $notice);
         if ($result) {
-            // Log disabled event.
+            // Log event.
             $params = array(
                 'context' => \context_system::instance(),
                 'objectid' => $noticeid,
                 'relateduserid' => $USER->id,
-                'other' => array('action' => $enabled ? 'enabled' : 'disabled'),
+                'other' => array('action' => $action),
             );
             $event = \local_sitenotice\event\sitenotice_updated::create($params);
             $event->trigger();
