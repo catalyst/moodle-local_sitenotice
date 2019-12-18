@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 class sitenotice_dismissed extends \core\event\base {
 
     protected function init() {
-        $this->data['objecttable'] = 'sitenotice';
+        $this->data['objecttable'] = 'local_sitenotice';
         $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }

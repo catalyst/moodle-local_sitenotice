@@ -117,24 +117,28 @@ class helper {
         }
         $notices = self::retrieve_enabled_notices();
         if (!isset($USER->viewednotices)) {
-            list($insql, $inparams) = $DB->get_in_or_equal(array_keys($notices), SQL_PARAMS_NAMED);
-            $sql = "SELECT sn.id 
+            self::reload_viewed_notices($notices);
+        }
+        $notices = array_diff_key($notices, $USER->viewednotices);
+        return $notices;
+    }
+
+    private static function reload_viewed_notices($notices) {
+        global $USER, $DB;
+        $USER->viewednotices = [];
+        list($insql, $inparams) = $DB->get_in_or_equal(array_keys($notices), SQL_PARAMS_NAMED);
+        $sql = "SELECT sn.id, lv.timeviewed 
                       FROM {local_sitenotice} sn
                       JOIN {local_sitenotice_lastview} lv
                         ON sn.id = lv.noticeid
                      WHERE lv.timeviewed > sn.timemodified
                        AND lv.userid = :userid
                        AND lv.noticeid $insql";
-            $params = array_merge($inparams, ['userid' => $USER->id]);
-            $records = $DB->get_records_sql($sql, $params);
-            if (empty($records)) {
-                $USER->viewednotices = [];
-            } else {
-                $USER->viewednotices = $records;
-            }
+        $params = array_merge($inparams, ['userid' => $USER->id]);
+        $records = $DB->get_records_sql($sql, $params);
+        foreach($records as $record) {
+            $USER->viewednotices[$record->id] = $record->timeviewed;
         }
-        $notices = array_diff_key($notices, $USER->viewednotices);
-        return $notices;
     }
 
     public static function update_viewed_noticed($noticeid) {
