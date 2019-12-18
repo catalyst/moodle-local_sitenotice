@@ -33,6 +33,9 @@ class helper {
         global $DB, $USER;
         $data->timecreated = time();
         $data->timemodified = time();
+        if (is_array($data->content)) {
+            $data->content = $data->content['text'];
+        }
         $transaction = $DB->start_delegated_transaction();
         $noticeid = $DB->insert_record('local_sitenotice', $data);
         if (!empty($noticeid)) {
@@ -230,18 +233,11 @@ class helper {
 
     public static function track_link($linkid) {
         global $DB, $USER;
-        $record = $DB->get_record('local_sitenotice_hlinks_his', [ 'userid' => $USER->id, 'hlinkid' => $linkid]);
-        if (empty($record)) {
-            $record = new \stdClass();
-            $record->hlinkid = $linkid;
-            $record->userid = $USER->id;
-            $record->timeclicked = time();
-            $DB->insert_record('local_sitenotice_hlinks_his', $record);
-        } else {
-            $record->timeclicked = time();
-            $DB->update_record('local_sitenotice_hlinks_his', $record);
-        }
-
+        $record = new \stdClass();
+        $record->hlinkid = $linkid;
+        $record->userid = $USER->id;
+        $record->timeclicked = time();
+        $DB->insert_record('local_sitenotice_hlinks_his', $record);
         $result = array();
         $result['status'] = true;
         return $result;

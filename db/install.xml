@@ -69,9 +69,6 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
-      <INDEXES>
-        <INDEX NAME="user_hlink_uq" UNIQUE="true" FIELDS="userid, hlinkid"/>
-      </INDEXES>
     </TABLE>
 
     <TABLE NAME="local_sitenotice_lastview" COMMENT="Track user viewed notices">
