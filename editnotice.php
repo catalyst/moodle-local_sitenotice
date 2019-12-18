@@ -26,7 +26,6 @@ use local_sitenotice\form\notice_form;
 use local_sitenotice\helper;
 
 require_once(__DIR__.'/../../config.php');
-require_once($CFG->libdir.'/adminlib.php');
 
 require_login();
 require_capability('moodle/site:config', context_system::instance());
@@ -36,6 +35,7 @@ $PAGE->requires->css('/local/sitenotice/styles.css');
 
 $thispage = '/local/sitenotice/editnotice.php';
 $managenoticepage = '/local/sitenotice/managenotice.php';
+$reportpage = '/local/sitenotice/report.php';
 $PAGE->set_url(new moodle_url($thispage));
 
 $noticeid = optional_param('noticeid', 0, PARAM_INT);
@@ -56,6 +56,9 @@ if (empty($noticeid)) {
     }
 } else {
     switch ($action) {
+        case 'report':
+            redirect(new moodle_url($reportpage, ["noticeid" => $noticeid]));
+            break;
         case 'reset':
             helper::reset_notice($noticeid);
             redirect(new moodle_url($managenoticepage));

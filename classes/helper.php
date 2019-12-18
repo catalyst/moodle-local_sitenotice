@@ -254,4 +254,26 @@ class helper {
         $result['status'] = true;
         return $result;
     }
+
+    public static function retrieve_acknowlegement($userid = 0, $noticeid = 0, $startdate = 0, $enddate = 0) {
+        global $DB;
+        $wheresql = "";
+        $sql = "SELECT *
+                  FROM {local_sitenotice_ack} $wheresql
+              ORDER BY userid ASC, timecreated DESC";
+        return $DB->get_records_sql($sql);
+
+    }
+
+    public static function retrieve_hlink_count($userid, $noticeid) {
+        global $DB;
+        $wheresql = "WHERE h.userid = :userid AND l.noticeid = :noticeid";
+        $sql = "SELECT h.hlinkid, l.text, l.link, COUNT(h.hlinkid)
+                  FROM {local_sitenotice_hlinks_his} h
+                  JOIN {local_sitenotice_hlinks} l on h.hlinkid = l.id
+                  $wheresql
+              GROUP BY h.hlinkid, l.text, l.link";
+        $params = ['userid' => $userid, 'noticeid' => $noticeid];
+        return $DB->get_records_sql($sql, $params);
+    }
 }
