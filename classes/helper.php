@@ -110,63 +110,71 @@ class helper {
         return $option;
     }
 
-    public static function retrieve_user_notices($userid) {
-        global $USER, $DB;
-        if (!$userid) {
+    public static function retrieve_user_notices() {
+        global $USER;
+        $notices = self::retrieve_enabled_notices();
+
+        if (empty($notices)) {
             return [];
         }
-        $notices = self::retrieve_enabled_notices();
+
+        // Only load at login time.
         if (!isset($USER->viewednotices)) {
-            self::reload_viewed_notices($notices);
+            self::load_viewed_notices();
+        }
+        /**
+         * Check for updated notice
+         * Exclude it from viewed notices if it is updated (based on timemodified)
+         */
+        $viewednotices = $USER->viewednotices;
+        foreach ($viewednotices as $noticeid => $data) {
+            if ($data['timeviewed'] < $notices[$noticeid]->timemodified ||
+                ($data['action'] === 'dismissed' && $notices[$noticeid]->reqack == true)) {
+                unset($USER->viewednotices[$noticeid]);
+            }
         }
         $notices = array_diff_key($notices, $USER->viewednotices);
         return $notices;
     }
 
-    private static function reload_viewed_notices($notices) {
+    private static function load_viewed_notices() {
         global $USER, $DB;
         $USER->viewednotices = [];
-        list($insql, $inparams) = $DB->get_in_or_equal(array_keys($notices), SQL_PARAMS_NAMED);
-        $sql = "SELECT sn.id, lv.timeviewed 
+        $sql = "SELECT sn.id, lv.timeviewed, lv.action 
                       FROM {local_sitenotice} sn
                       JOIN {local_sitenotice_lastview} lv
                         ON sn.id = lv.noticeid
-                     WHERE lv.timeviewed > sn.timemodified
-                       AND lv.userid = :userid
-                       AND lv.noticeid $insql";
-        $params = array_merge($inparams, ['userid' => $USER->id]);
+                     WHERE lv.userid = :userid
+                       AND sn.enabled = 1";
+        $params = ['userid' => $USER->id];
         $records = $DB->get_records_sql($sql, $params);
         foreach($records as $record) {
-            $USER->viewednotices[$record->id] = $record->timeviewed;
+            $USER->viewednotices[$record->id] = ["timeviewed" => $record->timeviewed, 'action' => $record->action];
         }
     }
 
-    public static function update_viewed_noticed($noticeid) {
+    public static function add_to_viewed_noticed($noticeid, $userid, $action) {
         global $USER, $DB;
-        // Update viewed notices.
+        // Add to viewed notices.
         $currenttime = time();
-        $USER->viewednotices[$noticeid] = $currenttime;
+        $USER->viewednotices[$noticeid] = ['timeviewed' => $currenttime, 'action' => $action];
         $record = $DB->get_record('local_sitenotice_lastview', ['userid' => $USER->id, 'noticeid' => $noticeid]);
         if (!$record) {
             $record = new \stdClass();
             $record->noticeid = $noticeid;
-            $record->userid = $USER->id;
+            $record->userid = $userid;
             $record->timeviewed = $currenttime;
+            $record->action = $action;
             $DB->insert_record('local_sitenotice_lastview', $record);
         } else {
             $record->timeviewed = $currenttime;
+            $record->action = $action;
             $DB->update_record('local_sitenotice_lastview', $record);
         }
     }
 
     public static function dismiss_notice($noticeid) {
         global $USER;
-        $notice = self::retrieve_notice($noticeid);
-        if ($notice && $notice->reqack) {
-            require_logout();
-            $loginpage = new \moodle_url("/login/index.php");
-            $result['redirecturl'] = $loginpage->out();
-        }
 
         // Log dismissed event.
         $params = array(
@@ -178,6 +186,12 @@ class helper {
         $event->trigger();
 
         $result = array();
+        $notice = self::retrieve_notice($noticeid);
+        if ($notice && $notice->reqack) {
+            require_logout();
+            $loginpage = new \moodle_url("/login/index.php");
+            $result['redirecturl'] = $loginpage->out();
+        }
         $result['status'] = true;
         return $result;
     }

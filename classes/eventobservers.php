@@ -39,11 +39,15 @@ class eventobservers {
 
     public static function sitenotice_dismissed(\local_sitenotice\event\sitenotice_dismissed $event) {
         $noticeid = $event->get_data()['objectid'];
-        helper::update_viewed_noticed($noticeid);
+        $userid = $event->get_data()['relateduserid'];
+        $action = $event->get_data()['action'];
+        helper::add_to_viewed_noticed($noticeid, $userid, $action);
     }
 
     public static function sitenotice_acknowledged(\local_sitenotice\event\sitenotice_acknowledged $event) {
         $noticeid = $event->get_data()['objectid'];
-        helper::update_viewed_noticed($noticeid);
+        $userid = $event->get_data()['relateduserid'];
+        $action = $event->get_data()['action'];
+        helper::add_to_viewed_noticed($noticeid, $userid, $action);
     }
 }

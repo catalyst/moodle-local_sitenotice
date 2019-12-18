@@ -79,6 +79,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="noticeid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of the notice"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User ID"/>
+        <FIELD NAME="action" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false" COMMENT="Action"/>
         <FIELD NAME="timeviewed" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp of the latest view"/>
       </FIELDS>
       <KEYS>

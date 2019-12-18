@@ -33,9 +33,8 @@ function local_sitenotice_extend_navigation(global_navigation $navigation) {
         return;
     }
 
-    $usernotices = helper::retrieve_user_notices($USER->id);
+    $usernotices = helper::retrieve_user_notices();
     if (!empty($usernotices)) {
-//        $USER->sitenotices = array_keys($usernotices);
         $PAGE->requires->css('/local/sitenotice/styles.css');
         $PAGE->requires->js_call_amd('local_sitenotice/notice', 'init', array(json_encode($usernotices), $USER->id));
     }
