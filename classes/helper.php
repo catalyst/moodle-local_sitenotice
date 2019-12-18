@@ -137,7 +137,19 @@ class helper {
             }
         }
         $notices = array_diff_key($notices, $USER->viewednotices);
-        return $notices;
+
+        // Check user cohort.
+        $usernotices = $notices;
+        if (!empty($notices)) {
+            $usercohort = cohort_get_user_cohorts($USER->id);
+            foreach ($notices as $notice) {
+                if ($notice->audience > 0 && !array_key_exists($notice->audience, $usercohort)) {
+                    unset($usernotices[$notice->id]);
+                }
+            }
+        }
+
+        return $usernotices;
     }
 
     private static function load_viewed_notices() {
