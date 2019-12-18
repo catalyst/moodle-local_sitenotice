@@ -276,4 +276,9 @@ class helper {
         $params = ['userid' => $userid, 'noticeid' => $noticeid];
         return $DB->get_records_sql($sql, $params);
     }
+
+    public static function retrieve_notice_hlinks($noticeid) {
+        global $DB;
+        return $DB->get_records('local_sitenotice_hlinks', ['noticeid' => $noticeid]);
+    }
 }
