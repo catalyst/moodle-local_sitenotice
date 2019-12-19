@@ -44,6 +44,7 @@ $string['notice:view'] = 'View notice';
 $string['notice:report'] = 'View report';
 $string['notice:reset'] = 'Reset notice';
 $string['notice:hlinkcount'] = 'Hyperlink Counts';
+$string['notice:resetinterval'] = 'Reset every';
 
 // Event.
 $string['event:dismiss'] = 'Notice dismission';
@@ -53,6 +54,9 @@ $string['event:update'] = 'Notice update';
 
 // Report.
 $string['report:name'] = 'Notice Report';
+
+// Time format
+$string['timeformat:resetinterval'] = '%a days, %h hours, %i minutes and %s seconds';
 
 // Privacy.
 $string['privacy:metadata:local_sitenotice_ack'] = 'Notice Acknowledgement';

@@ -131,8 +131,10 @@ class helper {
          */
         $viewednotices = $USER->viewednotices;
         foreach ($viewednotices as $noticeid => $data) {
-            if ($data['timeviewed'] < $notices[$noticeid]->timemodified ||
-                ($data['action'] === 'dismissed' && $notices[$noticeid]->reqack == true)) {
+            $notice = $notices[$noticeid];
+            if ($data['timeviewed'] < $notice->timemodified
+                || (($notice->resetinterval > 0) && ($data['timeviewed'] + $notice->resetinterval < time()))
+                || ($data['action'] === 'dismissed' && $notice->reqack == true)) {
                 unset($USER->viewednotices[$noticeid]);
             }
         }
@@ -281,5 +283,11 @@ class helper {
     public static function retrieve_notice_hlinks($noticeid) {
         global $DB;
         return $DB->get_records('local_sitenotice_hlinks', ['noticeid' => $noticeid]);
+    }
+
+    public static function format_time($time) {
+        $datefrom = new \DateTime("@0");
+        $dateto = new \DateTime("@$time");
+        return $datefrom->diff($dateto)->format(get_string('timeformat:resetinterval', 'local_sitenotice'));
     }
 }

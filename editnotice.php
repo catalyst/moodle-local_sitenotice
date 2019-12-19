@@ -75,6 +75,7 @@ if (empty($noticeid)) {
             $notice = helper::retrieve_notice($noticeid);
             $notice->noticeid = $noticeid;
             $mform = new notice_form(null, ['readonly' => true]);
+            $notice->resetinterval = helper::format_time($notice->resetinterval);
             $mform->set_data($notice);
             echo $OUTPUT->header();
             echo $OUTPUT->heading(get_string('notice:view', 'local_sitenotice'));

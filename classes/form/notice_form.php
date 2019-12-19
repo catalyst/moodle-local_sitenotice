@@ -55,6 +55,13 @@ class notice_form extends moodleform {
         $mform->setType('content', PARAM_RAW);
         $mform->addRule('content', get_string('required'), 'required', null, 'client');
 
+        if ($readonly) {
+            $mform->addElement('static', 'resetinterval', get_string('notice:resetinterval', 'local_sitenotice'));
+        } else {
+            $mform->addElement('duration', 'resetinterval', get_string('notice:resetinterval', 'local_sitenotice'));
+            $mform->setDefault('resetinterval', 0);
+        }
+
         $mform->addElement('selectyesno', 'reqack', get_string('notice:reqack', 'local_sitenotice'), $attributes);
         $mform->setDefault('reqack', 0);
 
