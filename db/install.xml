@@ -13,9 +13,7 @@
         <FIELD NAME="reqinteract" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Requires Physical Interaction: 1 - YES, 0 - NO"/>
         <FIELD NAME="reqack" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Requires Acknowledgement: 1 - YES, 0 - NO"/>
         <FIELD NAME="enabled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Enabled: 1 - YES, 0 - NO"/>
-        <FIELD NAME="expiredon" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="0-6 From Monday to Sunday, at 00.00"/>
-        <FIELD NAME="runafternotice" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="ID of the notice this notice will be run after"/>
-        <FIELD NAME="runafter" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Period of the the notice will run after"/>
+        <FIELD NAME="resetinterval" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Reset Interval"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp of when the notice was created."/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp of when the notice was last modified."/>
       </FIELDS>
