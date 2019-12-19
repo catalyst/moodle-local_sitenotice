@@ -33,8 +33,7 @@ defined('MOODLE_INTERNAL') || die();
 
 class provider implements
 \core_privacy\local\metadata\provider,
-\core_privacy\local\request\plugin\provider
-{
+\core_privacy\local\request\plugin\provider {
 
     use \core_privacy\local\legacy_polyfill;
 

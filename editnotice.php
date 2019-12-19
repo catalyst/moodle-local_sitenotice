@@ -86,5 +86,3 @@ if (empty($noticeid)) {
             redirect(new moodle_url($managenoticepage));
     }
 }
-
-
