@@ -46,19 +46,24 @@ class provider implements
      */
     public static function get_metadata(collection $collection) : collection {
         $collection->add_database_table(
-            'local_sitenotice_ack',
-            [
-                'userid' => 'privacy:metadata:local_sitenotice_ack:userid',
+            'local_sitenotice_ack', [
+                'userid' => 'privacy:metadata:userid',
             ],
             'privacy:metadata:local_sitenotice_ack'
         );
 
         $collection->add_database_table(
-            'local_sitenotice_hlinks_his',
-            [
-                'userid' => 'privacy:metadata:local_sitenotice_hlinks_his:userid',
+            'local_sitenotice_hlinks_his', [
+                'userid' => 'privacy:metadata:userid',
             ],
             'privacy:metadata:local_sitenotice_hlinks_his'
+        );
+
+        $collection->add_database_table(
+            'local_sitenotice_lastview', [
+                'userid' => 'privacy:metadata:userid',
+            ],
+            'privacy:metadata:local_sitenotice_lastview'
         );
 
         return $collection;

@@ -53,3 +53,9 @@ $string['event:update'] = 'Notice update';
 
 // Report.
 $string['report:name'] = 'Notice Report';
+
+// Privacy.
+$string['privacy:metadata:local_sitenotice_ack'] = 'Notice Acknowledgement';
+$string['privacy:metadata:local_sitenotice_hlinks_his'] = 'Hyperlink Tracking';
+$string['privacy:metadata:local_sitenotice_lastview'] = 'Notice last view';
+$string['privacy:metadata:userid'] = 'User ID';
