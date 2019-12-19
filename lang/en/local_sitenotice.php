@@ -55,7 +55,7 @@ $string['event:update'] = 'Notice update';
 // Report.
 $string['report:name'] = 'Notice Report';
 
-// Time format
+// Time format.
 $string['timeformat:resetinterval'] = '%a days, %h hours, %i minutes and %s seconds';
 
 // Privacy.
@@ -63,3 +63,6 @@ $string['privacy:metadata:local_sitenotice_ack'] = 'Notice Acknowledgement';
 $string['privacy:metadata:local_sitenotice_hlinks_his'] = 'Hyperlink Tracking';
 $string['privacy:metadata:local_sitenotice_lastview'] = 'Notice last view';
 $string['privacy:metadata:userid'] = 'User ID';
+
+// Notification.
+$string['notification:noack'] = 'There is no acknowledgment for this notice';

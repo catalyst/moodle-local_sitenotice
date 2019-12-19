@@ -25,8 +25,8 @@
 
 namespace local_sitenotice;
 defined('MOODLE_INTERNAL') || die();
-require_once($CFG->dirroot.'/user/filters/date.php');
 
+require_once($CFG->dirroot.'/user/filters/date.php');
 use local_sitenotice\form\active_filter_form;
 use local_sitenotice\form\add_filter_form;
 
@@ -37,7 +37,7 @@ class report_filter {
     private $addfilterform;
     private $activefilterform;
 
-    public function __construct($baseurl){
+    public function __construct($baseurl) {
         $this->filterfields = [
             'timecreated' => new \user_filter_date('time', get_string('time'), false, 'timecreated'),
         ];
@@ -47,6 +47,10 @@ class report_filter {
         $this->activefilterform = new active_filter_form($this->baseurl, $this->customdata);
     }
 
+    /**
+     * Add filter to the $SESSION.
+     * @throws \moodle_exception
+     */
     private function add_filters() {
         global $SESSION;
         if ($adddata = $this->addfilterform->get_data()) {
@@ -60,23 +64,31 @@ class report_filter {
                     $SESSION->noticereportfilter[$fname][] = $data;
                 }
             }
-            // Reload page
+            // Reload page. Otherwise, the noticeid will disappear in the address url due to POST method.
             redirect($this->baseurl);
         }
     }
 
+    /**
+     * Remove all filters from the $SESSION.
+     * @throws \moodle_exception
+     */
     private function remove_filters() {
         global $SESSION;
         if ($activedata = $this->activefilterform->get_data()) {
             if (!empty($activedata->removeall)) {
                 $SESSION->noticereportfilter = [];
             }
-            // Reload page
+            // Reload page. Otherwise, the noticeid will disappear in the address url due to POST method.
             redirect($this->baseurl);
         }
     }
 
-    private function process_filter(){
+    /**
+     * Get filter sql from active filters.
+     * @return array
+     */
+    private function process_filter() {
         global $SESSION;
         $filtersql = [];
         $params = [];
@@ -97,6 +109,11 @@ class report_filter {
         return [$filtersql, $params];
     }
 
+    /**
+     * Steps involved to get the final filter sql
+     * @return array filter sql and its params
+     * @throws \moodle_exception
+     */
     public function get_sql_filter() {
         // Add new filters if any.
         $this->add_filters();
@@ -106,6 +123,9 @@ class report_filter {
         return $this->process_filter();
     }
 
+    /**
+     * Display add filter and active filter from.
+     */
     public function display_forms() {
         $this->addfilterform->display();
         $this->activefilterform->display();

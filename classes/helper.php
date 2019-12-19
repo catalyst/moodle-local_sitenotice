@@ -29,6 +29,13 @@ require_once($CFG->dirroot.'/cohort/lib.php');
 
 class helper {
 
+    /**
+     * Create new notice
+     * @param $data new notice data
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \dml_transaction_exception
+     */
     public static function create_new_notice($data) {
         global $DB, $USER;
         $data->timecreated = time();
@@ -65,21 +72,47 @@ class helper {
         $transaction->allow_commit();
     }
 
+    /**
+     * Retrieve single notice based on ID
+     * @param $noticeid notice id
+     * @return mixed
+     * @throws \dml_exception
+     */
     public static function retrieve_notice($noticeid) {
         global $DB;
         return $DB->get_record('local_sitenotice', ['id' => $noticeid]);
     }
 
+    /**
+     * Retrieve all notices
+     * @param string $sort sort order
+     * @return array
+     * @throws \dml_exception
+     */
     public static function retrieve_all_notices($sort = '') {
         global $DB;
         return $DB->get_records('local_sitenotice', null, $sort);
     }
 
+    /**
+     * Retrieve active notices
+     * @param string $sort sort order
+     * @return array
+     * @throws \dml_exception
+     */
     public static function retrieve_enabled_notices($sort = '') {
         global $DB;
         return $DB->get_records('local_sitenotice', ['enabled' => 1], $sort);
     }
 
+    /**
+     * Reset/enable/disable a notice
+     * @param $noticeid notice id
+     * @param null $enabled whether to enable/disable the notice
+     * @return bool
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
     public static function reset_notice($noticeid, $enabled = null) {
         global $DB, $USER;
         $notice = self::retrieve_notice($noticeid);
@@ -104,6 +137,10 @@ class helper {
         return $result;
     }
 
+    /**
+     * Audience options based on site cohorts.
+     * @return array
+     */
     public static function built_audience_option() {
         $option = ['0' => 'All Users'];
         $cohorts = cohort_get_all_cohorts();
@@ -113,6 +150,12 @@ class helper {
         return $option;
     }
 
+
+    /**
+     * Retrieve notice applied to user.
+     * @return array
+     * @throws \dml_exception
+     */
     public static function retrieve_user_notices() {
         global $USER;
         $notices = self::retrieve_enabled_notices();
@@ -125,7 +168,7 @@ class helper {
         if (!isset($USER->viewednotices)) {
             self::load_viewed_notices();
         }
-        /**
+        /*
          * Check for updated notice
          * Exclude it from viewed notices if it is updated (based on timemodified)
          */
@@ -154,22 +197,33 @@ class helper {
         return $usernotices;
     }
 
+    /**
+     * Load viewed notices of current user.
+     * @throws \dml_exception
+     */
     private static function load_viewed_notices() {
         global $USER, $DB;
         $USER->viewednotices = [];
-        $sql = "SELECT sn.id, lv.timeviewed, lv.action 
-                      FROM {local_sitenotice} sn
-                      JOIN {local_sitenotice_lastview} lv
-                        ON sn.id = lv.noticeid
-                     WHERE lv.userid = :userid
-                       AND sn.enabled = 1";
+        $sql = "SELECT sn.id, lv.timeviewed, lv.action
+                  FROM {local_sitenotice} sn
+                  JOIN {local_sitenotice_lastview} lv
+                    ON sn.id = lv.noticeid
+                 WHERE lv.userid = :userid
+                   AND sn.enabled = 1";
         $params = ['userid' => $USER->id];
         $records = $DB->get_records_sql($sql, $params);
-        foreach($records as $record) {
+        foreach ($records as $record) {
             $USER->viewednotices[$record->id] = ["timeviewed" => $record->timeviewed, 'action' => $record->action];
         }
     }
 
+    /**
+     * Record the lastest interaction with the notice of a user.
+     * @param $noticeid notice id
+     * @param $userid user id
+     * @param $action dismissed or acknowledged
+     * @throws \dml_exception
+     */
     public static function add_to_viewed_noticed($noticeid, $userid, $action) {
         global $USER, $DB;
         // Add to viewed notices.
@@ -190,6 +244,14 @@ class helper {
         }
     }
 
+    /**
+     * Dismiss the notice
+     * @param $noticeid notice id
+     * @return array
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
+     */
     public static function dismiss_notice($noticeid) {
         global $USER;
 
@@ -213,6 +275,13 @@ class helper {
         return $result;
     }
 
+    /**
+     * Acknowledge the notice
+     * @param $noticeid notice id
+     * @return array|bool|int
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
     public static function acknowledge_notice($noticeid) {
         global $USER, $DB;
 
@@ -245,6 +314,12 @@ class helper {
         return $result;
     }
 
+    /**
+     * Track user interaction with the hyperlink
+     * @param $linkid link ID
+     * @return array
+     * @throws \dml_exception
+     */
     public static function track_link($linkid) {
         global $DB, $USER;
         $record = new \stdClass();
@@ -257,17 +332,31 @@ class helper {
         return $result;
     }
 
+    /**
+     * Get acknowledgement records based on current filter sql
+     * @param null $filtersql filter sql
+     * @param null $params parameter
+     * @return array
+     * @throws \dml_exception
+     */
     public static function retrieve_acknowlegement($filtersql = null, $params = null) {
         global $DB;
         $filtersql = empty($filtersql) ? ' true ' : $filtersql;
         $sql = "SELECT *
-                  FROM {local_sitenotice_ack} 
-                  WHERE $filtersql
-              ORDER BY userid ASC, timecreated DESC";
+                  FROM {local_sitenotice_ack}
+                 WHERE $filtersql
+               ORDER BY userid ASC, timecreated DESC";
         return $DB->get_records_sql($sql, $params);
 
     }
 
+    /**
+     * Hyperlink interaction info of a user on a notice
+     * @param $userid user id
+     * @param $noticeid notice id
+     * @return array
+     * @throws \dml_exception
+     */
     public static function retrieve_hlink_count($userid, $noticeid) {
         global $DB;
         $wheresql = "WHERE h.userid = :userid AND l.noticeid = :noticeid";
@@ -280,11 +369,23 @@ class helper {
         return $DB->get_records_sql($sql, $params);
     }
 
+    /**
+     * Retrieve all hyperlinks belong to a notice
+     * @param $noticeid notice id
+     * @return array
+     * @throws \dml_exception
+     */
     public static function retrieve_notice_hlinks($noticeid) {
         global $DB;
         return $DB->get_records('local_sitenotice_hlinks', ['noticeid' => $noticeid]);
     }
 
+    /**
+     * Format time
+     * @param $time
+     * @return string
+     * @throws \coding_exception
+     */
     public static function format_time($time) {
         $datefrom = new \DateTime("@0");
         $dateto = new \DateTime("@$time");

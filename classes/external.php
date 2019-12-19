@@ -84,8 +84,7 @@ class local_sitenotice_external extends external_api {
     }
 
     public static function track_link($linkid) {
-        $params = self::validate_parameters(self::track_link_parameters(),
-            array('linkid' => $linkid,));
+        $params = self::validate_parameters(self::track_link_parameters(), array('linkid' => $linkid));
         return helper::track_link($params['linkid']);
     }
 

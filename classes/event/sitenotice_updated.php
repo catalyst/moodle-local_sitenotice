@@ -44,6 +44,7 @@ class sitenotice_updated extends \core\event\base {
     }
 
     public function get_url() {
-        return new \moodle_url('/local/sitenotice/editnotice.php', array('noticeid' => $this->objectid, 'action' => 'view', 'sesskey' => sesskey()));
+        return new \moodle_url('/local/sitenotice/editnotice.php',
+            array('noticeid' => $this->objectid, 'action' => 'view', 'sesskey' => sesskey()));
     }
 }

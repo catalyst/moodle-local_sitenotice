@@ -28,29 +28,35 @@ use local_sitenotice\report_filter;
 
 require_login();
 require_capability('moodle/site:config', context_system::instance());
-$PAGE->set_context(context_system::instance());
 
+// Parameters.
 $noticeid = required_param('noticeid', PARAM_INT);
 $download = optional_param('download', false, PARAM_BOOL);
 
+// Set up page.
 $thispage = '/local/sitenotice/report.php';
-$url = new moodle_url($thispage, ['noticeid' => $noticeid]);
 $managenoticepage = '/local/sitenotice/managenotice.php';
+$url = new moodle_url($thispage, ['noticeid' => $noticeid]);
 $PAGE->set_url($url);
+$PAGE->set_context(context_system::instance());
+$PAGE->navbar->add(get_string('report:name', 'local_sitenotice'));
 
+// Get current filter for the report.
 $filter = new report_filter($url);
 list($filtersql, $params) = $filter->get_sql_filter();
 
+$notice = helper::retrieve_notice($noticeid);
+$records = helper::retrieve_acknowlegement($filtersql, $params);
+
+// Do not show header if downloading.
 if (!$download) {
     echo $OUTPUT->header();
-    echo $OUTPUT->heading(get_string('report:name', 'local_sitenotice'));
+    echo $OUTPUT->heading($notice->title);
     $filter->display_forms();
 }
 
-$records = helper::retrieve_acknowlegement($filtersql, $params);
-$notice = helper::retrieve_notice($noticeid);
-
-if(!empty($records)) {
+if (!empty($records)) {
+    // Display Table.
     if (!$download) {
         $button = $OUTPUT->single_button(new moodle_url($thispage, ['noticeid' => $noticeid, 'download' => true]),
             get_string("downloadtext"));
@@ -68,6 +74,10 @@ if(!empty($records)) {
             get_string('notice:hlinkcount', 'local_sitenotice'),
             get_string('time'),
         );
+        /*
+         * To check if the record is next user
+         * As to show the hlink count in the first row of a user.
+         */
         $currentuserid = 0;
         foreach ($records as $record) {
             $row = array();
@@ -76,9 +86,9 @@ if(!empty($records)) {
             $row[] = $record->firstname;
             $row[] = $record->lastname;
             $row[] = $record->idnumber;
-
+            // Show all link counts in the same column.
             $hlinkcount = '';
-            if ($currentuserid !=  $record->userid) {
+            if ($currentuserid != $record->userid) {
                 $currentuserid = $record->userid;
                 $linkcounts = helper::retrieve_hlink_count($record->userid, $record->noticeid);
                 foreach ($linkcounts as $count) {
@@ -94,21 +104,15 @@ if(!empty($records)) {
         echo html_writer::table($table);
         echo $OUTPUT->footer();
     } else {
-        $filename = clean_filename(strip_tags(format_string($notice->title,true)).'.csv');
+        // Download report.
+        $filename = clean_filename(strip_tags(format_string($notice->title, true)).'.csv');
         header("Content-Type: application/download\n");
         header("Content-Disposition: attachment; filename=\"$filename\"");
         header("Expires: 0");
         header("Cache-Control: must-revalidate,post-check=0,pre-check=0");
         header("Pragma: public");
 
-        // Fields/
-        $hlinks = helper::retrieve_notice_hlinks($noticeid);
-
-        $hlinkheaders = [];
-        foreach ($hlinks as $link) {
-            $hlinkheaders[$link->id] =  "$link->text ($link->link)";
-        }
-
+        // Headers.
         $header = array(
             get_string('notice:title', 'local_sitenotice'),
             get_string('username'),
@@ -117,7 +121,12 @@ if(!empty($records)) {
             get_string('idnumber'),
             get_string('time'),
         );
-
+        // Add each hyperlink as a header.
+        $hlinks = helper::retrieve_notice_hlinks($noticeid);
+        $hlinkheaders = [];
+        foreach ($hlinks as $link) {
+            $hlinkheaders[$link->id] = "$link->text ($link->link)";
+        }
         $header = array_merge($header, $hlinkheaders);
 
         echo implode("\t", $header) . "\n";
@@ -136,14 +145,14 @@ if(!empty($records)) {
             if ($currentuserid != $record->userid) {
                 $currentuserid = $record->userid;
                 $linkcounts = helper::retrieve_hlink_count($record->userid, $record->noticeid);
-                foreach (array_keys($hlinkheaders) as $linkid ) {
+                foreach (array_keys($hlinkheaders) as $linkid) {
                     $row[] = $linkcounts[$linkid]->count;
                 }
             }
-            
             echo implode("\t", $row) . "\n";
         }
     }
-
+} else {
+    echo $OUTPUT->notification(get_string('notification:noack', 'local_sitenotice'), 'notifyinfo');
+    echo $OUTPUT->footer();
 }
-

@@ -26,10 +26,9 @@ namespace local_sitenotice\form;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->libdir . '/formslib.php');
 use moodleform;
 use local_sitenotice\helper;
-
-require_once($CFG->libdir . '/formslib.php');
 
 class notice_form extends moodleform {
 
@@ -39,8 +38,8 @@ class notice_form extends moodleform {
         $mform->addElement('hidden', 'noticeid', 0);
         $mform->setType('noticeid', PARAM_INT);
 
+        // Check read only mode.
         $readonly = isset($this->_customdata['readonly']) ? $this->_customdata['readonly'] : false;
-
         $attributes = $readonly ? ['disabled' => ''] : [];
 
         $mform->addElement('text', 'title', get_string('notice:title', 'local_sitenotice'), $attributes);
@@ -50,7 +49,8 @@ class notice_form extends moodleform {
         if ($readonly) {
             $mform->addElement('static', 'content', get_string('notice:content', 'local_sitenotice'));
         } else {
-            $mform->addElement('htmleditor', 'content', get_string('notice:content', 'local_sitenotice'), [], ['class' => 'noticecontent']);
+            $mform->addElement('htmleditor', 'content',
+                get_string('notice:content', 'local_sitenotice'), [], ['class' => 'noticecontent']);
         }
         $mform->setType('content', PARAM_RAW);
         $mform->addRule('content', get_string('required'), 'required', null, 'client');
