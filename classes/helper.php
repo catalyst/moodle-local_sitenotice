@@ -255,13 +255,14 @@ class helper {
         return $result;
     }
 
-    public static function retrieve_acknowlegement($userid = 0, $noticeid = 0, $startdate = 0, $enddate = 0) {
+    public static function retrieve_acknowlegement($filtersql = null, $params = null) {
         global $DB;
-        $wheresql = "";
+        $filtersql = empty($filtersql) ? ' true ' : $filtersql;
         $sql = "SELECT *
-                  FROM {local_sitenotice_ack} $wheresql
+                  FROM {local_sitenotice_ack} 
+                  WHERE $filtersql
               ORDER BY userid ASC, timecreated DESC";
-        return $DB->get_records_sql($sql);
+        return $DB->get_records_sql($sql, $params);
 
     }
 

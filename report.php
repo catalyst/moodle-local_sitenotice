@@ -21,32 +21,39 @@
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+require_once(__DIR__.'/../../config.php');
 
 use local_sitenotice\helper;
-
-require_once(__DIR__.'/../../config.php');
+use local_sitenotice\report_filter;
 
 require_login();
 require_capability('moodle/site:config', context_system::instance());
 $PAGE->set_context(context_system::instance());
 
-$thispage = '/local/sitenotice/report.php';
-$managenoticepage = '/local/sitenotice/managenotice.php';
-$PAGE->set_url(new moodle_url($thispage));
-
 $noticeid = required_param('noticeid', PARAM_INT);
-$download   = optional_param('download', false, PARAM_BOOL);
+$download = optional_param('download', false, PARAM_BOOL);
 
-$records = helper::retrieve_acknowlegement();
+$thispage = '/local/sitenotice/report.php';
+$url = new moodle_url($thispage, ['noticeid' => $noticeid]);
+$managenoticepage = '/local/sitenotice/managenotice.php';
+$PAGE->set_url($url);
+
+$filter = new report_filter($url);
+list($filtersql, $params) = $filter->get_sql_filter();
+
+if (!$download) {
+    echo $OUTPUT->header();
+    echo $OUTPUT->heading(get_string('report:name', 'local_sitenotice'));
+    $filter->display_forms();
+}
+
+$records = helper::retrieve_acknowlegement($filtersql, $params);
 $notice = helper::retrieve_notice($noticeid);
 
 if(!empty($records)) {
     if (!$download) {
-        echo $OUTPUT->header();
-        echo $OUTPUT->heading(get_string('report:name', 'local_sitenotice'));
-
-        $button = $OUTPUT->single_button(new moodle_url($thispage, ['noticeid' => $noticeid, 'download' => true
-        ]), get_string("downloadtext"));
+        $button = $OUTPUT->single_button(new moodle_url($thispage, ['noticeid' => $noticeid, 'download' => true]),
+            get_string("downloadtext"));
         echo html_writer::tag('div', $button, array('class' => 'noticereport'));
 
         // Notice table.
