@@ -174,6 +174,10 @@ class helper {
          */
         $viewednotices = $USER->viewednotices;
         foreach ($viewednotices as $noticeid => $data) {
+            // The Notice is disabled during the current session.
+            if (!isset($notices[$noticeid])) {
+                continue;
+            }
             $notice = $notices[$noticeid];
             if ($data['timeviewed'] < $notice->timemodified
                 || (($notice->resetinterval > 0) && ($data['timeviewed'] + $notice->resetinterval < time()))
