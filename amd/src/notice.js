@@ -88,7 +88,7 @@ define(
             if (notice.reqack == 1) {
                 // Checkbox.
                 var $ackcheckbox = $("<input>", {type: "checkbox", id: "sitenotice-modal-content-body-ackcheckbox"});
-                var labeltext = "I have read and understand the notice. Close this notice will log you off this site.";
+                var labeltext = "I have read and understand the notice. Closing this notice will log you off this site.";
                 var $ackcheckboxlabel = $("<label>", { for: "sitenotice-modal-content-body-ackcheckboxlabel", text: labeltext});
                 $body.append($ackcheckbox);
                 $body.append($ackcheckboxlabel);
