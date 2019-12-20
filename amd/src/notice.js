@@ -36,20 +36,7 @@ define(
             var $body = $("<div>", {id: "sitenotice-modal-content-body"});
             var $footer = $("<div>", {id: "sitenotice-modal-content-footer"});
 
-            var $closebutton = $("<button>", {id: "sitenotice-modal-content-footer-closebutton"});
-            var $ackbutton = $("<button>", {id: "sitenotice-modal-content-footer-ackbutton"});
-            var $paragraph = $("<p>");
-
-            $modal.attr("data-noticeid", notice.id);
             $modal.attr("data-userid", userid);
-            $header.html("<h2>" + notice.title + "</h2>");
-            $body.html(notice.content);
-
-            $closebutton.html('Close');
-            $ackbutton.html('I acknowledge');
-            $paragraph.append($closebutton);
-            $paragraph.append($ackbutton);
-            $footer.append($paragraph);
 
             $content.append($header);
             $content.append($body);
@@ -57,6 +44,8 @@ define(
 
             $modal.append($content);
             $("body").append($modal);
+
+            buildContent(notice);
 
             $modal.on('click', '#sitenotice-modal-content-footer-closebutton', function() {
                 var noticeid = $("#sitenotice-modal").attr('data-noticeid');
@@ -70,20 +59,58 @@ define(
                 nextNotice();
             });
 
+            $modal.on('click', '#sitenotice-modal-content-body-ackcheckbox', function() {
+                toogleAcceptButton();
+            });
+
             $modal.on('click', 'a', function() {
                 var linkid = $(this).attr("data-linkid");
                 trackLink(linkid);
             });
+        }
 
+        function buildContent(notice) {
+            var $modal = $("#sitenotice-modal");
+            var $header = $("#sitenotice-modal-content-header");
+            var $body = $("#sitenotice-modal-content-body");
+            var $footer = $("#sitenotice-modal-content-footer");
+
+            $modal.attr("data-noticeid", notice.id);
+            $header.html("<h2>" + notice.title + "</h2>");
+            $body.html(notice.content);
+            $footer.empty();
+
+            var $paragraph = $("<p>");
+            // Close button.
+            var $closebutton = $("<button>", {id: "sitenotice-modal-content-footer-closebutton"});
+            $closebutton.html('CLOSE');
+            $paragraph.append($closebutton);
+            if (notice.reqack == 1) {
+                // Checkbox.
+                var $ackcheckbox = $("<input>", {type: "checkbox", id: "sitenotice-modal-content-body-ackcheckbox"});
+                var labeltext = "I have read and understand the notice. Close this notice will log you off this site.";
+                var $ackcheckboxlabel = $("<label>", { for: "sitenotice-modal-content-body-ackcheckboxlabel", text: labeltext});
+                $body.append($ackcheckbox);
+                $body.append($ackcheckboxlabel);
+                // Acknowledge button.
+                var $ackbutton = $("<button>", {id: "sitenotice-modal-content-footer-ackbutton"});
+                $ackbutton.html('ACCEPT');
+                $ackbutton.attr('disabled', true);
+                $paragraph.append($ackbutton);
+            }
+            $footer.append($paragraph);
+        }
+
+        function toogleAcceptButton() {
+            $("#sitenotice-modal-content-footer-ackbutton").attr('disabled',
+                !$("#sitenotice-modal-content-body-ackcheckbox").is(":checked"));
         }
 
         function nextNotice() {
             $("#sitenotice-modal").fadeOut("slow", function() {
                 var notice = getNotice();
                 if (notice != false) {
-                    $("#sitenotice-modal").attr("data-noticeid", notice.id);
-                    $("#sitenotice-modal-content-header").html("<h2>" + notice.title + "</h2>");
-                    $("#sitenotice-modal-content-body").html(notice.content);
+                    buildContent(notice);
                     $("#sitenotice-modal").fadeIn("slow");
                 }
             });

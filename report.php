@@ -40,6 +40,7 @@ $url = new moodle_url($thispage, ['noticeid' => $noticeid]);
 $PAGE->set_url($url);
 $PAGE->set_context(context_system::instance());
 $PAGE->navbar->add(get_string('report:name', 'local_sitenotice'));
+$PAGE->requires->css('/local/sitenotice/styles.css');
 
 // Get current filter for the report.
 $filter = new report_filter($url);
