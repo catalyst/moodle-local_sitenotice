@@ -89,7 +89,7 @@ class helper {
      * @return array
      * @throws \dml_exception
      */
-    public static function retrieve_all_notices($sort = '') {
+    public static function retrieve_all_notices($sort = 'id ASC') {
         global $DB;
         return $DB->get_records('local_sitenotice', null, $sort);
     }
@@ -100,7 +100,7 @@ class helper {
      * @return array
      * @throws \dml_exception
      */
-    public static function retrieve_enabled_notices($sort = '') {
+    public static function retrieve_enabled_notices($sort = 'id ASC') {
         global $DB;
         return $DB->get_records('local_sitenotice', ['enabled' => 1], $sort);
     }
@@ -379,9 +379,9 @@ class helper {
      * @return array
      * @throws \dml_exception
      */
-    public static function retrieve_notice_hlinks($noticeid) {
+    public static function retrieve_notice_hlinks($noticeid, $sort = 'id ASC') {
         global $DB;
-        return $DB->get_records('local_sitenotice_hlinks', ['noticeid' => $noticeid]);
+        return $DB->get_records('local_sitenotice_hlinks', ['noticeid' => $noticeid], $sort);
     }
 
     /**
