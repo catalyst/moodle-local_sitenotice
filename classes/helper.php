@@ -55,6 +55,7 @@ class helper {
                 $link->link = trim($node->getAttribute("href"));
                 $linkid = $DB->insert_record('local_sitenotice_hlinks', $link);
                 $node->setAttribute('data-linkid', $linkid);
+                $node->setAttribute('target', '_blank');
             }
             $content = $dom->saveHTML();
             $result = $DB->set_field('local_sitenotice', 'content', $content, ['id' => $noticeid]);
