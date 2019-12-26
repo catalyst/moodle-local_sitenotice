@@ -1,5 +1,5 @@
 /**
- *
+ * User interaction with notice
  * @package local_sitenotice
  * @author  Nathan Nguyen <nathannguyen@catalyst-au.net>
  * @copyright  Catalyst IT
