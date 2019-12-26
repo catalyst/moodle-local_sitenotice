@@ -36,21 +36,21 @@ class local_sitenotice_test extends advanced_testcase {
         $this->resetAfterTest(true);
     }
 
-    private function createNotice1() {
+    private function create_notice1() {
         $formdata = new stdClass();
         $formdata->title = "Notice 1";
         $formdata->content = "Notice 1 <a href=\"www.example1.com\">Link 1</a> <a href=\"www.example2.com\">Link 2</a>";
         helper::create_new_notice($formdata);
     }
 
-    private function createNotice2() {
+    private function create_notice2() {
         $formdata = new stdClass();
         $formdata->title = "Notice 2";
         $formdata->content = "Notice 2 <a href=\"www.example3.com\">Link 3</a> <a href=\"www.example4.com\">Link 4</a>";
         helper::create_new_notice($formdata);
     }
 
-    private function createCohortNotice1() {
+    private function create_cohort_notice1() {
         $formdata = new stdClass();
         $formdata->title = "Cohort Notice 1";
         $formdata->content = "Cohort Notice 1 <a href=\"www.example5.com\">Link 5</a> <a href=\"www.example6.com\">Link 6</a>";
@@ -59,7 +59,7 @@ class local_sitenotice_test extends advanced_testcase {
         helper::create_new_notice($formdata);
     }
 
-    private function createCohortNotice2() {
+    private function create_cohort_notice2() {
         $formdata = new stdClass();
         $formdata->title = "Cohort Notice 2";
         $formdata->content = "Cohort Notice 2 <a href=\"www.example7.com\">Link 7</a> <a href=\"www.example8.com\">Link 8</a>";
@@ -69,12 +69,12 @@ class local_sitenotice_test extends advanced_testcase {
     }
 
     public function test_create_notices() {
-        $this->createNotice1();
+        $this->create_notice1();
         $allnotices = helper::retrieve_enabled_notices();
         $this->assertEquals(1, count($allnotices));
         $this->assertEquals("Notice 1", reset($allnotices)->title);
 
-        $this->createNotice2();
+        $this->create_notice2();
         $allnotices = helper::retrieve_enabled_notices();
         $this->assertEquals(2, count($allnotices));
         $notice1 = array_shift($allnotices);
@@ -93,8 +93,8 @@ class local_sitenotice_test extends advanced_testcase {
     }
 
     public function test_reset_notices() {
-        $this->createNotice1();
-        $this->createNotice2();
+        $this->create_notice1();
+        $this->create_notice2();
         $allnotices = helper::retrieve_enabled_notices();
         $this->assertEquals(2, count($allnotices));
         $oldnotice1 = array_shift($allnotices);
@@ -112,8 +112,8 @@ class local_sitenotice_test extends advanced_testcase {
     }
 
     public function test_enable_notices() {
-        $this->createNotice1();
-        $this->createNotice2();
+        $this->create_notice1();
+        $this->create_notice2();
         $allnotices = helper::retrieve_enabled_notices();
         $notice1 = array_shift($allnotices);
         $this->assertEquals("Notice 1", $notice1->title);
@@ -146,10 +146,10 @@ class local_sitenotice_test extends advanced_testcase {
 
     public function test_user_notice() {
         global $USER;
-        $this->createNotice1();
-        $this->createNotice2();
-        $this->createCohortNotice1();
-        $this->createCohortNotice2();
+        $this->create_notice1();
+        $this->create_notice2();
+        $this->create_cohort_notice1();
+        $this->create_cohort_notice2();
         $user1 = $this->getDataGenerator()->create_user();
         $this->setUser($user1);
 
@@ -190,7 +190,7 @@ class local_sitenotice_test extends advanced_testcase {
     }
 
     public function test_user_hlink_interact() {
-        $this->createNotice1();
+        $this->create_notice1();
         $user1 = $this->getDataGenerator()->create_user();
         $this->setUser($user1);
         $allnotices = helper::retrieve_enabled_notices();
