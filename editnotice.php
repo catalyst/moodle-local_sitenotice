@@ -55,6 +55,15 @@ if (empty($noticeid)) {
         echo $OUTPUT->footer();
     }
 } else {
+    $notice = helper::retrieve_notice($noticeid);
+    if (empty($notice)) {
+        echo $OUTPUT->header();
+        echo $OUTPUT->heading(get_string('notice:info', 'local_sitenotice'));
+        echo $OUTPUT->notification(get_string('notification:noticedoesnotexist', 'local_sitenotice'), 'notifyinfo');
+        echo $OUTPUT->footer();
+        die;
+    }
+
     switch ($action) {
         case 'report':
             redirect(new moodle_url($reportpage, ["noticeid" => $noticeid]));
@@ -72,13 +81,12 @@ if (empty($noticeid)) {
             redirect(new moodle_url($managenoticepage));
             break;
         case 'view':
-            $notice = helper::retrieve_notice($noticeid);
+            echo $OUTPUT->header();
+            echo $OUTPUT->heading(get_string('notice:view', 'local_sitenotice'));
             $notice->noticeid = $noticeid;
             $mform = new notice_form(null, ['readonly' => true]);
             $notice->resetinterval = helper::format_time($notice->resetinterval);
             $mform->set_data($notice);
-            echo $OUTPUT->header();
-            echo $OUTPUT->heading(get_string('notice:view', 'local_sitenotice'));
             $mform->display();
             echo $OUTPUT->footer();
             break;

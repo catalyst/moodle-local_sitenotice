@@ -41,6 +41,7 @@ $string['notice:reqack'] = 'Requires Acknowledgement';
 $string['notice:disable'] = 'Disable notice';
 $string['notice:create'] = 'Create new notice';
 $string['notice:view'] = 'View notice';
+$string['notice:info'] = 'Notice information';
 $string['notice:report'] = 'View report';
 $string['notice:reset'] = 'Reset notice';
 $string['notice:hlinkcount'] = 'Hyperlink Counts';
@@ -66,3 +67,4 @@ $string['privacy:metadata:userid'] = 'User ID';
 
 // Notification.
 $string['notification:noack'] = 'There is no acknowledgment for this notice';
+$string['notification:noticedoesnotexist'] = 'The notice does not exist';
