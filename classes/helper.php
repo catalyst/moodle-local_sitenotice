@@ -339,20 +339,26 @@ class helper {
 
     /**
      * Get acknowledgement records based on current filter sql
+     * @param $userid user id
+     * @param $noticeid notice id
      * @param null $filtersql filter sql
      * @param null $params parameter
      * @return array
      * @throws \dml_exception
      */
-    public static function retrieve_acknowlegement($filtersql = null, $params = null) {
+    public static function retrieve_acknowlegement($userid, $noticeid, $filtersql = null, $params = null) {
         global $DB;
-        $filtersql = empty($filtersql) ? ' true ' : $filtersql;
+        if (empty($filtersql)) {
+            $filtersql = " userid = :userid AND noticeid = :noticeid ";
+        } else {
+            $filtersql = " $filtersql AND userid = :userid AND noticeid = :noticeid ";
+        }
+        $params = array_merge($params, ['userid' => $userid, 'noticeid' => $noticeid]);
         $sql = "SELECT *
                   FROM {local_sitenotice_ack}
                  WHERE $filtersql
-               ORDER BY userid ASC, timecreated DESC";
+              ORDER BY userid ASC, timecreated DESC";
         return $DB->get_records_sql($sql, $params);
-
     }
 
     /**
