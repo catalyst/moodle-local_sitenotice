@@ -46,7 +46,7 @@ class helper {
         $transaction = $DB->start_delegated_transaction();
         $noticeid = $DB->insert_record('local_sitenotice', $data);
         if (!empty($noticeid)) {
-            // Extract hyperlinks from the content of the notice.
+            // Extract hyperlinks from the content of the notice, which is then used for link clicked tracking.
             $dom = new \DOMDocument();
             $dom->loadHTML($data->content);
             foreach ($dom->getElementsByTagName('a') as $node) {
