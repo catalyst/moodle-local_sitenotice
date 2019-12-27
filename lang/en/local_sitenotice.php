@@ -51,6 +51,7 @@ $string['notice:view'] = 'View notice';
 $string['notice:info'] = 'Notice information';
 $string['notice:report'] = 'View report';
 $string['notice:reset'] = 'Reset notice';
+$string['notice:delete'] = 'Delete notice';
 $string['notice:hlinkcount'] = 'Hyperlink Counts';
 $string['notice:resetinterval'] = 'Reset every';
 $string['notice:resetinterval_help'] = 'The notice will be displayed to user again once the specified period elapses.';
@@ -78,3 +79,6 @@ $string['privacy:metadata:userid'] = 'User ID';
 // Notification.
 $string['notification:noack'] = 'There is no acknowledgment for this notice';
 $string['notification:noticedoesnotexist'] = 'The notice does not exist';
+
+// Confirmation.
+$string['confirmation:deletenotice'] = 'Do you really want to delete the notice "{$a}"';

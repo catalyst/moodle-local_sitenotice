@@ -142,8 +142,21 @@ class helper {
     }
 
     /**
-     * Audience options based on site cohorts.
+     * Delete a notice
+     * @param $noticeid notice id
+     * @throws \dml_exception
+     */
+    public static function delete_notice($noticeid) {
+        global $DB;
+        if (get_config('local_sitenotice', 'allow_delete')) {
+            $DB->delete_records('local_sitenotice', ['id' => $noticeid]);
+        }
+    }
+
+    /**
+     * Built Audience options based on site cohorts.
      * @return array
+     * @throws \coding_exception
      */
     public static function built_audience_options() {
         $option = ['0' => get_string('notice:audience:all', 'local_sitenotice')];

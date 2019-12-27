@@ -88,6 +88,15 @@ foreach ($notices as $notice) {
     $editlink = html_writer::link($editurl, $icon);
     $links .= ' ' . $editlink;
 
+    // Delete.
+    if (get_config('local_sitenotice', 'allow_delete')) {
+        $editparams = ['noticeid' => $notice->id, 'action' => 'unconfirmeddelete', 'sesskey' => sesskey()];
+        $editurl = new moodle_url($editnotice, $editparams);
+        $icon = $OUTPUT->pix_icon('t/delete', get_string('notice:delete', 'local_sitenotice'));
+        $editlink = html_writer::link($editurl, $icon);
+        $links .= ' ' . $editlink;
+    }
+
     // Report.
     $editparams = ['noticeid' => $notice->id, 'action' => 'report', 'sesskey' => sesskey()];
     $editurl = new moodle_url($editnotice, $editparams);
