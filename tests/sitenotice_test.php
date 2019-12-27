@@ -208,4 +208,12 @@ class local_sitenotice_test extends advanced_testcase {
         $userlinks = helper::retrieve_hlink_count($user1->id, $notice1->id);
         $this->assertEquals(2, count($userlinks));
     }
+
+    public function test_format_interval_time() {
+        // 1 day(s) 2 hour(s) 3 minute(s) 4 second(s)
+        $timeinterval = 93784;
+        $formatedtime = helper::format_interval_time($timeinterval);
+        // Assume the time format is '%a day(s), %h hour(s), %i minute(s) and %s second(s)'.
+        $this->assertContains('1 day(s), 2 hour(s), 3 minute(s) and 4 second(s)', $formatedtime);
+    }
 }

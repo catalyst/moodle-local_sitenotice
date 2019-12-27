@@ -60,7 +60,7 @@ $string['event:update'] = 'Notice update';
 $string['report:name'] = 'Notice Report';
 
 // Time format.
-$string['timeformat:resetinterval'] = '%a days, %h hours, %i minutes and %s seconds';
+$string['timeformat:resetinterval'] = '%a day(s), %h hour(s), %i minute(s) and %s second(s)';
 
 // Privacy.
 $string['privacy:metadata:local_sitenotice_ack'] = 'Notice Acknowledgement';

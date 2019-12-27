@@ -395,14 +395,17 @@ class helper {
     }
 
     /**
-     * Format time
+     * Format date interval.
      * @param $time
      * @return string
      * @throws \coding_exception
      */
-    public static function format_time($time) {
+    public static function format_interval_time($time) {
+        // Datetime for 01/01/1970.
         $datefrom = new \DateTime("@0");
+        // Datetime for 01/01/1970 after the specified time (in seconds).
         $dateto = new \DateTime("@$time");
+        // Format the date interval.
         return $datefrom->diff($dateto)->format(get_string('timeformat:resetinterval', 'local_sitenotice'));
     }
 }
