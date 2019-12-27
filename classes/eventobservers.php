@@ -29,13 +29,6 @@ defined('MOODLE_INTERNAL') || die();
 use local_sitenotice\helper;
 
 class eventobservers {
-    public static function sitenotice_created(\local_sitenotice\event\sitenotice_created $event) {
-
-    }
-
-    public static function sitenotice_updated(\local_sitenotice\event\sitenotice_updated $event) {
-
-    }
 
     public static function sitenotice_dismissed(\local_sitenotice\event\sitenotice_dismissed $event) {
         $noticeid = $event->get_data()['objectid'];
@@ -50,4 +43,5 @@ class eventobservers {
         $action = $event->get_data()['action'];
         helper::add_to_viewed_noticed($noticeid, $userid, $action);
     }
+
 }

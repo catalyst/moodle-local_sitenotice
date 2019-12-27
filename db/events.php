@@ -25,15 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $observers = array (
-    array(
-        'eventname'   => '\local_sitenotice\event\sitenotice_created',
-        'callback'    => '\local_sitenotice\eventobservers::sitenotice_created',
-    ),
-
-    array(
-        'eventname'   => '\local_sitenotice\event\sitenotice_updated',
-        'callback'    => '\local_sitenotice\eventobservers::sitenotice_updated',
-    ),
 
     array(
         'eventname'   => '\local_sitenotice\event\sitenotice_dismissed',
@@ -44,4 +35,5 @@ $observers = array (
         'eventname'   => '\local_sitenotice\event\sitenotice_acknowledged',
         'callback'    => '\local_sitenotice\eventobservers::sitenotice_acknowledged',
     ),
+
 );
