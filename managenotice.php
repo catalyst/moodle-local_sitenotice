@@ -39,8 +39,7 @@ echo $OUTPUT->heading(get_string('setting:managenotice', 'local_sitenotice'));
 
 $newnoticeparams = ['noticeid' => 0, 'sesskey' => sesskey()];
 $newnoticeurl = new moodle_url($editnotice, $newnoticeparams);
-echo html_writer::link($newnoticeurl, get_string('notice:create', 'local_sitenotice'));
-
+echo $OUTPUT->single_button($newnoticeurl, get_string('notice:create', 'local_sitenotice'));
 
 // Notice table.
 $table = new html_table();
