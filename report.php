@@ -34,16 +34,17 @@ $noticeid = required_param('noticeid', PARAM_INT);
 $download = optional_param('download', false, PARAM_BOOL);
 
 // Set up page.
-$thispage = '/local/sitenotice/report.php';
-$managenoticepage = '/local/sitenotice/managenotice.php';
-$url = new moodle_url($thispage, ['noticeid' => $noticeid]);
-$PAGE->set_url($url);
+$thispage = new moodle_url('/local/sitenotice/report.php', ['noticeid' => $noticeid, 'download' => $download]);
+
+$PAGE->set_url($thispage);
 $PAGE->set_context(context_system::instance());
-$PAGE->navbar->add(get_string('report:name', 'local_sitenotice'));
+
+$managenoticepage = new moodle_url('/local/sitenotice/managenotice.php');
+$PAGE->navbar->add(get_string('setting:managenotice', 'local_sitenotice'), $managenoticepage);
 $PAGE->requires->css('/local/sitenotice/styles.css');
 
 // Get current filter for the report.
-$filter = new report_filter($url);
+$filter = new report_filter($thispage);
 list($filtersql, $params) = $filter->get_sql_filter();
 
 $notice = helper::retrieve_notice($noticeid);
@@ -59,8 +60,8 @@ if (!$download) {
 if (!empty($records)) {
     // Display Table.
     if (!$download) {
-        $button = $OUTPUT->single_button(new moodle_url($thispage, ['noticeid' => $noticeid, 'download' => true]),
-            get_string("downloadtext"));
+        $thispage->param('download', true);
+        $button = $OUTPUT->single_button($thispage, get_string("downloadtext"));
         echo html_writer::tag('div', $button, array('class' => 'noticereport'));
 
         // Notice table.

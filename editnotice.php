@@ -33,10 +33,11 @@ require_sesskey();
 $PAGE->set_context(context_system::instance());
 $PAGE->requires->css('/local/sitenotice/styles.css');
 
-$thispage = '/local/sitenotice/editnotice.php';
-$managenoticepage = '/local/sitenotice/managenotice.php';
-$reportpage = '/local/sitenotice/report.php';
-$PAGE->set_url(new moodle_url($thispage));
+$thispage = new moodle_url('/local/sitenotice/editnotice.php');
+$PAGE->set_url($thispage);
+
+$managenoticepage = new moodle_url('/local/sitenotice/managenotice.php');
+$PAGE->navbar->add(get_string('setting:managenotice', 'local_sitenotice'), $managenoticepage);
 
 $noticeid = optional_param('noticeid', 0, PARAM_INT);
 $action = optional_param('action', '', PARAM_TEXT);
@@ -45,9 +46,9 @@ if (empty($noticeid)) {
     $mform = new notice_form();
     if ($formdata = $mform->get_data()) {
         helper::create_new_notice($formdata);
-        redirect(new moodle_url($managenoticepage));
+        redirect($managenoticepage);
     } else if ($mform->is_cancelled()) {
-        redirect(new moodle_url($managenoticepage));
+        redirect($managenoticepage);
     } else {
         echo $OUTPUT->header();
         echo $OUTPUT->heading(get_string('notice:create', 'local_sitenotice'));
@@ -66,19 +67,20 @@ if (empty($noticeid)) {
 
     switch ($action) {
         case 'report':
-            redirect(new moodle_url($reportpage, ["noticeid" => $noticeid]));
+            $reportpage = new moodle_url('/local/sitenotice/report.php', ["noticeid" => $noticeid]);
+            redirect($reportpage);
             break;
         case 'reset':
             helper::reset_notice($noticeid);
-            redirect(new moodle_url($managenoticepage));
+            redirect($managenoticepage);
             break;
         case 'disable':
             helper::reset_notice($noticeid, 0);
-            redirect(new moodle_url($managenoticepage));
+            redirect($managenoticepage);
             break;
         case 'enable':
             helper::reset_notice($noticeid, 1);
-            redirect(new moodle_url($managenoticepage));
+            redirect($managenoticepage);
             break;
         case 'view':
             echo $OUTPUT->header();
@@ -91,6 +93,6 @@ if (empty($noticeid)) {
             echo $OUTPUT->footer();
             break;
         default:
-            redirect(new moodle_url($managenoticepage));
+            redirect($managenoticepage);
     }
 }
