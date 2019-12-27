@@ -150,6 +150,16 @@ class helper {
         global $DB;
         if (get_config('local_sitenotice', 'allow_delete')) {
             $DB->delete_records('local_sitenotice', ['id' => $noticeid]);
+            if (get_config('local_sitenotice', 'cleanup_deleted_notice')) {
+                $DB->delete_records('local_sitenotice_ack', ['noticeid' => $noticeid]);
+                $DB->delete_records('local_sitenotice_lastview', ['noticeid' => $noticeid]);
+                $hlinks = self::retrieve_notice_hlinks($noticeid);
+                if (!empty($hlinks)) {
+                    list($linksql, $param) = $DB->get_in_or_equal(array_keys($hlinks), SQL_PARAMS_NAMED);
+                    $DB->delete_records_select('local_sitenotice_hlinks_his', " hlinkid $linksql", $param);
+                    $DB->delete_records('local_sitenotice_hlinks', ['noticeid' => $noticeid]);
+                }
+            }
         }
     }
 

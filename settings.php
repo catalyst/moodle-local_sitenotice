@@ -42,6 +42,10 @@ if ($hassiteconfig) {
         new lang_string('setting:allow_delete', 'local_sitenotice'),
         new lang_string('setting:allow_deletedesc', 'local_sitenotice'), 0));
 
+    $temp->add(new admin_setting_configcheckbox('local_sitenotice/cleanup_deleted_notice',
+        new lang_string('setting:cleanup_deleted_notice', 'local_sitenotice'),
+        new lang_string('setting:cleanup_deleted_noticedesc', 'local_sitenotice'), 0));
+
     $ADMIN->add('sitenotice', $temp);
 
     $managenotice = new admin_externalpage('local_sitenotice_managenotice',
