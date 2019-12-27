@@ -36,6 +36,7 @@ $string['setting:enableddesc'] = 'Enable site notice';
 $string['notice:title'] = 'Title';
 $string['notice:content'] = 'Content';
 $string['notice:audience'] = 'Audience';
+$string['notice:audience:all'] = 'All Users';
 $string['notice:enable'] = 'Enable notice';
 $string['notice:reqack'] = 'Requires Acknowledgement';
 $string['notice:reqack_help'] = 'If enabled, the user will need to accept the notice before they can continue to use the LMS site.
@@ -61,6 +62,8 @@ $string['report:name'] = 'Notice Report';
 
 // Time format.
 $string['timeformat:resetinterval'] = '%a day(s), %h hour(s), %i minute(s) and %s second(s)';
+$string['booleanformat:true'] = 'YES';
+$string['booleanformat:false'] = 'NO';
 
 // Privacy.
 $string['privacy:metadata:local_sitenotice_ack'] = 'Notice Acknowledgement';

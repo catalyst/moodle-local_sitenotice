@@ -145,15 +145,14 @@ class helper {
      * Audience options based on site cohorts.
      * @return array
      */
-    public static function built_audience_option() {
-        $option = ['0' => 'All Users'];
+    public static function built_audience_options() {
+        $option = ['0' => get_string('notice:audience:all', 'local_sitenotice')];
         $cohorts = cohort_get_all_cohorts();
         foreach ($cohorts['cohorts'] as $cohort) {
             $option[$cohort->id] = $cohort->name;
         }
         return $option;
     }
-
 
     /**
      * Retrieve notice applied to user.
@@ -408,4 +407,29 @@ class helper {
         // Format the date interval.
         return $datefrom->diff($dateto)->format(get_string('timeformat:resetinterval', 'local_sitenotice'));
     }
+
+    /**
+     * Format boolean value
+     * @param $value boolean
+     * @return string
+     * @throws \coding_exception
+     */
+    public static function format_boolean($value) {
+        if($value) {
+            return get_string('booleanformat:true', 'local_sitenotice');
+        } else {
+            return get_string('booleanformat:false', 'local_sitenotice');
+        }
+    }
+
+    /**
+     * Get audience name from the audience options.
+     * @param $audienceid audience id
+     * @return mixed
+     */
+    public static function get_audience_name($audienceid) {
+        $audiences = self::built_audience_options();
+        return $audiences[$audienceid];
+    }
+
 }

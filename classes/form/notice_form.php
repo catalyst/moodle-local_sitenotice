@@ -68,7 +68,7 @@ class notice_form extends moodleform {
 
         $mform->setDefault('reqack', 0);
 
-        $audience = helper::built_audience_option();
+        $audience = helper::built_audience_options();
 
         $mform->addElement('select', 'audience', get_string('notice:audience', 'local_sitenotice'), $audience, $attributes);
         $mform->setDefault('audience', 0);

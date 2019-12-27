@@ -136,11 +136,11 @@ class local_sitenotice_test extends advanced_testcase {
 
     public function test_audience_options() {
         $this->getDataGenerator()->create_cohort();
-        $options = helper::built_audience_option();
+        $options = helper::built_audience_options();
         $this->assertEquals(2, count($options));
 
         $this->getDataGenerator()->create_cohort();
-        $options = helper::built_audience_option();
+        $options = helper::built_audience_options();
         $this->assertEquals(3, count($options));
     }
 

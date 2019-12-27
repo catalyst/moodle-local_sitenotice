@@ -46,6 +46,9 @@ $table = new html_table();
 $table->attributes['class'] = 'generaltable';
 $table->head = array(
     get_string('notice:title', 'local_sitenotice'),
+    get_string('notice:resetinterval', 'local_sitenotice'),
+    get_string('notice:reqack', 'local_sitenotice'),
+    get_string('notice:audience', 'local_sitenotice'),
     get_string('actions'),
 );
 
@@ -53,6 +56,9 @@ $notices = helper::retrieve_all_notices('enabled DESC, timemodified DESC');
 foreach ($notices as $notice) {
     $row = array();
     $row[] = $notice->title;
+    $row[] = helper::format_interval_time($notice->resetinterval);
+    $row[] = helper::format_boolean($notice->reqack);
+    $row[] = helper::get_audience_name($notice->audience);
     $links = null;
     // View/Edit.
     $editparams = ['noticeid' => $notice->id, 'action' => 'view', 'sesskey' => sesskey()];
