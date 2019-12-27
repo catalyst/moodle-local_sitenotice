@@ -10,7 +10,6 @@
         <FIELD NAME="title" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false" COMMENT="Title of the Notice"/>
         <FIELD NAME="content" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Notice Content"/>
         <FIELD NAME="audience" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="0 - All user or cohort ID"/>
-        <FIELD NAME="reqinteract" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Requires Physical Interaction: 1 - YES, 0 - NO"/>
         <FIELD NAME="reqack" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Requires Acknowledgement: 1 - YES, 0 - NO"/>
         <FIELD NAME="enabled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Enabled: 1 - YES, 0 - NO"/>
         <FIELD NAME="resetinterval" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Reset Interval"/>
