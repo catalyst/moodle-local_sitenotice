@@ -11,7 +11,7 @@ Site administration > Plugins > Local plugins > Site Notice > Settings
 * Click on "Create New Notice"
 * Enter Title
 * Enter Content
-* Set up reset interval ('reset every') if required. The notice will be displayed to user again if the period elapses.
+* Set up reset interval ('reset every') if required. The notice will be displayed to user again once the specified period elapses.
 * Requires Acknowledgement. If enabled, the user will need to accept the notice before they can continue to use the LMS site.
 If the user does not accept the notice, he/she will be logged out of the site.
 * Set up target audience (cohort) 

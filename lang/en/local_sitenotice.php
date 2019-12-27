@@ -38,6 +38,8 @@ $string['notice:content'] = 'Content';
 $string['notice:audience'] = 'Audience';
 $string['notice:enable'] = 'Enable notice';
 $string['notice:reqack'] = 'Requires Acknowledgement';
+$string['notice:reqack_help'] = 'If enabled, the user will need to accept the notice before they can continue to use the LMS site.
+If the user does not accept the notice, he/she will be logged out of the site.';
 $string['notice:disable'] = 'Disable notice';
 $string['notice:create'] = 'Create new notice';
 $string['notice:view'] = 'View notice';
@@ -46,6 +48,7 @@ $string['notice:report'] = 'View report';
 $string['notice:reset'] = 'Reset notice';
 $string['notice:hlinkcount'] = 'Hyperlink Counts';
 $string['notice:resetinterval'] = 'Reset every';
+$string['notice:resetinterval_help'] = 'The notice will be displayed to user again once the specified period elapses.';
 
 // Event.
 $string['event:dismiss'] = 'Notice dismission';
