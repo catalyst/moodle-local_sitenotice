@@ -34,6 +34,14 @@ if ($hassiteconfig) {
         new lang_string('setting:enabled', 'local_sitenotice'),
         new lang_string('setting:enableddesc', 'local_sitenotice'), 0));
 
+    $temp->add(new admin_setting_configcheckbox('local_sitenotice/allow_update',
+        new lang_string('setting:allow_update', 'local_sitenotice'),
+        new lang_string('setting:allow_updatedesc', 'local_sitenotice'), 0));
+
+    $temp->add(new admin_setting_configcheckbox('local_sitenotice/allow_delete',
+        new lang_string('setting:allow_delete', 'local_sitenotice'),
+        new lang_string('setting:allow_deletedesc', 'local_sitenotice'), 0));
+
     $ADMIN->add('sitenotice', $temp);
 
     $managenotice = new admin_externalpage('local_sitenotice_managenotice',

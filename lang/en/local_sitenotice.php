@@ -31,6 +31,10 @@ $string['setting:settings'] = 'Settings';
 $string['setting:managenotice'] = 'Manage Notice';
 $string['setting:enabled'] = 'Enabled';
 $string['setting:enableddesc'] = 'Enable site notice';
+$string['setting:allow_update'] = 'Allow notice update';
+$string['setting:allow_updatedesc'] = 'Allow notice to be updated';
+$string['setting:allow_delete'] = 'Allow notice deletion';
+$string['setting:allow_deletedesc'] = 'Allow notice to be deleted';
 
 // Notice Management.
 $string['notice:title'] = 'Title';
