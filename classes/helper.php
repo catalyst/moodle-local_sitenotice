@@ -46,6 +46,7 @@ class helper {
         $transaction = $DB->start_delegated_transaction();
         $noticeid = $DB->insert_record('local_sitenotice', $data);
         if (!empty($noticeid)) {
+            // Extract hyperlinks from the content of the notice.
             $dom = new \DOMDocument();
             $dom->loadHTML($data->content);
             foreach ($dom->getElementsByTagName('a') as $node) {
@@ -54,9 +55,11 @@ class helper {
                 $link->text = trim($node->nodeValue);
                 $link->link = trim($node->getAttribute("href"));
                 $linkid = $DB->insert_record('local_sitenotice_hlinks', $link);
+                // ID to use for link tracking in javascript.
                 $node->setAttribute('data-linkid', $linkid);
                 $node->setAttribute('target', '_blank');
             }
+            // Update the content of the inserted notice (With included link ids).
             $content = $dom->saveHTML();
             $result = $DB->set_field('local_sitenotice', 'content', $content, ['id' => $noticeid]);
             if ($result) {
