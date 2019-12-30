@@ -33,6 +33,7 @@ $thispage = '/local/sitenotice/managenotice.php';
 $editnotice = '/local/sitenotice/editnotice.php';
 
 $PAGE->set_url(new moodle_url($thispage));
+$PAGE->requires->js_call_amd('local_sitenotice/preview', 'init');
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('setting:managenotice', 'local_sitenotice'));
@@ -49,6 +50,7 @@ $table->head = array(
     get_string('notice:resetinterval', 'local_sitenotice'),
     get_string('notice:reqack', 'local_sitenotice'),
     get_string('notice:audience', 'local_sitenotice'),
+    get_string('notice:content', 'local_sitenotice'),
     get_string('actions'),
 );
 
@@ -59,6 +61,10 @@ foreach ($notices as $notice) {
     $row[] = helper::format_interval_time($notice->resetinterval);
     $row[] = helper::format_boolean($notice->reqack);
     $row[] = helper::get_audience_name($notice->audience);
+
+    $row[] = html_writer::link("#", get_string('view'),
+        ['class' => 'notice-preview', 'data-noticecontent' => $notice->content]);
+
     $links = null;
     // View/Edit.
     $editparams = ['noticeid' => $notice->id, 'action' => 'view', 'sesskey' => sesskey()];
