@@ -66,12 +66,14 @@ foreach ($notices as $notice) {
         ['class' => 'notice-preview', 'data-noticecontent' => $notice->content]);
 
     $links = null;
-    // View/Edit.
-    $editparams = ['noticeid' => $notice->id, 'action' => 'view', 'sesskey' => sesskey()];
-    $editurl = new moodle_url($editnotice, $editparams);
-    $icon = $OUTPUT->pix_icon('t/edit', get_string('view'));
-    $editlink = html_writer::link($editurl, $icon);
-    $links .= ' ' . $editlink;
+    // Edit.
+    if (get_config('local_sitenotice', 'allow_update')) {
+        $editparams = ['noticeid' => $notice->id, 'action' => 'edit', 'sesskey' => sesskey()];
+        $editurl = new moodle_url($editnotice, $editparams);
+        $icon = $OUTPUT->pix_icon('t/edit', get_string('edit'));
+        $editlink = html_writer::link($editurl, $icon);
+        $links .= ' ' . $editlink;
+    }
 
     // Enable/Disable.
     if ($notice->enabled) {

@@ -42,9 +42,12 @@ $PAGE->navbar->add(get_string('setting:managenotice', 'local_sitenotice'), $mana
 $noticeid = optional_param('noticeid', 0, PARAM_INT);
 $action = optional_param('action', '', PARAM_TEXT);
 
+$mform = new notice_form();
+$formdata = $mform->get_data();
+
 if (empty($noticeid)) {
-    $mform = new notice_form();
-    if ($formdata = $mform->get_data()) {
+    // Create new notice.
+    if (!empty($formdata)) {
         helper::create_new_notice($formdata);
         redirect($managenoticepage);
     } else if ($mform->is_cancelled()) {
@@ -55,6 +58,10 @@ if (empty($noticeid)) {
         $mform->display();
         echo $OUTPUT->footer();
     }
+} else if (!empty($formdata)) {
+    // Update notice.
+    helper::update_notice($formdata);
+    redirect($managenoticepage);
 } else {
     $notice = helper::retrieve_notice($noticeid);
     if (empty($notice)) {
@@ -96,11 +103,11 @@ if (empty($noticeid)) {
             helper::delete_notice($noticeid);
             redirect($managenoticepage);
             break;
-        case 'view':
+        case 'edit':
             echo $OUTPUT->header();
             echo $OUTPUT->heading(get_string('notice:view', 'local_sitenotice'));
             $notice->noticeid = $noticeid;
-            $mform = new notice_form(null, ['readonly' => true]);
+            $mform = new notice_form(null);
             $notice->resetinterval = helper::format_interval_time($notice->resetinterval);
             $mform->set_data($notice);
             $mform->display();

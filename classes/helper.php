@@ -46,21 +46,7 @@ class helper {
         $transaction = $DB->start_delegated_transaction();
         $noticeid = $DB->insert_record('local_sitenotice', $data);
         if (!empty($noticeid)) {
-            // Extract hyperlinks from the content of the notice, which is then used for link clicked tracking.
-            $dom = new \DOMDocument();
-            $dom->loadHTML($data->content);
-            foreach ($dom->getElementsByTagName('a') as $node) {
-                $link = new \stdClass();
-                $link->noticeid = $noticeid;
-                $link->text = trim($node->nodeValue);
-                $link->link = trim($node->getAttribute("href"));
-                $linkid = $DB->insert_record('local_sitenotice_hlinks', $link);
-                // ID to use for link tracking in javascript.
-                $node->setAttribute('data-linkid', $linkid);
-                $node->setAttribute('target', '_blank');
-            }
-            // Update the content of the inserted notice (With included link ids).
-            $content = $dom->saveHTML();
+            $content = self::update_hyperlinks($noticeid, $data->content);
             $result = $DB->set_field('local_sitenotice', 'content', $content, ['id' => $noticeid]);
             if ($result) {
                 // Log created event.
@@ -74,6 +60,76 @@ class helper {
             }
         }
         $transaction->allow_commit();
+    }
+
+    /**
+     * Update existing notice.
+     * @param $data form data
+     * @throws \dml_exception
+     */
+    public static function update_notice($data){
+        global $DB;
+        if (!get_config('local_sitenotice', 'allow_update')) {
+            return;
+        }
+        $data->id = $data->noticeid;
+        $data->timemodified = time();
+        $data->content = self::update_hyperlinks($data->noticeid, $data->content);
+        $DB->update_record('local_sitenotice', $data);
+    }
+
+    /**
+     * Extract hyperlink from notice content.
+     * @param $noticeid notice id
+     * @param $content notice content
+     * @return string
+     * @throws \dml_exception
+     */
+    private static function update_hyperlinks($noticeid, $content) {
+        global $DB;
+        // Extract hyperlinks from the content of the notice, which is then used for link clicked tracking.
+        $dom = new \DOMDocument();
+        $dom->loadHTML('<?xml encoding="utf-8" ?>' . $content);
+        // Current links in the notice.
+        $noticelinks = self::retrieve_notice_hlinks($noticeid);
+        $unchangedlinks = [];
+
+        foreach ($dom->getElementsByTagName('a') as $node) {
+            $link = new \stdClass();
+            $link->noticeid = $noticeid;
+            $link->text = trim($node->nodeValue);
+            $link->link = trim($node->getAttribute("href"));
+
+            if (!empty($noticelinks)) {
+                // A link is considered as 'unchanged' if it has the same text and href value.
+                $currentlink = $DB->get_record('local_sitenotice_hlinks',
+                    ['noticeid' => $noticeid, 'text' => $link->text, 'link' => $link->link]);
+                if (empty($currentlink)) {
+                    $linkid = $DB->insert_record('local_sitenotice_hlinks', $link);
+                } else {
+                    // Link and its text does not change.
+                    $linkid = $currentlink->id;
+                    $unchangedlinks[$linkid] = $currentlink;
+                }
+            } else {
+                // New Links.
+                $linkid = $DB->insert_record('local_sitenotice_hlinks', $link);
+            }
+
+            // ID to use for link tracking in javascript.
+            $node->setAttribute('data-linkid', $linkid);
+            $node->setAttribute('target', '_blank');
+        }
+
+        // Clean up unused links.
+        $unusedlinks = array_diff_key($noticelinks, $unchangedlinks);
+        if (!empty($unusedlinks)) {
+            list($unusedlinksql, $param) = $DB->get_in_or_equal(array_keys($unusedlinks), SQL_PARAMS_NAMED);
+            $DB->delete_records_select('local_sitenotice_hlinks', " id $unusedlinksql", $param);
+        }
+
+        // Update the content of the inserted notice (With included link ids).
+        return $dom->saveHTML();
     }
 
     /**

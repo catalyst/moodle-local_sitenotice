@@ -38,52 +38,37 @@ class notice_form extends moodleform {
         $mform->addElement('hidden', 'noticeid', 0);
         $mform->setType('noticeid', PARAM_INT);
 
-        // Check read only mode.
-        $readonly = isset($this->_customdata['readonly']) ? $this->_customdata['readonly'] : false;
-        $attributes = $readonly ? ['disabled' => ''] : [];
-
-        $mform->addElement('text', 'title', get_string('notice:title', 'local_sitenotice'), $attributes);
+        $mform->addElement('text', 'title', get_string('notice:title', 'local_sitenotice'));
         $mform->setType('title', PARAM_TEXT);
         $mform->addRule('title', get_string('required'), 'required', null, 'client');
 
-        if ($readonly) {
-            $mform->addElement('static', 'content', get_string('notice:content', 'local_sitenotice'));
-        } else {
-            $mform->addElement('htmleditor', 'content',
-                get_string('notice:content', 'local_sitenotice'), [], ['class' => 'noticecontent']);
-        }
+        $mform->addElement('htmleditor', 'content',
+            get_string('notice:content', 'local_sitenotice'), [], ['class' => 'noticecontent']);
+
         $mform->setType('content', PARAM_RAW);
         $mform->addRule('content', get_string('required'), 'required', null, 'client');
 
-        if ($readonly) {
-            $mform->addElement('static', 'resetinterval', get_string('notice:resetinterval', 'local_sitenotice'));
-        } else {
-            $mform->addElement('duration', 'resetinterval', get_string('notice:resetinterval', 'local_sitenotice'));
-            $mform->addHelpButton('resetinterval', 'notice:resetinterval', 'local_sitenotice');
-            $mform->setDefault('resetinterval', 0);
-        }
+        $mform->addElement('duration', 'resetinterval', get_string('notice:resetinterval', 'local_sitenotice'));
+        $mform->addHelpButton('resetinterval', 'notice:resetinterval', 'local_sitenotice');
+        $mform->setDefault('resetinterval', 0);
 
-        $mform->addElement('selectyesno', 'reqack', get_string('notice:reqack', 'local_sitenotice'), $attributes);
+        $mform->addElement('selectyesno', 'reqack', get_string('notice:reqack', 'local_sitenotice'));
         $mform->addHelpButton('reqack', 'notice:reqack', 'local_sitenotice');
 
         $mform->setDefault('reqack', 0);
 
         $audience = helper::built_audience_options();
 
-        $mform->addElement('select', 'audience', get_string('notice:audience', 'local_sitenotice'), $audience, $attributes);
+        $mform->addElement('select', 'audience', get_string('notice:audience', 'local_sitenotice'), $audience);
         $mform->setDefault('audience', 0);
 
-        $mform->addElement('selectyesno', 'enabled', get_string('notice:enable', 'local_sitenotice'), $attributes);
+        $mform->addElement('selectyesno', 'enabled', get_string('notice:enable', 'local_sitenotice'));
         $mform->setDefault('enabled', 1);
 
         $buttonarray = array();
 
-        if ($readonly) {
-            $buttonarray[] = $mform->createElement('cancel');
-        } else {
-            $buttonarray[] = $mform->createElement('submit', 'submitbutton', get_string('savechanges'));
-            $buttonarray[] = $mform->createElement('cancel');
-        }
+        $buttonarray[] = $mform->createElement('submit', 'submitbutton', get_string('savechanges'));
+        $buttonarray[] = $mform->createElement('cancel');
 
         $mform->addGroup($buttonarray, 'buttonar', '', ' ', false);
     }
