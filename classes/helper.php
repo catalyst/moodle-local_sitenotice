@@ -348,7 +348,6 @@ class helper {
             'relateduserid' => $USER->id,
         );
         $event = \local_sitenotice\event\sitenotice_dismissed::create($params);
-        $event->trigger();
 
         $result = array();
         $notice = self::retrieve_notice($noticeid);
@@ -358,6 +357,7 @@ class helper {
             $result['redirecturl'] = $loginpage->out();
         }
         $result['status'] = true;
+        $event->trigger();
         return $result;
     }
 
