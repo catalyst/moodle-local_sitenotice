@@ -67,7 +67,7 @@ class helper {
      * @param $data form data
      * @throws \dml_exception
      */
-    public static function update_notice($data){
+    public static function update_notice($data) {
         global $DB;
         if (!get_config('local_sitenotice', 'allow_update')) {
             return;
@@ -494,7 +494,7 @@ class helper {
      * @throws \coding_exception
      */
     public static function format_boolean($value) {
-        if($value) {
+        if ($value) {
             return get_string('booleanformat:true', 'local_sitenotice');
         } else {
             return get_string('booleanformat:false', 'local_sitenotice');

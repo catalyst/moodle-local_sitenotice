@@ -90,11 +90,11 @@ define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry'],
         ModalNotice.prototype.setRequiredAcknoledgement = function(reqack) {
             if (reqack == 1) {
                 var body = this.getBody();
-                var $ackcheckbox = $("<input>", {type: "checkbox", id: SELECTORS.ACK_CHECKBOX});
-                var labeltext = "I have read and understand the notice. Closing this notice will log you off this site.";
-                var $ackcheckboxlabel = $("<label>", { for: SELECTORS.ACK_CHECKBOX, text: labeltext});
-                body.append($ackcheckbox);
-                body.append($ackcheckboxlabel);
+                var ackcheckbox = $("<input>", {type: "checkbox", id: SELECTORS.ACK_CHECKBOX});
+                var labeltext = "I have read and understand the notice (Closing this notice will log you off this site).";
+                var ackcheckboxlabel = $("<label>", {for: SELECTORS.ACK_CHECKBOX, text: labeltext});
+                body.append(ackcheckbox);
+                body.append(ackcheckboxlabel);
                 this.getFooter().find(SELECTORS.ACCEPT_BUTTON).attr('disabled', true);
             } else {
                 this.getFooter().find(SELECTORS.ACCEPT_BUTTON).css('display', 'none');

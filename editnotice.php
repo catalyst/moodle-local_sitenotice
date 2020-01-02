@@ -93,10 +93,11 @@ if (empty($noticeid)) {
             if (get_config('local_sitenotice', 'allow_delete')) {
                 echo $OUTPUT->header();
                 echo $OUTPUT->box_start();
-                $thispage->params(array('sesskey' => sesskey(),'action' => 'confirmeddelete', 'noticeid' => $noticeid));
+                $thispage->params(array('sesskey' => sesskey(), 'action' => 'confirmeddelete', 'noticeid' => $noticeid));
                 $confirmeddelete = new single_button($thispage, get_string('delete'), 'post');
                 $cancel = new single_button($managenoticepage, get_string('cancel'), 'get');
-                echo $OUTPUT->confirm(get_string('confirmation:deletenotice', 'local_sitenotice', $notice->title), $confirmeddelete, $cancel);
+                echo $OUTPUT->confirm(get_string('confirmation:deletenotice', 'local_sitenotice', $notice->title),
+                    $confirmeddelete, $cancel);
                 echo $OUTPUT->box_end();
                 echo $OUTPUT->footer();
             } else {
