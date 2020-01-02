@@ -83,6 +83,8 @@ $string['privacy:metadata:userid'] = 'User ID';
 // Notification.
 $string['notification:noack'] = 'There is no acknowledgment for this notice';
 $string['notification:noticedoesnotexist'] = 'The notice does not exist';
+$string['notification:nodeleteallowed'] = 'Notice deletion is not allowed';
+$string['notification:noupdateallowed'] = 'Notice update is not allowed';
 
 // Confirmation.
 $string['confirmation:deletenotice'] = 'Do you really want to delete the notice "{$a}"';

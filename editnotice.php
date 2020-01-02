@@ -90,28 +90,40 @@ if (empty($noticeid)) {
             redirect($managenoticepage);
             break;
         case 'unconfirmeddelete':
-            echo $OUTPUT->header();
-            echo $OUTPUT->box_start();
-            $thispage->params(array('sesskey' => sesskey(),'action' => 'confirmeddelete', 'noticeid' => $noticeid));
-            $confirmeddelete = new single_button($thispage, get_string('delete'), 'post');
-            $cancel = new single_button($managenoticepage, get_string('cancel'), 'get');
-            echo $OUTPUT->confirm(get_string('confirmation:deletenotice', 'local_sitenotice', $notice->title), $confirmeddelete, $cancel);
-            echo $OUTPUT->box_end();
-            echo $OUTPUT->footer();
+            if (get_config('local_sitenotice', 'allow_delete')) {
+                echo $OUTPUT->header();
+                echo $OUTPUT->box_start();
+                $thispage->params(array('sesskey' => sesskey(),'action' => 'confirmeddelete', 'noticeid' => $noticeid));
+                $confirmeddelete = new single_button($thispage, get_string('delete'), 'post');
+                $cancel = new single_button($managenoticepage, get_string('cancel'), 'get');
+                echo $OUTPUT->confirm(get_string('confirmation:deletenotice', 'local_sitenotice', $notice->title), $confirmeddelete, $cancel);
+                echo $OUTPUT->box_end();
+                echo $OUTPUT->footer();
+            } else {
+                redirect($managenoticepage, get_string('notification:nodeleteallowed', 'local_sitenotice'));
+            }
             break;
         case 'confirmeddelete':
-            helper::delete_notice($noticeid);
-            redirect($managenoticepage);
+            if (get_config('local_sitenotice', 'allow_delete')) {
+                helper::delete_notice($noticeid);
+                redirect($managenoticepage);
+            } else {
+                redirect($managenoticepage, get_string('notification:nodeleteallowed', 'local_sitenotice'));
+            }
             break;
         case 'edit':
-            echo $OUTPUT->header();
-            echo $OUTPUT->heading(get_string('notice:view', 'local_sitenotice'));
-            $notice->noticeid = $noticeid;
-            $mform = new notice_form(null);
-            $notice->resetinterval = helper::format_interval_time($notice->resetinterval);
-            $mform->set_data($notice);
-            $mform->display();
-            echo $OUTPUT->footer();
+            if (get_config('local_sitenotice', 'allow_update')) {
+                echo $OUTPUT->header();
+                echo $OUTPUT->heading(get_string('notice:view', 'local_sitenotice'));
+                $notice->noticeid = $noticeid;
+                $mform = new notice_form(null);
+                $notice->resetinterval = helper::format_interval_time($notice->resetinterval);
+                $mform->set_data($notice);
+                $mform->display();
+                echo $OUTPUT->footer();
+            } else {
+                redirect($managenoticepage, get_string('notification:noupdateallowed', 'local_sitenotice'));
+            }
             break;
         default:
             redirect($managenoticepage);
