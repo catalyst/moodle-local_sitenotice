@@ -7,116 +7,89 @@
  */
 
 define(
-    ['jquery', 'core/ajax'],
-    function ($, ajax) {
-        var notice = {};
+    ['jquery', 'core/ajax', 'core/modal_factory', 'local_sitenotice/modal_notice'],
+    function ($, ajax, ModalFactory, ModalNotice) {
+
         var notices = {};
+        var modal;
         var viewednotices = [];
 
-        function getNotice() {
+        var SiteNotice = {};
+
+        /**
+         * Retrieved notice which has not been viewwed.
+         * @returns {boolean|*}
+         */
+        var getNotice= function() {
             for (var i in notices) {
+                // Check the notice has been viewed.
                 if (!viewednotices.includes(i)) {
                     viewednotices.push(i);
                     return notices[i];
                 }
             }
             return false;
-        }
+        };
 
-        function buildModal(userid) {
-            var notice = getNotice();
+        /**
+         * Show next notice in the modal.
+         */
+        var nextNotice = function () {
+            var nextnotice = getNotice();
+            if (nextnotice == false) {
+                return;
+            }
+            if (typeof modal === 'undefined') {
+                ModalFactory.create({
+                    type: ModalNotice.TYPE,
+                    title: nextnotice.title,
+                    body: nextnotice.content,
+                    large: true,
+                })
+                .then(function (newmodal) {
+                    modal = newmodal;
 
-            if (notice == false) {
-                return false;
+                    modal.setNoticeId(nextnotice.id);
+                    modal.setRequiredAcknoledgement(nextnotice.reqack);
+
+                    //Event listener for close button.
+                    modal.getModal().on('click', modal.getCloseButtonID(), function() {
+                        dismissNotice();
+                        modal.hide();
+                    });
+                    //Event listener for accept button.
+                    modal.getModal().on('click', modal.getAcceptButtonID(), function() {
+                        acknowledgeNotice();
+                        modal.hide();
+                    });
+                    //Event listener for link tracking.
+                    modal.getModal().on('click', 'a', function() {
+                        var linkid = $(this).attr("data-linkid");
+                        trackLink(linkid);
+                    });
+                    //Event listener for ack checkbox.
+                    modal.getModal().on('click', modal.getAckCheckboxID(), function() {
+                        $(modal.getAcceptButtonID()).attr('disabled', !$(modal.getAckCheckboxID()).is(":checked"));
+                    });
+
+                    modal.show();
+                });
+            } else {
+                // Update with new details.
+                modal.setTitle(nextnotice.title);
+                modal.setBody(nextnotice.content);
+                modal.setNoticeId(nextnotice.id);
+                modal.setRequiredAcknoledgement(nextnotice.reqack);
+                modal.show();
             }
 
-            var $modal = $("<div>", {id: "sitenotice-modal", "tabindex": "0"});
-            var $content = $("<div>", {id: "sitenotice-modal-content"});
-            var $header = $("<div>", {id: "sitenotice-modal-content-header"});
-            var $body = $("<div>", {id: "sitenotice-modal-content-body"});
-            var $footer = $("<div>", {id: "sitenotice-modal-content-footer"});
+        };
 
-            $modal.attr("data-userid", userid);
-
-            $content.append($header);
-            $content.append($body);
-            $content.append($footer);
-
-            $modal.append($content);
-            $("body").append($modal);
-
-            buildContent(notice);
-
-            $modal.on('click', '#sitenotice-modal-content-footer-closebutton', function() {
-                var noticeid = $("#sitenotice-modal").attr('data-noticeid');
-                dismissNotice(noticeid);
-                nextNotice();
-            });
-
-            $modal.on('click', '#sitenotice-modal-content-footer-ackbutton', function() {
-                var noticeid = $("#sitenotice-modal").attr('data-noticeid');
-                acknowledgeNotice(noticeid);
-                nextNotice();
-            });
-
-            $modal.on('click', '#sitenotice-modal-content-body-ackcheckbox', function() {
-                toogleAcceptButton();
-            });
-
-            $modal.on('click', 'a', function() {
-                var linkid = $(this).attr("data-linkid");
-                trackLink(linkid);
-            });
-        }
-
-        function buildContent(notice) {
-            var $modal = $("#sitenotice-modal");
-            var $header = $("#sitenotice-modal-content-header");
-            var $body = $("#sitenotice-modal-content-body");
-            var $footer = $("#sitenotice-modal-content-footer");
-
-            $modal.attr("data-noticeid", notice.id);
-            $header.html("<h2>" + notice.title + "</h2>");
-            $body.html(notice.content);
-            $footer.empty();
-
-            var $paragraph = $("<p>");
-            // Close button.
-            var $closebutton = $("<button>", {id: "sitenotice-modal-content-footer-closebutton"});
-            $closebutton.html('CLOSE');
-            $paragraph.append($closebutton);
-            if (notice.reqack == 1) {
-                // Checkbox.
-                var $ackcheckbox = $("<input>", {type: "checkbox", id: "sitenotice-modal-content-body-ackcheckbox"});
-                var labeltext = "I have read and understand the notice. Closing this notice will log you off this site.";
-                var $ackcheckboxlabel = $("<label>", { for: "sitenotice-modal-content-body-ackcheckboxlabel", text: labeltext});
-                $body.append($ackcheckbox);
-                $body.append($ackcheckboxlabel);
-                // Acknowledge button.
-                var $ackbutton = $("<button>", {id: "sitenotice-modal-content-footer-ackbutton"});
-                $ackbutton.html('ACCEPT');
-                $ackbutton.attr('disabled', true);
-                $paragraph.append($ackbutton);
-            }
-            $footer.append($paragraph);
-        }
-
-        function toogleAcceptButton() {
-            $("#sitenotice-modal-content-footer-ackbutton").attr('disabled',
-                !$("#sitenotice-modal-content-body-ackcheckbox").is(":checked"));
-        }
-
-        function nextNotice() {
-            $("#sitenotice-modal").fadeOut("slow", function() {
-                var notice = getNotice();
-                if (notice != false) {
-                    buildContent(notice);
-                    $("#sitenotice-modal").fadeIn("slow");
-                }
-            });
-        }
-
-        function dismissNotice(noticeid) {
+        /**
+         * Dismiss Notice.
+         */
+        var dismissNotice = function () {
+            var noticeid = modal.getNoticeId();
             var promises = ajax.call([
                 { methodname: 'local_sitenotice_dismiss', args: { noticeid: noticeid} }
             ]);
@@ -124,14 +97,20 @@ define(
             promises[0].done(function(response) {
                 if(response.redirecturl) {
                     window.open(response.redirecturl,"_parent", "");
+                } else {
+                    nextNotice();
                 }
             }).fail(function(ex) {
                 // TODO: Log fail event.
                 this.console.log(ex);
             });
-        }
+        };
 
-        function acknowledgeNotice(noticeid) {
+        /**
+         * Acknowledge notice.
+         */
+        var acknowledgeNotice = function () {
+            var noticeid = modal.getNoticeId();
             var promises = ajax.call([
                 { methodname: 'local_sitenotice_acknowledge', args: { noticeid: noticeid} }
             ]);
@@ -139,14 +118,20 @@ define(
             promises[0].done(function(response) {
                 if(response.redirecturl) {
                     window.open(response.redirecturl,"_parent", "");
+                } else {
+                    nextNotice();
                 }
             }).fail(function(ex) {
                 // TODO: Log fail event.
                 this.console.log(ex);
             });
-        }
+        };
 
-        function trackLink(linkid) {
+        /**
+         * Link tracking.
+         * @param linkid
+         */
+        var trackLink = function (linkid) {
             var promises = ajax.call([
                 { methodname: 'local_sitenotice_tracklink', args: {linkid: linkid} }
             ]);
@@ -158,17 +143,19 @@ define(
             }).fail(function(ex) {
                 this.console.log(ex);
             });
-        }
+        };
 
-        notice.init = function(jsnotices, userid) {
+        /**
+         * Initial Modal with user notices.
+         * @param jsnotices
+         */
+        SiteNotice.init = function(jsnotices) {
             notices = JSON.parse(jsnotices);
-            buildModal(userid);
             $(document).ready(function() {
-                $("#sitenotice-modal").fadeIn("slow");
-                $("#sitenotice-modal").focus();
+                nextNotice();
             });
         };
 
-        return notice;
+        return SiteNotice;
     }
 );

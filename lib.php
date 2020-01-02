@@ -35,7 +35,6 @@ function local_sitenotice_extend_navigation(global_navigation $navigation) {
 
     $usernotices = helper::retrieve_user_notices();
     if (!empty($usernotices)) {
-        $PAGE->requires->css('/local/sitenotice/styles.css');
-        $PAGE->requires->js_call_amd('local_sitenotice/notice', 'init', array(json_encode($usernotices), $USER->id));
+        $PAGE->requires->js_call_amd('local_sitenotice/notice', 'init', array(json_encode($usernotices)));
     }
 }

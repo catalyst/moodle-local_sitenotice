@@ -19,6 +19,7 @@ define(
                     type: ModalFactory.types.CLOSE,
                     title: 'Content',
                     body: content,
+                    large: true
                 })
                 .then(function (modal) {
                     modal.show();
