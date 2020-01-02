@@ -117,7 +117,6 @@ if (empty($noticeid)) {
                 echo $OUTPUT->heading(get_string('notice:view', 'local_sitenotice'));
                 $notice->noticeid = $noticeid;
                 $mform = new notice_form(null);
-                $notice->resetinterval = helper::format_interval_time($notice->resetinterval);
                 $mform->set_data($notice);
                 $mform->display();
                 echo $OUTPUT->footer();
