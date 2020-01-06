@@ -93,7 +93,7 @@ class noticeview extends persistent {
      */
     public static function get_user_viewed_notice_records() {
         global $USER, $DB;
-        $sql = "SELECT sn.id, lv.timecreated, lv.action
+        $sql = "SELECT sn.id, lv.timecreated, lv.action, lv.timemodified
                   FROM {local_sitenotice} sn
                   JOIN {local_sitenotice_lastview} lv
                     ON sn.id = lv.noticeid
