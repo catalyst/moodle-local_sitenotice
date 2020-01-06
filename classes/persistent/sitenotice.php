@@ -41,7 +41,7 @@ class sitenotice extends persistent {
                 'null' => NULL_NOT_ALLOWED,
             ],
             'content' => [
-                'type' => PARAM_CLEANHTML,
+                'type' => PARAM_RAW,
                 'null' => NULL_NOT_ALLOWED,
             ],
             'audience' => [

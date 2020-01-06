@@ -124,6 +124,9 @@ class local_sitenotice_test extends advanced_testcase {
         $this->assertEquals('Link 2', $link2->text);
         $this->assertEquals('www.example2.com', $link2->link);
 
+        $this->assertContains('data-linkid', $notice1->content);
+        $this->assertContains('data-linkid', $notice2->content);
+
         // Do not allow deletion by default.
         helper::delete_notice($notice2->id);
         $allnotices = helper::retrieve_enabled_notices();

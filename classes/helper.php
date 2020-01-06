@@ -100,6 +100,8 @@ class helper {
     private static function update_hyperlinks($noticeid, $content) {
         // Extract hyperlinks from the content of the notice, which is then used for link clicked tracking.
         $dom = new \DOMDocument();
+        $content = format_text($content, FORMAT_HTML);
+        $content = mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8' );
         $dom->loadHTML($content);
         // Current links in the notice.
         $currentlinks = self::retrieve_notice_links($noticeid);
@@ -126,7 +128,8 @@ class helper {
         noticelink::delete_links(array_keys($unusedlinks));
 
         // New content of the notice (included link ids).
-        return $dom->saveHTML();
+        $newcontent = $dom->saveHTML();
+        return $newcontent;
     }
 
     /**
