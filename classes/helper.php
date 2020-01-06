@@ -251,6 +251,20 @@ class helper {
     }
 
     /**
+     * Get a notice
+     * @param $noticeid notice id
+     * @return bool|\stdClass
+     */
+    public static function retrieve_notice($noticeid) {
+        $sitenotice = sitenotice::get_record(['id' => $noticeid]);
+        if ($sitenotice) {
+            return $sitenotice->to_record();
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Retrieve all notices
      * @return array
      * @throws \dml_exception
