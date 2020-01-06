@@ -26,56 +26,66 @@ namespace local_sitenotice;
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/cohort/lib.php');
+use \local_sitenotice\persistent\sitenotice;
+use \local_sitenotice\persistent\noticelink;
+use \local_sitenotice\persistent\linkhistory;
+use \local_sitenotice\persistent\acknowledgement;
+use \local_sitenotice\persistent\noticeview;
 
 class helper {
 
     /**
      * Create new notice
-     * @param $data new notice data
+     * @param $data form data
      * @throws \coding_exception
      * @throws \dml_exception
-     * @throws \dml_transaction_exception
+     * @throws \core\invalid_persistent_exception
      */
     public static function create_new_notice($data) {
-        global $DB, $USER;
-        $data->timecreated = time();
-        $data->timemodified = time();
-        if (is_array($data->content)) {
-            $data->content = $data->content['text'];
-        }
-        $transaction = $DB->start_delegated_transaction();
-        $noticeid = $DB->insert_record('local_sitenotice', $data);
-        if (!empty($noticeid)) {
-            $content = self::update_hyperlinks($noticeid, $data->content);
-            $result = $DB->set_field('local_sitenotice', 'content', $content, ['id' => $noticeid]);
-            if ($result) {
-                // Log created event.
-                $params = array(
-                    'context' => \context_system::instance(),
-                    'objectid' => $noticeid,
-                    'relateduserid' => $USER->id,
-                );
-                $event = \local_sitenotice\event\sitenotice_created::create($params);
-                $event->trigger();
-            }
-        }
-        $transaction->allow_commit();
+        // Create new notice.
+        $sitenotice = sitenotice::create_new_notice($data);
+        // Extract hyperlinks and set ids for them.
+        $noticeid = $sitenotice->get('id');
+        $content = $sitenotice->get('content');
+        $newcontent = self::update_hyperlinks($noticeid, $content);
+        sitenotice::update_notice_content($sitenotice, $newcontent);
+
+        // Log created event.
+        $params = array(
+            'context' => \context_system::instance(),
+            'objectid' => $noticeid,
+            'relateduserid' => $sitenotice->get('usermodified'),
+        );
+        $event = \local_sitenotice\event\sitenotice_created::create($params);
+        $event->trigger();
     }
 
     /**
      * Update existing notice.
+     * @param sitenotice $sitenotice site notice persistent
      * @param $data form data
+     * @throws \coding_exception
+     * @throws \core\invalid_persistent_exception
      * @throws \dml_exception
      */
-    public static function update_notice($data) {
-        global $DB;
+    public static function update_notice(sitenotice $sitenotice, $data) {
         if (!get_config('local_sitenotice', 'allow_update')) {
             return;
         }
-        $data->id = $data->noticeid;
-        $data->timemodified = time();
-        $data->content = self::update_hyperlinks($data->noticeid, $data->content);
-        $DB->update_record('local_sitenotice', $data);
+        // Check if there is any changes in the hyperlinks.
+        $noticeid = $sitenotice->get('id');
+        $data->content = self::update_hyperlinks($noticeid, $data->content);
+        // Update notice.
+        sitenotice::update_notice_data($sitenotice, $data);
+
+        // Log updated event.
+        $params = array(
+            'context' => \context_system::instance(),
+            'objectid' => $noticeid,
+            'relateduserid' => $sitenotice->get('usermodified'),
+        );
+        $event = \local_sitenotice\event\sitenotice_updated::create($params);
+        $event->trigger();
     }
 
     /**
@@ -83,16 +93,17 @@ class helper {
      * @param $noticeid notice id
      * @param $content notice content
      * @return string
+     * @throws \coding_exception
+     * @throws \core\invalid_persistent_exception
      * @throws \dml_exception
      */
     private static function update_hyperlinks($noticeid, $content) {
-        global $DB;
         // Extract hyperlinks from the content of the notice, which is then used for link clicked tracking.
         $dom = new \DOMDocument();
-        $dom->loadHTML('<?xml encoding="utf-8" ?>' . $content);
+        $dom->loadHTML($content);
         // Current links in the notice.
-        $noticelinks = self::retrieve_notice_hlinks($noticeid);
-        $unchangedlinks = [];
+        $currentlinks = self::retrieve_notice_links($noticeid);
+        $newlinks = [];
 
         foreach ($dom->getElementsByTagName('a') as $node) {
             $link = new \stdClass();
@@ -100,21 +111,10 @@ class helper {
             $link->text = trim($node->nodeValue);
             $link->link = trim($node->getAttribute("href"));
 
-            if (!empty($noticelinks)) {
-                // A link is considered as 'unchanged' if it has the same text and href value.
-                $currentlink = $DB->get_record('local_sitenotice_hlinks',
-                    ['noticeid' => $noticeid, 'text' => $link->text, 'link' => $link->link]);
-                if (empty($currentlink)) {
-                    $linkid = $DB->insert_record('local_sitenotice_hlinks', $link);
-                } else {
-                    // Link and its text does not change.
-                    $linkid = $currentlink->id;
-                    $unchangedlinks[$linkid] = $currentlink;
-                }
-            } else {
-                // New Links.
-                $linkid = $DB->insert_record('local_sitenotice_hlinks', $link);
-            }
+            // Create new or reuse link.
+            $linkpersistent = noticelink::create_new_link($link);
+            $linkid = $linkpersistent->get('id');
+            $newlinks[$linkid] = $linkpersistent;
 
             // ID to use for link tracking in javascript.
             $node->setAttribute('data-linkid', $linkid);
@@ -122,99 +122,113 @@ class helper {
         }
 
         // Clean up unused links.
-        $unusedlinks = array_diff_key($noticelinks, $unchangedlinks);
-        if (!empty($unusedlinks)) {
-            list($unusedlinksql, $param) = $DB->get_in_or_equal(array_keys($unusedlinks), SQL_PARAMS_NAMED);
-            $DB->delete_records_select('local_sitenotice_hlinks', " id $unusedlinksql", $param);
-        }
+        $unusedlinks = array_diff_key($currentlinks, $newlinks);
+        noticelink::delete_links(array_keys($unusedlinks));
 
-        // Update the content of the inserted notice (With included link ids).
+        // New content of the notice (included link ids).
         return $dom->saveHTML();
     }
 
     /**
-     * Retrieve single notice based on ID
+     * Reset a notice
      * @param $noticeid notice id
-     * @return mixed
-     * @throws \dml_exception
-     */
-    public static function retrieve_notice($noticeid) {
-        global $DB;
-        return $DB->get_record('local_sitenotice', ['id' => $noticeid]);
-    }
-
-    /**
-     * Retrieve all notices
-     * @param string $sort sort order
-     * @return array
-     * @throws \dml_exception
-     */
-    public static function retrieve_all_notices($sort = 'id ASC') {
-        global $DB;
-        return $DB->get_records('local_sitenotice', null, $sort);
-    }
-
-    /**
-     * Retrieve active notices
-     * @param string $sort sort order
-     * @return array
-     * @throws \dml_exception
-     */
-    public static function retrieve_enabled_notices($sort = 'id ASC') {
-        global $DB;
-        return $DB->get_records('local_sitenotice', ['enabled' => 1], $sort);
-    }
-
-    /**
-     * Reset/enable/disable a notice
-     * @param $noticeid notice id
-     * @param null $enabled whether to enable/disable the notice
-     * @return bool
      * @throws \coding_exception
      * @throws \dml_exception
+     * @throws \core\invalid_persistent_exception
      */
-    public static function reset_notice($noticeid, $enabled = null) {
-        global $DB, $USER;
-        $notice = self::retrieve_notice($noticeid);
-        $action = 'reset';
-        if (isset($enabled)) {
-            $notice->enabled = $enabled;
-            $action = $enabled ? 'enabled' : 'disabled';
-        }
-        $notice->timemodified = time();
-        $result = $DB->update_record('local_sitenotice', $notice);
-        if ($result) {
-            // Log event.
+    public static function reset_notice($noticeid) {
+        try {
+            $sitenotice = sitenotice::reset($noticeid);
+            // Log reset event.
             $params = array(
                 'context' => \context_system::instance(),
-                'objectid' => $noticeid,
-                'relateduserid' => $USER->id,
-                'other' => array('action' => $action),
+                'objectid' => $sitenotice->get('id'),
+                'relateduserid' => $sitenotice->get('usermodified'),
+            );
+            $event = \local_sitenotice\event\sitenotice_reset::create($params);
+            $event->trigger();
+        } catch (Exception $e) {
+            \core\notification::error($e->getMessage());
+        }
+    }
+
+    /**
+     * Enable a notice
+     * @param $noticeid notice id
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \core\invalid_persistent_exception
+     */
+    public static function enable_notice($noticeid) {
+        try {
+            $sitenotice = sitenotice::enable($noticeid);
+            // Log enabled event.
+            $params = array(
+                'context' => \context_system::instance(),
+                'objectid' => $sitenotice->get('id'),
+                'relateduserid' => $sitenotice->get('usermodified'),
             );
             $event = \local_sitenotice\event\sitenotice_updated::create($params);
             $event->trigger();
+        } catch (Exception $e) {
+            \core\notification::error($e->getMessage());
         }
-        return $result;
+    }
+
+    /**
+     * Disable a notice
+     * @param $noticeid notice id
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \core\invalid_persistent_exception
+     */
+    public static function disable_notice($noticeid) {
+        try {
+            $sitenotice = sitenotice::disable($noticeid);
+            // Log disable event.
+            $params = array(
+                'context' => \context_system::instance(),
+                'objectid' => $sitenotice->get('id'),
+                'relateduserid' => $sitenotice->get('usermodified'),
+            );
+            $event = \local_sitenotice\event\sitenotice_updated::create($params);
+            $event->trigger();
+        } catch (Exception $e) {
+            \core\notification::error($e->getMessage());
+        }
     }
 
     /**
      * Delete a notice
      * @param $noticeid notice id
      * @throws \dml_exception
+     * @throws \coding_exception
      */
     public static function delete_notice($noticeid) {
-        global $DB;
-        if (get_config('local_sitenotice', 'allow_delete')) {
-            $DB->delete_records('local_sitenotice', ['id' => $noticeid]);
-            if (get_config('local_sitenotice', 'cleanup_deleted_notice')) {
-                $DB->delete_records('local_sitenotice_ack', ['noticeid' => $noticeid]);
-                $DB->delete_records('local_sitenotice_lastview', ['noticeid' => $noticeid]);
-                $hlinks = self::retrieve_notice_hlinks($noticeid);
-                if (!empty($hlinks)) {
-                    list($linksql, $param) = $DB->get_in_or_equal(array_keys($hlinks), SQL_PARAMS_NAMED);
-                    $DB->delete_records_select('local_sitenotice_hlinks_his', " hlinkid $linksql", $param);
-                    $DB->delete_records('local_sitenotice_hlinks', ['noticeid' => $noticeid]);
-                }
+        if (!get_config('local_sitenotice', 'allow_delete')) {
+            return;
+        }
+        $sitenotice = sitenotice::get_record(['id' => $noticeid]);
+        if ($sitenotice) {
+            $sitenotice->delete();
+
+            $params = array(
+                'context' => \context_system::instance(),
+                'objectid' => $sitenotice->get('id'),
+                'relateduserid' => $sitenotice->get('usermodified'),
+            );
+            $event = \local_sitenotice\event\sitenotice_deleted::create($params);
+            $event->trigger();
+
+            if (!get_config('local_sitenotice', 'cleanup_deleted_notice')) {
+                return;
+            }
+            acknowledgement::delete_notice_acknowledgement($noticeid);
+            noticeview::delete_notice_view($noticeid);
+            $noticelinks = self::retrieve_notice_links($noticeid);
+            if (!empty($noticelinks)) {
+                linkhistory::delete_link_history(array_keys($noticelinks));
+                noticelink::delete_notice_links($noticeid);
             }
         }
     }
@@ -234,7 +248,25 @@ class helper {
     }
 
     /**
-     * Retrieve notice applied to user.
+     * Retrieve all notices
+     * @return array
+     * @throws \dml_exception
+     */
+    public static function retrieve_all_notices() {
+        return sitenotice::get_all_notice_records();
+    }
+
+    /**
+     * Retrieve active notices
+     * @return array
+     * @throws \dml_exception
+     */
+    public static function retrieve_enabled_notices() {
+        return sitenotice::get_enabled_notices();
+    }
+
+    /**
+     * Retrieve notices applied to user.
      * @return array
      * @throws \dml_exception
      */
@@ -256,7 +288,7 @@ class helper {
          */
         $viewednotices = $USER->viewednotices;
         foreach ($viewednotices as $noticeid => $data) {
-            // The Notice is disabled during the current session.
+            // The notice is disabled during the current session.
             if (!isset($notices[$noticeid])) {
                 continue;
             }
@@ -269,7 +301,7 @@ class helper {
         }
         $notices = array_diff_key($notices, $USER->viewednotices);
 
-        // Check user cohort.
+        // Check if user is in the targeted audience.
         $usernotices = $notices;
         if (!empty($notices)) {
             $usercohort = cohort_get_user_cohorts($USER->id);
@@ -288,46 +320,26 @@ class helper {
      * @throws \dml_exception
      */
     private static function load_viewed_notices() {
-        global $USER, $DB;
+        global $USER;
+        $records = noticeview::get_user_viewed_notice_records();
         $USER->viewednotices = [];
-        $sql = "SELECT sn.id, lv.timeviewed, lv.action
-                  FROM {local_sitenotice} sn
-                  JOIN {local_sitenotice_lastview} lv
-                    ON sn.id = lv.noticeid
-                 WHERE lv.userid = :userid
-                   AND sn.enabled = 1";
-        $params = ['userid' => $USER->id];
-        $records = $DB->get_records_sql($sql, $params);
         foreach ($records as $record) {
-            $USER->viewednotices[$record->id] = ["timeviewed" => $record->timeviewed, 'action' => $record->action];
+            $USER->viewednotices[$record->id] = ["timeviewed" => $record->timemodified, 'action' => $record->action];
         }
     }
 
     /**
-     * Record the lastest interaction with the notice of a user.
+     * Record the latest interaction with the notice of a user.
      * @param $noticeid notice id
-     * @param $userid user id
      * @param $action dismissed or acknowledged
-     * @throws \dml_exception
+     * @throws \coding_exception
+     * @throws \core\invalid_persistent_exception
      */
-    public static function add_to_viewed_noticed($noticeid, $userid, $action) {
-        global $USER, $DB;
+    public static function add_to_viewed_notices($noticeid, $userid, $action) {
+        global $USER;
         // Add to viewed notices.
-        $currenttime = time();
-        $USER->viewednotices[$noticeid] = ['timeviewed' => $currenttime, 'action' => $action];
-        $record = $DB->get_record('local_sitenotice_lastview', ['userid' => $USER->id, 'noticeid' => $noticeid]);
-        if (!$record) {
-            $record = new \stdClass();
-            $record->noticeid = $noticeid;
-            $record->userid = $userid;
-            $record->timeviewed = $currenttime;
-            $record->action = $action;
-            $DB->insert_record('local_sitenotice_lastview', $record);
-        } else {
-            $record->timeviewed = $currenttime;
-            $record->action = $action;
-            $DB->update_record('local_sitenotice_lastview', $record);
-        }
+        $noticeview = noticeview::add_notice_view($noticeid, $userid, $action);
+        $USER->viewednotices[$noticeid] = ['timeviewed' => $noticeview->get('timemodified'), 'action' => $action];
     }
 
     /**
@@ -341,23 +353,26 @@ class helper {
     public static function dismiss_notice($noticeid) {
         global $USER;
 
-        // Log dismissed event.
-        $params = array(
-            'context' => \context_system::instance(),
-            'objectid' => $noticeid,
-            'relateduserid' => $USER->id,
-        );
-        $event = \local_sitenotice\event\sitenotice_dismissed::create($params);
+        $userid = $USER->id;
 
         $result = array();
-        $notice = self::retrieve_notice($noticeid);
-        if ($notice && $notice->reqack) {
+        $notice = sitenotice::get_record(['id' => $noticeid]);
+        if ($notice && $notice->get('reqack')) {
             require_logout();
             $loginpage = new \moodle_url("/login/index.php");
             $result['redirecturl'] = $loginpage->out();
         }
-        $result['status'] = true;
+
+        // Log dismissed event.
+        $params = array(
+            'context' => \context_system::instance(),
+            'objectid' => $noticeid,
+            'relateduserid' => $userid,
+        );
+        $event = \local_sitenotice\event\sitenotice_dismissed::create($params);
         $event->trigger();
+
+        $result['status'] = true;
         return $result;
     }
 
@@ -369,31 +384,29 @@ class helper {
      * @throws \dml_exception
      */
     public static function acknowledge_notice($noticeid) {
-        global $USER, $DB;
-
+        global $USER;
         // Acknowledgement Record.
-        $notice = self::retrieve_notice($noticeid);
-        $record = new \stdClass();
-        $record->userid = $USER->id;
-        $record->username = $USER->username;
-        $record->firstname = $USER->firstname;
-        $record->lastname = $USER->lastname;
-        $record->idnumber = $USER->idnumber;
-        $record->noticeid = $noticeid;
-        $record->noticetitle = $notice->title;
-        $record->timecreated = time();
-        $result = $DB->insert_record('local_sitenotice_ack', $record);
+        $notice = sitenotice::get_record(['id' => $noticeid]);
 
-        if ($result) {
-            // Log acknowledged event.
-            $params = array(
-                'context' => \context_system::instance(),
-                'objectid' => $noticeid,
-                'relateduserid' => $USER->id,
-            );
-            $event = \local_sitenotice\event\sitenotice_acknowledged::create($params);
-            $event->trigger();
-        }
+        $data = new \stdClass();
+        $data->userid = $USER->id;
+        $data->username = $USER->username;
+        $data->firstname = $USER->firstname;
+        $data->lastname = $USER->lastname;
+        $data->idnumber = $USER->idnumber;
+        $data->noticeid = $noticeid;
+        $data->noticetitle = $notice->get('title');
+        $persistent = new acknowledgement(0, $data);
+        $persistent = $persistent->create();
+
+        // Log acknowledged event.
+        $params = array(
+            'context' => \context_system::instance(),
+            'objectid' => $noticeid,
+            'relateduserid' => $persistent->get('usermodified'),
+        );
+        $event = \local_sitenotice\event\sitenotice_acknowledged::create($params);
+        $event->trigger();
 
         $result = array();
         $result['status'] = true;
@@ -407,12 +420,13 @@ class helper {
      * @throws \dml_exception
      */
     public static function track_link($linkid) {
-        global $DB, $USER;
-        $record = new \stdClass();
-        $record->hlinkid = $linkid;
-        $record->userid = $USER->id;
-        $record->timeclicked = time();
-        $DB->insert_record('local_sitenotice_hlinks_his', $record);
+        global $USER;
+        $data = new \stdClass();
+        $data->hlinkid = $linkid;
+        $data->userid = $USER->id;
+        $persistent = new linkhistory(0, $data);
+        $persistent->create();
+
         $result = array();
         $result['status'] = true;
         return $result;
@@ -428,48 +442,32 @@ class helper {
      * @throws \dml_exception
      */
     public static function retrieve_acknowlegement($userid, $noticeid, $filtersql = null, $params = null) {
-        global $DB;
         if (empty($filtersql)) {
             $filtersql = " userid = :userid AND noticeid = :noticeid ";
         } else {
             $filtersql = " $filtersql AND userid = :userid AND noticeid = :noticeid ";
         }
         $params = array_merge($params, ['userid' => $userid, 'noticeid' => $noticeid]);
-        $sql = "SELECT *
-                  FROM {local_sitenotice_ack}
-                 WHERE $filtersql
-              ORDER BY userid ASC, timecreated DESC";
-        return $DB->get_records_sql($sql, $params);
+        return acknowledgement::get_notice_acknowledgement($filtersql, $params);
     }
 
     /**
-     * Hyperlink interaction info of a user on a notice
+     * Hyperlink interaction on a notice.
      * @param $userid user id
      * @param $noticeid notice id
      * @return array
      * @throws \dml_exception
      */
-    public static function retrieve_hlink_count($userid, $noticeid) {
-        global $DB;
-        $wheresql = "WHERE h.userid = :userid AND l.noticeid = :noticeid";
-        $sql = "SELECT h.hlinkid, l.text, l.link, COUNT(h.hlinkid)
-                  FROM {local_sitenotice_hlinks_his} h
-                  JOIN {local_sitenotice_hlinks} l on h.hlinkid = l.id
-                  $wheresql
-              GROUP BY h.hlinkid, l.text, l.link";
-        $params = ['userid' => $userid, 'noticeid' => $noticeid];
-        return $DB->get_records_sql($sql, $params);
+    public static function count_clicked_notice_links($userid, $noticeid) {
+        return linkhistory::count_user_notice_clicked_link($userid, $noticeid);
     }
 
     /**
-     * Retrieve all hyperlinks belong to a notice
-     * @param $noticeid notice id
-     * @return array
-     * @throws \dml_exception
+     * Return links belong to a notice.
+     * @param $noticeid
      */
-    public static function retrieve_notice_hlinks($noticeid, $sort = 'id ASC') {
-        global $DB;
-        return $DB->get_records('local_sitenotice_hlinks', ['noticeid' => $noticeid], $sort);
+    public static function retrieve_notice_links($noticeid) {
+        return noticelink::get_notice_link_records($noticeid);
     }
 
     /**
@@ -505,10 +503,10 @@ class helper {
      * Get audience name from the audience options.
      * @param $audienceid audience id
      * @return mixed
+     * @throws \coding_exception
      */
     public static function get_audience_name($audienceid) {
         $audiences = self::built_audience_options();
         return $audiences[$audienceid];
     }
-
 }

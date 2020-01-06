@@ -36,6 +36,12 @@ class local_sitenotice_test extends advanced_testcase {
         $this->resetAfterTest(true);
     }
 
+    /**
+     * Create sample notice.
+     * @throws \core\invalid_persistent_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     private function create_notice1() {
         $formdata = new stdClass();
         $formdata->title = "Notice 1";
@@ -43,6 +49,12 @@ class local_sitenotice_test extends advanced_testcase {
         helper::create_new_notice($formdata);
     }
 
+    /**
+     * Create sample notice.
+     * @throws \core\invalid_persistent_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     private function create_notice2() {
         $formdata = new stdClass();
         $formdata->title = "Notice 2";
@@ -50,6 +62,12 @@ class local_sitenotice_test extends advanced_testcase {
         helper::create_new_notice($formdata);
     }
 
+    /**
+     * Create sample notice (with targeted audience)
+     * @throws \core\invalid_persistent_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     private function create_cohort_notice1() {
         $formdata = new stdClass();
         $formdata->title = "Cohort Notice 1";
@@ -59,6 +77,12 @@ class local_sitenotice_test extends advanced_testcase {
         helper::create_new_notice($formdata);
     }
 
+    /**
+     * Create sample notice (with targeted audience)
+     * @throws \core\invalid_persistent_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     private function create_cohort_notice2() {
         $formdata = new stdClass();
         $formdata->title = "Cohort Notice 2";
@@ -68,21 +92,30 @@ class local_sitenotice_test extends advanced_testcase {
         helper::create_new_notice($formdata);
     }
 
+    /**
+     * Test notice creation.
+     * @throws \core\invalid_persistent_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     public function test_create_notices() {
         $this->create_notice1();
         $allnotices = helper::retrieve_enabled_notices();
+        // There is only one notice.
         $this->assertEquals(1, count($allnotices));
         $this->assertEquals("Notice 1", reset($allnotices)->title);
 
         $this->create_notice2();
         $allnotices = helper::retrieve_enabled_notices();
+        // There are two notices.
         $this->assertEquals(2, count($allnotices));
         $notice1 = array_shift($allnotices);
         $this->assertEquals("Notice 1", $notice1->title);
         $notice2 = array_shift($allnotices);
         $this->assertEquals("Notice 2", $notice2->title);
 
-        $allinks = helper::retrieve_notice_hlinks($notice1->id);
+        // Check notice links.
+        $allinks = helper::retrieve_notice_links($notice1->id);
         $this->assertEquals(2, count($allinks));
         $link1 = array_shift($allinks);
         $this->assertEquals('Link 1', $link1->text);
@@ -90,8 +123,40 @@ class local_sitenotice_test extends advanced_testcase {
         $link2 = array_shift($allinks);
         $this->assertEquals('Link 2', $link2->text);
         $this->assertEquals('www.example2.com', $link2->link);
+
+        // Do not allow deletion by default.
+        helper::delete_notice($notice2->id);
+        $allnotices = helper::retrieve_enabled_notices();
+        $this->assertEquals(2, count($allnotices));
+
+        // Delete notice without cleaning up.
+        set_config('allow_delete', true, 'local_sitenotice');
+        helper::delete_notice($notice2->id);
+        $allnotices = helper::retrieve_enabled_notices();
+        // There is only one notice.
+        $this->assertEquals(1, count($allnotices));
+        $this->assertEquals("Notice 1", reset($allnotices)->title);
+        // Leftover hyperlinks of notice 2.
+        $allinks = helper::retrieve_notice_links($notice2->id);
+        $this->assertEquals(2, count($allinks));
+
+        // Allow cleaning up.
+        set_config('cleanup_deleted_notice', true, 'local_sitenotice');
+        helper::delete_notice($notice1->id);
+        $allnotices = helper::retrieve_enabled_notices();
+        $this->assertEquals(0, count($allnotices));
+        // Leftover hyperlinks of notice 1.
+        $allinks = helper::retrieve_notice_links($notice1->id);
+        $this->assertEquals(0, count($allinks));
+
     }
 
+    /**
+     * Test set reset notice.
+     * @throws \core\invalid_persistent_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     public function test_reset_notices() {
         $this->create_notice1();
         $this->create_notice2();
@@ -109,8 +174,15 @@ class local_sitenotice_test extends advanced_testcase {
         $this->assertGreaterThan($oldnotice1->timemodified, $newnotice1->timemodified);
         $this->assertEquals($oldnotice1->timecreated, $newnotice1->timecreated);
         $this->assertEquals($newnotice2->timemodified, $oldnotice2->timemodified);
+        $this->assertEquals($newnotice2->timecreated, $oldnotice2->timecreated);
     }
 
+    /**
+     * Test enable/disable notice.
+     * @throws \core\invalid_persistent_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     public function test_enable_notices() {
         $this->create_notice1();
         $this->create_notice2();
@@ -119,21 +191,25 @@ class local_sitenotice_test extends advanced_testcase {
         $this->assertEquals("Notice 1", $notice1->title);
 
         // Only disable Notice 1.
-        helper::reset_notice($notice1->id, 0);
+        helper::disable_notice($notice1->id);
         $allnotices = helper::retrieve_enabled_notices();
         $this->assertEquals(1, count($allnotices));
         $notice2 = array_shift($allnotices);
         $this->assertEquals("Notice 2", $notice2->title);
 
         // Enable Notice 1, disable Notice 2.
-        helper::reset_notice($notice1->id, 1);
-        helper::reset_notice($notice2->id, 0);
+        helper::enable_notice($notice1->id);
+        helper::disable_notice($notice2->id);
         $allnotices = helper::retrieve_enabled_notices();
         $this->assertEquals(1, count($allnotices));
         $notice1 = array_shift($allnotices);
         $this->assertEquals("Notice 1", $notice1->title);
     }
 
+    /**
+     * Test audience options.
+     * @throws coding_exception
+     */
     public function test_audience_options() {
         $this->getDataGenerator()->create_cohort();
         $options = helper::built_audience_options();
@@ -144,6 +220,13 @@ class local_sitenotice_test extends advanced_testcase {
         $this->assertEquals(3, count($options));
     }
 
+    /**
+     * Test user notice interaction.
+     * @throws \core\invalid_persistent_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
     public function test_user_notice() {
         global $USER;
         $this->create_notice1();
@@ -163,7 +246,7 @@ class local_sitenotice_test extends advanced_testcase {
         $usernotices = helper::retrieve_user_notices();
         $this->assertEquals(2, count($usernotices));
 
-        helper::reset_notice($notice2->id, 0);
+        helper::disable_notice($notice2->id);
         $usernotices = helper::retrieve_user_notices();
         $this->assertEquals(1, count($usernotices));
 
@@ -189,6 +272,12 @@ class local_sitenotice_test extends advanced_testcase {
         $this->assertEquals(1, count($USER->viewednotices));
     }
 
+    /**
+     * Test user link interaction
+     * @throws \core\invalid_persistent_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     public function test_user_hlink_interact() {
         $this->create_notice1();
         $user1 = $this->getDataGenerator()->create_user();
@@ -197,7 +286,7 @@ class local_sitenotice_test extends advanced_testcase {
         $this->assertEquals(1, count($allnotices));
         $notice1 = array_shift($allnotices);
 
-        $links = helper::retrieve_notice_hlinks($notice1->id);
+        $links = helper::retrieve_notice_links($notice1->id);
         $this->assertEquals(2, count($links));
         $link1 = array_shift($links);
         $link2 = array_shift($links);
@@ -205,10 +294,14 @@ class local_sitenotice_test extends advanced_testcase {
         // Clink on links.
         helper::track_link($link1->id);
         helper::track_link($link2->id);
-        $userlinks = helper::retrieve_hlink_count($user1->id, $notice1->id);
+        $userlinks = helper::count_clicked_notice_links($user1->id, $notice1->id);
         $this->assertEquals(2, count($userlinks));
     }
 
+    /**
+     * Test time interval format.
+     * @throws coding_exception
+     */
     public function test_format_interval_time() {
         // The interval is 1 day(s) 2 hour(s) 3 minute(s) 4 second(s).
         $timeinterval = 93784;

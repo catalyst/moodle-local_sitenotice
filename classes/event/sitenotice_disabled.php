@@ -15,33 +15,35 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Observers for notice events
- * @package package
+ * Notice Updated event
+ * @package local_sitenotice
  * @author  Nathan Nguyen <nathannguyen@catalyst-au.net>
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_sitenotice;
+namespace local_sitenotice\event;
 
 defined('MOODLE_INTERNAL') || die();
 
-use local_sitenotice\helper;
+class sitenotice_disabled extends \core\event\base {
 
-class eventobservers {
-
-    public static function sitenotice_dismissed(\local_sitenotice\event\sitenotice_dismissed $event) {
-        $noticeid = $event->get_data()['objectid'];
-        $userid = $event->get_data()['relateduserid'];
-        $action = $event->get_data()['action'];
-        helper::add_to_viewed_notices($noticeid, $userid, $action);
+    protected function init() {
+        $this->data['objecttable'] = 'local_sitenotice';
+        $this->data['crud'] = 'u';
+        $this->data['edulevel'] = self::LEVEL_OTHER;
     }
 
-    public static function sitenotice_acknowledged(\local_sitenotice\event\sitenotice_acknowledged $event) {
-        $noticeid = $event->get_data()['objectid'];
-        $userid = $event->get_data()['relateduserid'];
-        $action = $event->get_data()['action'];
-        helper::add_to_viewed_notices($noticeid, $userid, $action);
+    public function get_description() {
+        return "The user with id '$this->relateduserid' disabled the notice with id '$this->objectid'";
     }
 
+    public static function get_name() {
+        return get_string('event:disable', 'local_sitenotice');
+    }
+
+    public function get_url() {
+        return new \moodle_url('/local/sitenotice/editnotice.php',
+            array('noticeid' => $this->objectid, 'action' => 'view', 'sesskey' => sesskey()));
+    }
 }

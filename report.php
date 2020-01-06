@@ -92,7 +92,7 @@ if (!empty($records)) {
             $hlinkcount = '';
             if ($currentuserid != $record->userid) {
                 $currentuserid = $record->userid;
-                $linkcounts = helper::retrieve_hlink_count($record->userid, $record->noticeid);
+                $linkcounts = helper::count_clicked_notice_links($record->userid, $record->noticeid);
                 foreach ($linkcounts as $count) {
                     $hlinkcount .= "<a href=\"{$count->link}\">{$count->text}</a>: $count->count <br/>";
                 }
@@ -124,7 +124,7 @@ if (!empty($records)) {
             get_string('time'),
         );
         // Add each hyperlink as a header.
-        $hlinks = helper::retrieve_notice_hlinks($noticeid);
+        $hlinks = helper::retrieve_notice_links($noticeid);
         $hlinkheaders = [];
         foreach ($hlinks as $link) {
             $hlinkheaders[$link->id] = "$link->text ($link->link)";
@@ -146,7 +146,7 @@ if (!empty($records)) {
 
             if ($currentuserid != $record->userid) {
                 $currentuserid = $record->userid;
-                $linkcounts = helper::retrieve_hlink_count($record->userid, $record->noticeid);
+                $linkcounts = helper::count_clicked_notice_links($record->userid, $record->noticeid);
                 foreach (array_keys($hlinkheaders) as $linkid) {
                     $row[] = $linkcounts[$linkid]->count;
                 }

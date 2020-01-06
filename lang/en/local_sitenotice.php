@@ -61,10 +61,13 @@ $string['notice:resetinterval'] = 'Reset every';
 $string['notice:resetinterval_help'] = 'The notice will be displayed to user again once the specified period elapses.';
 
 // Event.
-$string['event:dismiss'] = 'Notice dismission';
-$string['event:acknowledgement'] = 'Notice acknowledgement';
-$string['event:create'] = 'Notice creation';
-$string['event:update'] = 'Notice update';
+$string['event:dismiss'] = 'dismiss';
+$string['event:acknowledge'] = 'acknowledge';
+$string['event:create'] = 'create';
+$string['event:update'] = 'update';
+$string['event:reset'] = 'reset';
+$string['event:enable'] = 'enable';
+$string['event:disable'] = 'disable';
 
 // Report.
 $string['report:name'] = 'Notice Report';

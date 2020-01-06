@@ -54,7 +54,7 @@ $table->head = array(
     get_string('actions'),
 );
 
-$notices = helper::retrieve_all_notices('enabled DESC, timemodified DESC');
+$notices = helper::retrieve_all_notices();
 foreach ($notices as $notice) {
     $row = array();
     $row[] = $notice->title;

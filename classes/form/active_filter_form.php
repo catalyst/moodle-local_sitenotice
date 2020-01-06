@@ -31,8 +31,8 @@ class active_filter_form extends moodleform {
     public function definition() {
         global $SESSION;
 
-        $mform       =& $this->_form;
-        $fields      = $this->_customdata['fields'];
+        $mform =& $this->_form;
+        $fields = $this->_customdata['fields'];
 
         if (!empty($SESSION->noticereportfilter)) {
             $mform->addElement('header', 'actfilterhdr', get_string('actfilterhdr', 'filters'));

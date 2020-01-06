@@ -27,16 +27,19 @@ namespace local_sitenotice\form;
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/formslib.php');
-use moodleform;
+
 use local_sitenotice\helper;
 
-class notice_form extends moodleform {
+class notice_form extends \core\form\persistent {
+
+    /** @var string Persistent class name. */
+    protected static $persistentclass = 'local_sitenotice\persistent\sitenotice';
 
     public function definition () {
         $mform =& $this->_form;
 
-        $mform->addElement('hidden', 'noticeid', 0);
-        $mform->setType('noticeid', PARAM_INT);
+        $mform->addElement('hidden', 'id', 0);
+        $mform->setType('id', PARAM_INT);
 
         $mform->addElement('text', 'title', get_string('notice:title', 'local_sitenotice'));
         $mform->setType('title', PARAM_TEXT);

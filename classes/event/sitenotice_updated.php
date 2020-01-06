@@ -35,8 +35,7 @@ class sitenotice_updated extends \core\event\base {
     }
 
     public function get_description() {
-        $action = isset($this->other) ? "({$this->other['action']})" : '';
-        return "The user with id '$this->relateduserid' updated $action the notice with id '$this->objectid'";
+        return "The user with id '$this->relateduserid' updated the notice with id '$this->objectid'";
     }
 
     public static function get_name() {

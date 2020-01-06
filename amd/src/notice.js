@@ -20,7 +20,7 @@ define(
          * Retrieved notice which has not been viewwed.
          * @returns {boolean|*}
          */
-        var getNotice= function() {
+        var getNotice = function() {
             for (var i in notices) {
                 // Check the notice has been viewed.
                 if (!viewednotices.includes(i)) {
@@ -52,22 +52,22 @@ define(
                     modal.setNoticeId(nextnotice.id);
                     modal.setRequiredAcknoledgement(nextnotice.reqack);
 
-                    //Event listener for close button.
+                    // Event listener for close button.
                     modal.getModal().on('click', modal.getCloseButtonID(), function() {
                         dismissNotice();
                         modal.hide();
                     });
-                    //Event listener for accept button.
+                    // Event listener for accept button.
                     modal.getModal().on('click', modal.getAcceptButtonID(), function() {
                         acknowledgeNotice();
                         modal.hide();
                     });
-                    //Event listener for link tracking.
+                    // Event listener for link tracking.
                     modal.getModal().on('click', 'a', function() {
                         var linkid = $(this).attr("data-linkid");
                         trackLink(linkid);
                     });
-                    //Event listener for ack checkbox.
+                    // Event listener for ack checkbox.
                     modal.getModal().on('click', modal.getAckCheckboxID(), function() {
                         $(modal.getAcceptButtonID()).attr('disabled', !$(modal.getAckCheckboxID()).is(":checked"));
                     });
