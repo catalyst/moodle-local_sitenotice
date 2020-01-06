@@ -37,7 +37,7 @@ $string['setting:allow_delete'] = 'Allow notice deletion';
 $string['setting:allow_deletedesc'] = 'Allow notice to be deleted';
 $string['setting:cleanup_deleted_notice'] = 'Clean up info related to the deleted notice';
 $string['setting:cleanup_deleted_noticedesc'] = 'Requires "Allow notice deletion".
-If enabled, other details related to the notice being deleted, such as hyperlinks, hyperlinks history, acknowlegement,
+If enabled, other details related to the notice being deleted, such as hyperlinks, hyperlinks history, acknowledgement,
 user last view will also be deleted';
 
 // Notice Management.

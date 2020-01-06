@@ -4,7 +4,23 @@ This plugin displays notices to users.
 ## Configuration 
 
 ### Enable the plugin
-Site administration > Plugins > Local plugins > Site Notice > Settings
+Site administration > Plugins > Local plugins > Site Notice > Settings: "Enabled"
+
+### Allow updating notices
+Site administration > Plugins > Local plugins > Site Notice > Settings: "Allow notice update"
+If the config is enabled, user will be able to update existing notice.
+
+
+### Allow deleting notices
+Site administration > Plugins > Local plugins > Site Notice > Settings: "Allow notice deletion"
+If the config is enabled, user will be able to delete existing notice.
+
+### Clean up other related data when deleting a notice
+Site administration > Plugins > Local plugins > Site Notice > Settings: "Clean up info related to the deleted notice"
+If the config is enabled (and "notice deletion" is also allowed), when deleting a notice, other records related to the notice
+ in hyperlinks, hyperlinks history, acknowledgement, user last view will also be deleted.
+
+## Usage
 
 ### Create new notice
 * Go to Manage Notices: Site administration > Plugins > Local plugins > Site Notice > Manage Notice
@@ -16,7 +32,7 @@ Site administration > Plugins > Local plugins > Site Notice > Settings
 If the user does not accept the notice, he/she will be logged out of the site.
 * Set up target audience (cohort) 
 
-### View Notice
+### Edit Notice (Requires "Allow notice update")
 * Go to Manage Notices: Site administration > Plugins > Local plugins > Site Notice > Manage Notice
 * Click on the gear icon to view existing notice.
 
@@ -27,6 +43,10 @@ If the user does not accept the notice, he/she will be logged out of the site.
 ### Reset Notice
 * Go to Manage Notices: Site administration > Plugins > Local plugins > Site Notice > Manage Notice
 * Click on the 'load/reload' icon to reset notice
+
+### Delete Notice (Requires "Allow notice deletion")
+* Go to Manage Notices: Site administration > Plugins > Local plugins > Site Notice > Manage Notice
+* Click on the 'trash' icon to delete notice
 
 ### View/Download Notice Report
 * Go to Manage Notices: Site administration > Plugins > Local plugins > Site Notice > Manage Notice
