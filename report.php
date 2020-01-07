@@ -148,7 +148,12 @@ if (!empty($records)) {
                 $currentuserid = $record->userid;
                 $linkcounts = helper::count_clicked_notice_links($record->userid, $record->noticeid);
                 foreach (array_keys($hlinkheaders) as $linkid) {
-                    $row[] = $linkcounts[$linkid]->count;
+                    if (isset($linkcounts[$linkid])) {
+                        $row[] = $linkcounts[$linkid]->count;
+                    } else {
+                        $row[] = "";
+                    }
+
                 }
             }
             echo implode("\t", $row) . "\n";
