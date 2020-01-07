@@ -42,6 +42,7 @@ class helper {
      * @throws \core\invalid_persistent_exception
      */
     public static function create_new_notice($data) {
+        self::check_manage_capability();
         // Create new notice.
         $sitenotice = sitenotice::create_new_notice($data);
         // Extract hyperlinks and set ids for them.
@@ -69,6 +70,7 @@ class helper {
      * @throws \dml_exception
      */
     public static function update_notice(sitenotice $sitenotice, $data) {
+        self::check_manage_capability();
         if (!get_config('local_sitenotice', 'allow_update')) {
             return;
         }
@@ -140,6 +142,7 @@ class helper {
      * @throws \core\invalid_persistent_exception
      */
     public static function reset_notice($noticeid) {
+        self::check_manage_capability();
         try {
             $sitenotice = sitenotice::reset($noticeid);
             // Log reset event.
@@ -163,6 +166,7 @@ class helper {
      * @throws \core\invalid_persistent_exception
      */
     public static function enable_notice($noticeid) {
+        self::check_manage_capability();
         try {
             $sitenotice = sitenotice::enable($noticeid);
             // Log enabled event.
@@ -186,6 +190,7 @@ class helper {
      * @throws \core\invalid_persistent_exception
      */
     public static function disable_notice($noticeid) {
+        self::check_manage_capability();
         try {
             $sitenotice = sitenotice::disable($noticeid);
             // Log disable event.
@@ -208,6 +213,7 @@ class helper {
      * @throws \coding_exception
      */
     public static function delete_notice($noticeid) {
+        self::check_manage_capability();
         if (!get_config('local_sitenotice', 'allow_delete')) {
             return;
         }
@@ -525,5 +531,14 @@ class helper {
     public static function get_audience_name($audienceid) {
         $audiences = self::built_audience_options();
         return $audiences[$audienceid];
+    }
+
+    /**
+     * Check capability.
+     * @throws \required_capability_exception
+     */
+    public static function check_manage_capability() {
+        $syscontext = \context_system::instance();
+        require_capability('local/sitenotice:manage', $syscontext);
     }
 }

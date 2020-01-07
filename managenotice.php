@@ -24,10 +24,10 @@
 
 require_once(__DIR__.'/../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
+use local_sitenotice\helper;
 
 admin_externalpage_setup('local_sitenotice_managenotice');
-
-use local_sitenotice\helper;
+helper::check_manage_capability();
 
 $thispage = '/local/sitenotice/managenotice.php';
 $editnotice = '/local/sitenotice/editnotice.php';

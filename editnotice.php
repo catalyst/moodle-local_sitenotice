@@ -29,8 +29,8 @@ use local_sitenotice\persistent\sitenotice;
 require_once(__DIR__.'/../../config.php');
 
 require_login();
-require_capability('moodle/site:config', context_system::instance());
 require_sesskey();
+helper::check_manage_capability();
 $PAGE->set_context(context_system::instance());
 $PAGE->requires->css('/local/sitenotice/styles.css');
 

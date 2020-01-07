@@ -24,9 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-if ($hassiteconfig) {
-    $ADMIN->add('localplugins', new admin_category('sitenotice', get_string('pluginname', 'local_sitenotice')));
+$ADMIN->add('root', new admin_category('sitenotice', new lang_string('pluginname', 'local_sitenotice')));
 
+if ($hassiteconfig) {
     $temp = new admin_settingpage('sitenoticesettings',
         new lang_string('setting:settings', 'local_sitenotice'));
 
@@ -47,12 +47,11 @@ if ($hassiteconfig) {
         new lang_string('setting:cleanup_deleted_noticedesc', 'local_sitenotice'), 0));
 
     $ADMIN->add('sitenotice', $temp);
-
-    $managenotice = new admin_externalpage('local_sitenotice_managenotice',
-        get_string('setting:managenotice', 'local_sitenotice', null, true),
-        new moodle_url('/local/sitenotice/managenotice.php'));
-
-    $ADMIN->add('sitenotice', $managenotice);
-
     $settings = null;
 }
+
+$managenotice = new admin_externalpage('local_sitenotice_managenotice',
+    get_string('setting:managenotice', 'local_sitenotice', null, true),
+    new moodle_url('/local/sitenotice/managenotice.php'), 'local/sitenotice:manage');
+
+$ADMIN->add('sitenotice', $managenotice);

@@ -27,7 +27,7 @@ use local_sitenotice\helper;
 use local_sitenotice\report_filter;
 
 require_login();
-require_capability('moodle/site:config', context_system::instance());
+helper::check_manage_capability();
 
 // Parameters.
 $noticeid = required_param('noticeid', PARAM_INT);
