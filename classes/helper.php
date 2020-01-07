@@ -457,20 +457,19 @@ class helper {
 
     /**
      * Get acknowledgement records based on current filter sql
-     * @param $userid user id
      * @param $noticeid notice id
      * @param null $filtersql filter sql
      * @param null $params parameter
      * @return array
      * @throws \dml_exception
      */
-    public static function retrieve_acknowlegement($userid, $noticeid, $filtersql = null, $params = null) {
+    public static function retrieve_notice_acknowledgement($noticeid, $filtersql = null, $params = null) {
         if (empty($filtersql)) {
-            $filtersql = " userid = :userid AND noticeid = :noticeid ";
+            $filtersql = " noticeid = :noticeid ";
         } else {
-            $filtersql = " $filtersql AND userid = :userid AND noticeid = :noticeid ";
+            $filtersql = " $filtersql AND noticeid = :noticeid ";
         }
-        $params = array_merge($params, ['userid' => $userid, 'noticeid' => $noticeid]);
+        $params = array_merge($params, ['noticeid' => $noticeid]);
         return acknowledgement::get_notice_acknowledgement($filtersql, $params);
     }
 

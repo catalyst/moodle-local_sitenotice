@@ -48,7 +48,7 @@ $filter = new report_filter($thispage);
 list($filtersql, $params) = $filter->get_sql_filter();
 
 $notice = helper::retrieve_notice($noticeid);
-$records = helper::retrieve_acknowlegement($USER->id, $noticeid, $filtersql, $params);
+$records = helper::retrieve_notice_acknowledgement($noticeid, $filtersql, $params);
 
 // Do not show header if downloading.
 if (!$download) {
