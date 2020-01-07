@@ -71,7 +71,7 @@ $string['event:update'] = 'update';
 $string['event:reset'] = 'reset';
 $string['event:enable'] = 'enable';
 $string['event:disable'] = 'disable';
-$string['event:delete'] = 'disable';
+$string['event:delete'] = 'delete';
 
 // Report.
 $string['report:name'] = 'Notice Report';
