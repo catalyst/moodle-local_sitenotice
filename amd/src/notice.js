@@ -149,10 +149,18 @@ define(
          * Initial Modal with user notices.
          * @param jsnotices
          */
-        SiteNotice.init = function(jsnotices) {
-            notices = JSON.parse(jsnotices);
-            $(document).ready(function() {
-                nextNotice();
+        SiteNotice.init = function() {
+            var promises = ajax.call([
+                { methodname: 'local_sitenotice_getnotices', args: {} }
+            ]);
+
+            promises[0].done(function(response) {
+                notices = JSON.parse(response.notices);
+                $(document).ready(function() {
+                    nextNotice();
+                });
+            }).fail(function(ex) {
+                this.console.log(ex);
             });
         };
 

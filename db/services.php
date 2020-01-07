@@ -53,4 +53,14 @@ $functions = array(
         'loginrequired' => true,
         'ajax' => true,
     ),
+
+    'local_sitenotice_getnotices' => array(
+        'classname' => 'local_sitenotice_external',
+        'methodname' => 'get_notices',
+        'classpath' => 'local/sitenotice/classes/external.php',
+        'description' => 'Record link clicks',
+        'type' => 'write',
+        'loginrequired' => true,
+        'ajax' => true,
+    ),
 );

@@ -96,4 +96,24 @@ class local_sitenotice_external extends external_api {
             )
         );
     }
+
+    public static function get_notices_parameters() {
+        return new external_function_parameters([]);
+    }
+
+    public static function get_notices() {
+        $result = array();
+        $result['status'] = true;
+        $result['notices'] = json_encode(helper::retrieve_user_notices());
+        return $result;
+    }
+
+    public static function get_notices_returns() {
+        return new external_single_structure(
+            array(
+                'status' => new external_value(PARAM_BOOL, 'status: true if success', VALUE_DEFAULT, "0"),
+                'notices' => new external_value(PARAM_RAW, 'json of notices', VALUE_DEFAULT, ""),
+            )
+        );
+    }
 }
