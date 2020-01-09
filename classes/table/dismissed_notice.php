@@ -29,6 +29,8 @@ use table_sql;
 use renderable;
 
 class dismissed_notice extends table_sql implements renderable {
+    // Notice id.
+    protected $noticeid = '';
 
     // Notice title.
     protected $title = '';
@@ -41,7 +43,7 @@ class dismissed_notice extends table_sql implements renderable {
      * @param $uniqueid
      * @throws \coding_exception
      */
-    public function __construct($uniqueid, \moodle_url $url, $filters = [], $download = '', $page = 0, $perpage = 20, $title = '') {
+    public function __construct($uniqueid, \moodle_url $url, $filters = [], $download = '', $page = 0, $perpage = 20, $noticeid, $title = '') {
         parent::__construct($uniqueid);
 
         $this->set_attribute('class', 'local_sitenotice dismissed_notices');
@@ -50,6 +52,7 @@ class dismissed_notice extends table_sql implements renderable {
         $this->pagesize = $perpage;
         $this->page = $page;
         $this->filters = (object)$filters;
+        $this->noticeid = $noticeid;
         $this->title = $title;
 
         // Define columns in the table.
@@ -109,7 +112,7 @@ class dismissed_notice extends table_sql implements renderable {
         if ($count) {
             $select = "COUNT(1)";
         } else {
-            $select = "{$alias}.timecreated , u.username, u.firstname, u.lastname, u.idnumber";
+            $select = "{$alias}.timecreated, {$alias}.objectid  , u.username, u.firstname, u.lastname, u.idnumber";
         }
 
         list($where, $params) = $this->get_filters_sql_and_params();
@@ -132,8 +135,8 @@ class dismissed_notice extends table_sql implements renderable {
      * @return array
      */
     protected function get_filters_sql_and_params() {
-        $filter = "component = 'local_sitenotice' AND action = 'dismissed'";
-        $params = array();
+        $filter = "component = 'local_sitenotice' AND action = 'dismissed' and objectid = :noticeid";
+        $params = ['noticeid' => $this->noticeid];
         if (!empty($this->filters->filtersql)) {
             $filter .= " AND {$this->filters->filtersql}";
             $params = array_merge($this->filters->params, $params);

@@ -105,19 +105,21 @@ foreach ($notices as $notice) {
         $links .= ' ' . $editlink;
     }
 
-    // Acknowledge Report.
-    $editparams = ['noticeid' => $notice->id, 'action' => 'acknowledged_report', 'sesskey' => sesskey()];
-    $editurl = new moodle_url($editnotice, $editparams);
-    $icon = $OUTPUT->pix_icon('i/report', get_string('report'));
-    $editlink = html_writer::link($editurl, $icon);
-    $links .= ' ' . $editlink;
+    if ($notice->reqack) {
+        // Acknowledge Report.
+        $editparams = ['noticeid' => $notice->id, 'action' => 'acknowledged_report', 'sesskey' => sesskey()];
+        $editurl = new moodle_url($editnotice, $editparams);
+        $icon = $OUTPUT->pix_icon('i/report', get_string('report'));
+        $editlink = html_writer::link($editurl, $icon);
+        $links .= ' ' . $editlink;
 
-    // Dismiss Report.
-    $editparams = ['noticeid' => $notice->id, 'action' => 'dismissed_report', 'sesskey' => sesskey()];
-    $editurl = new moodle_url($editnotice, $editparams);
-    $icon = $OUTPUT->pix_icon('i/risk_xss', get_string('report'));
-    $editlink = html_writer::link($editurl, $icon);
-    $links .= ' ' . $editlink;
+        // Dismiss Report.
+        $editparams = ['noticeid' => $notice->id, 'action' => 'dismissed_report', 'sesskey' => sesskey()];
+        $editurl = new moodle_url($editnotice, $editparams);
+        $icon = $OUTPUT->pix_icon('i/risk_xss', get_string('report'));
+        $editlink = html_writer::link($editurl, $icon);
+        $links .= ' ' . $editlink;
+    }
 
     $row[] = $links;
     $table->data[] = $row;
