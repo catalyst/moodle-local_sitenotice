@@ -36,9 +36,10 @@ class report_filter {
     private $addfilterform;
     private $activefilterform;
 
-    public function __construct($baseurl) {
+    public function __construct($baseurl, $tablealias = '') {
+        $tablealias = $tablealias ? $tablealias . "." : '';
         $this->filterfields = [
-            'timecreated' => new \user_filter_date('time', get_string('time'), false, 'timecreated'),
+            "timecreated" => new \user_filter_date('time', get_string('time'), false, "{$tablealias}timecreated"),
         ];
         $this->baseurl = $baseurl;
         $this->customdata = ['fields' => $this->filterfields];
@@ -118,7 +119,7 @@ class report_filter {
         $this->add_filters();
         // Remove filters if any.
         $this->remove_filters();
-        // Proccess current filter.
+        // Process current filter.
         return $this->process_filter();
     }
 

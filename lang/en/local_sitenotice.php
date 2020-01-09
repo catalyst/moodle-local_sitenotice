@@ -72,6 +72,7 @@ $string['event:reset'] = 'reset';
 $string['event:enable'] = 'enable';
 $string['event:disable'] = 'disable';
 $string['event:delete'] = 'delete';
+$string['event:timecreated'] = 'Time';
 
 // Report.
 $string['report:name'] = 'Notice Report';
@@ -99,3 +100,10 @@ $string['confirmation:deletenotice'] = 'Do you really want to delete the notice 
 // Modal Buttons.
 $string['button:close'] = 'CLOSE';
 $string['button:accept'] = 'ACCEPT';
+
+// Report.
+$string['report:dismissed'] = 'notice_dismissed_{$a}.csv';
+$string['report:dismissed_desc'] = 'List of users who dismissed the notice.';
+$string['report:acknowledge'] = 'notice_acknowledged_{$a}.csv';
+$string['report:acknowledge_desc'] = 'List of users who dismiss the notice.';
+$string['report:timeformat:sortable'] = '%Y.%m.%d-%H:%M:%S.';

@@ -105,10 +105,17 @@ foreach ($notices as $notice) {
         $links .= ' ' . $editlink;
     }
 
-    // Report.
+    // Acknowledge Report.
     $editparams = ['noticeid' => $notice->id, 'action' => 'report', 'sesskey' => sesskey()];
     $editurl = new moodle_url($editnotice, $editparams);
     $icon = $OUTPUT->pix_icon('i/report', get_string('report'));
+    $editlink = html_writer::link($editurl, $icon);
+    $links .= ' ' . $editlink;
+
+    // Dismiss Report.
+    $editparams = ['noticeid' => $notice->id, 'action' => 'report', 'sesskey' => sesskey()];
+    $editurl = new moodle_url($editnotice, $editparams);
+    $icon = $OUTPUT->pix_icon('i/risk_xss', get_string('report'));
     $editlink = html_writer::link($editurl, $icon);
     $links .= ' ' . $editlink;
 
