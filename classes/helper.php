@@ -477,11 +477,12 @@ class helper {
      * Hyperlink interaction on a notice.
      * @param $userid user id
      * @param $noticeid notice id
+     * @param $linkid hyperlink  id
      * @return array
      * @throws \dml_exception
      */
-    public static function count_clicked_notice_links($userid, $noticeid) {
-        return linkhistory::count_user_notice_clicked_link($userid, $noticeid);
+    public static function count_clicked_notice_links($userid, $noticeid, $linkid = 0) {
+        return linkhistory::count_clicked_links($userid, $noticeid, $linkid);
     }
 
     /**

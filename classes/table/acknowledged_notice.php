@@ -37,7 +37,7 @@ class acknowledged_notice extends table_sql implements renderable {
     const TABLE_ALIAS = 'ack';
 
     // To check next user.
-    protected $currentuser = '';
+    protected $previoususer = '';
 
     /**
      * Constructor.
@@ -62,15 +62,15 @@ class acknowledged_notice extends table_sql implements renderable {
         $this->filters = (object)$filters;
         $this->noticeid = $noticeid;
 
+        // Set download status.
+        $currenttime = userdate(time(), get_string('report:timeformat:sortable', 'local_sitenotice'), null, false);
+        $this->is_downloading($download, get_string('report:acknowledged', 'local_sitenotice', $currenttime));
+
         // Define columns in the table.
         $this->define_table_columns();
 
         // Define configs.
         $this->define_table_configs($url);
-
-        // Set download status.
-        $currenttime = userdate(time(), get_string('report:timeformat:sortable', 'local_sitenotice'), null, false);
-        $this->is_downloading($download, get_string('report:acknowledged', 'local_sitenotice', $currenttime));
     }
 
     /**
@@ -78,15 +78,31 @@ class acknowledged_notice extends table_sql implements renderable {
      * @throws \coding_exception
      */
     protected function define_table_columns() {
-        $cols = array(
-            'noticetitle' => get_string('notice:title', 'local_sitenotice'),
-            'username' => get_string('username'),
-            'firstname' => get_string('firstname'),
-            'lastname' => get_string('lastname'),
-            'idnumber' => get_string('idnumber'),
-            'hlinkcount' => get_string('notice:hlinkcount', 'local_sitenotice'),
-            'timecreated' => get_string('event:timecreated', 'local_sitenotice'),
-        );
+        if ($this->is_downloading()) {
+            $cols = array(
+                'noticetitle' => get_string('notice:title', 'local_sitenotice'),
+                'username' => get_string('username'),
+                'firstname' => get_string('firstname'),
+                'lastname' => get_string('lastname'),
+                'idnumber' => get_string('idnumber'),
+            );
+            // Add each hyperlink as a header.
+            $hlinks = helper::retrieve_notice_links($this->noticeid);
+            foreach ($hlinks as $link) {
+                $cols[$link->id] = "$link->text ($link->link)";
+            }
+            $cols['timecreated'] = get_string('event:timecreated', 'local_sitenotice');
+        } else {
+            $cols = array(
+                'noticetitle' => get_string('notice:title', 'local_sitenotice'),
+                'username' => get_string('username'),
+                'firstname' => get_string('firstname'),
+                'lastname' => get_string('lastname'),
+                'idnumber' => get_string('idnumber'),
+                'hlinkcount' => get_string('notice:hlinkcount', 'local_sitenotice'),
+                'timecreated' => get_string('event:timecreated', 'local_sitenotice'),
+            );
+        }
 
         $this->define_columns(array_keys($cols));
         $this->define_headers(array_values($cols));
@@ -184,6 +200,7 @@ class acknowledged_notice extends table_sql implements renderable {
      * @return string
      */
     protected function col_timecreated($row) {
+        $this->previoususer = $row->userid;
         if ($row->timecreated) {
             return userdate($row->timecreated);
         } else {
@@ -198,15 +215,40 @@ class acknowledged_notice extends table_sql implements renderable {
      * @throws \dml_exception
      */
     protected function col_hlinkcount($row) {
-        if ($this->currentuser == $row->userid) {
+        // Only count on the first record of a user.
+        if ($this->previoususer == $row->userid) {
             return '';
         }
-        $this->currentuser = $row->userid;
         $hlinkcount = '';
         $linkcounts = helper::count_clicked_notice_links($row->userid, $row->noticeid);
         foreach ($linkcounts as $count) {
             $hlinkcount .= "<a href=\"{$count->link}\">{$count->text}</a>: $count->count <br/>";
         }
         return $hlinkcount;
+    }
+
+    /**
+     * Process hyperlink counts.
+     * @param $column column
+     * @param $row rows
+     * @return string|null
+     * @throws \dml_exception
+     */
+    public function other_cols($column, $row) {
+        // Check if the column name is the id of a notice hyperlink.
+        if ($column > 0) {
+            // Only do link count on the first record of a user.
+            if ($this->previoususer == $row->userid) {
+                return '';
+            }
+            $linkcounts = helper::count_clicked_notice_links($row->userid, $row->noticeid, $column);
+            if (isset($linkcounts[$column])) {
+                return $linkcounts[$column]->count;
+            } else {
+                return '0';
+            }
+        } else {
+            return null;
+        }
     }
 }

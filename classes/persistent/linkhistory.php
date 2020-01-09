@@ -68,15 +68,22 @@ class linkhistory extends persistent {
      * @return array
      * @throws \dml_exception
      */
-    public static function count_user_notice_clicked_link($userid, $noticeid) {
+    public static function count_clicked_links($userid, $noticeid, $linkid = 0) {
         global $DB;
-        $wheresql = "WHERE h.userid = :userid AND l.noticeid = :noticeid";
+        $params = [];
+        if ($linkid > 0) {
+            $wheresql = "WHERE h.userid = :userid AND l.noticeid = :noticeid AND h.hlinkid = :hlinkid";
+            $params = ['hlinkid' => $linkid];
+        } else {
+            $wheresql = "WHERE h.userid = :userid AND l.noticeid = :noticeid";
+        }
         $sql = "SELECT h.hlinkid, l.text, l.link, COUNT(h.hlinkid)
                   FROM {local_sitenotice_hlinks_his} h
                   JOIN {local_sitenotice_hlinks} l on h.hlinkid = l.id
                   $wheresql
               GROUP BY h.hlinkid, l.text, l.link";
-        $params = ['userid' => $userid, 'noticeid' => $noticeid];
+
+        $params = array_merge($params, ['userid' => $userid, 'noticeid' => $noticeid]);
         return $DB->get_records_sql($sql, $params);
     }
 }
