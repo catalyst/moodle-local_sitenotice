@@ -84,8 +84,12 @@ if (!$sitenotice) {
 }
 
 switch ($action) {
-    case 'report':
+    case 'dismissed_report':
         $reportpage = new moodle_url('/local/sitenotice/report/dismissed_report.php', ["noticeid" => $noticeid]);
+        redirect($reportpage);
+        break;
+    case 'acknowledged_report':
+        $reportpage = new moodle_url('/local/sitenotice/report/acknowledged_report.php', ["noticeid" => $noticeid]);
         redirect($reportpage);
         break;
     case 'reset':

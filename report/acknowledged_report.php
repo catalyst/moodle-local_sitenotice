@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Report of users who dismissed a notice.
+ * Report of users who acknowledged a notice.
  * @package local_sitenotice
  * @author  Nathan Nguyen <nathannguyen@catalyst-au.net>
  * @copyright  Catalyst IT
@@ -25,7 +25,7 @@ require_once(__DIR__.'/../../../config.php');
 
 use local_sitenotice\helper;
 use local_sitenotice\report_filter;
-use local_sitenotice\table\dismissed_notice;
+use local_sitenotice\table\acknowledged_notice;
 
 require_login();
 helper::check_manage_capability();
@@ -36,7 +36,7 @@ $download = optional_param('download', '', PARAM_ALPHA);
 $page = optional_param('page', 0, PARAM_INT);
 
 // Set up page.
-$thispage = new moodle_url('/local/sitenotice/report/dismissed_report.php', ['noticeid' => $noticeid]);
+$thispage = new moodle_url('/local/sitenotice/report/acknowledged_report.php', ['noticeid' => $noticeid]);
 
 $PAGE->set_url($thispage);
 $PAGE->set_context(context_system::instance());
@@ -50,15 +50,16 @@ $notice = helper::retrieve_notice($noticeid);
 
 if (empty($notice)) {
     echo $output->header();
-    echo $OUTPUT->notification(get_string('notification:nodis', 'local_sitenotice'), 'notifyinfo');
+    echo $OUTPUT->notification(get_string('notification:noack', 'local_sitenotice'), 'notifyinfo');
     echo $output->footer();
 }
 // Get current filter for the report.
-$filter = new report_filter($thispage, dismissed_notice::TABLE_ALIAS);
+$filter = new report_filter($thispage, \local_sitenotice\table\acknowledged_notice::TABLE_ALIAS);
 list($filtersql, $params) = $filter->get_sql_filter();
 
-$table = new dismissed_notice('dismissed_notice_table', $thispage, ['filtersql' => $filtersql, 'params' => $params],
-    $download, $page, 20, $notice->title);
+$table = new acknowledged_notice('acknowledged_notice_table', $thispage, ['filtersql' => $filtersql, 'params' => $params],
+    $download, $page, 20, $notice->id);
+
 if ($table->is_downloading()) {
     \core\session\manager::write_close();
     echo $output->render($table);
@@ -67,7 +68,7 @@ if ($table->is_downloading()) {
 
 echo $output->header();
 echo $output->heading($notice->title);
-echo $output->heading(get_string('report:dismissed_desc', 'local_sitenotice'), 4);
+echo $output->heading(get_string('report:acknowledge_desc', 'local_sitenotice'), 4);
 $filter->display_forms();
 echo $output->render($table);
 echo $output->footer();

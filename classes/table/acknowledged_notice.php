@@ -27,30 +27,40 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/tablelib.php');
 use table_sql;
 use renderable;
+use local_sitenotice\helper;
 
-class dismissed_notice extends table_sql implements renderable {
-
-    // Notice title.
-    protected $title = '';
+class acknowledged_notice extends table_sql implements renderable {
+    // Notice id.
+    protected $noticeid = '';
 
     // Table alias for standard log.
-    const TABLE_ALIAS = 'sl';
+    const TABLE_ALIAS = 'ack';
+
+    // To check next user.
+    protected $currentuser = '';
 
     /**
-     * Construct table with headers.
-     * @param $uniqueid
+     * Constructor.
+     * @param $uniqueid unique id of the table
+     * @param \moodle_url $url base url
+     * @param $noticeid notice id
+     * @param array $filters filter
+     * @param string $download download file format
+     * @param int $page current page
+     * @param int $perpage number of record per page
      * @throws \coding_exception
      */
-    public function __construct($uniqueid, \moodle_url $url, $filters = [], $download = '', $page = 0, $perpage = 20, $title = '') {
+    public function __construct($uniqueid, \moodle_url $url, $filters = [],
+                                $download = '', $page = 0, $perpage = 20, $noticeid) {
         parent::__construct($uniqueid);
 
-        $this->set_attribute('class', 'local_sitenotice dismissed_notices');
+        $this->set_attribute('class', 'local_sitenotice acknowledged_notices');
 
         // Set protected properties.
         $this->pagesize = $perpage;
         $this->page = $page;
         $this->filters = (object)$filters;
-        $this->title = $title;
+        $this->noticeid = $noticeid;
 
         // Define columns in the table.
         $this->define_table_columns();
@@ -60,7 +70,7 @@ class dismissed_notice extends table_sql implements renderable {
 
         // Set download status.
         $currenttime = userdate(time(), get_string('report:timeformat:sortable', 'local_sitenotice'), null, false);
-        $this->is_downloading($download, get_string('report:dismissed', 'local_sitenotice', $currenttime));
+        $this->is_downloading($download, get_string('report:acknowledged', 'local_sitenotice', $currenttime));
     }
 
     /**
@@ -69,11 +79,12 @@ class dismissed_notice extends table_sql implements renderable {
      */
     protected function define_table_columns() {
         $cols = array(
-            'title' => get_string('notice:title', 'local_sitenotice'),
+            'noticetitle' => get_string('notice:title', 'local_sitenotice'),
             'username' => get_string('username'),
             'firstname' => get_string('firstname'),
             'lastname' => get_string('lastname'),
             'idnumber' => get_string('idnumber'),
+            'hlinkcount' => get_string('notice:hlinkcount', 'local_sitenotice'),
             'timecreated' => get_string('event:timecreated', 'local_sitenotice'),
         );
 
@@ -109,14 +120,13 @@ class dismissed_notice extends table_sql implements renderable {
         if ($count) {
             $select = "COUNT(1)";
         } else {
-            $select = "{$alias}.timecreated , u.username, u.firstname, u.lastname, u.idnumber";
+            $select = "{$alias}.*";
         }
 
         list($where, $params) = $this->get_filters_sql_and_params();
 
         $sql = "SELECT {$select}
-                  FROM {logstore_standard_log} {$alias}
-                  JOIN {user} u ON u.id = {$alias}.relateduserid
+                  FROM {local_sitenotice_ack} {$alias}
                  WHERE {$where}";
 
         // Add order by if needed.
@@ -132,8 +142,8 @@ class dismissed_notice extends table_sql implements renderable {
      * @return array
      */
     protected function get_filters_sql_and_params() {
-        $filter = "component = 'local_sitenotice' AND action = 'dismissed'";
-        $params = array();
+        $filter = "noticeid = :noticeid";
+        $params = ['noticeid' => $this->noticeid];
         if (!empty($this->filters->filtersql)) {
             $filter .= " AND {$this->filters->filtersql}";
             $params = array_merge($this->filters->params, $params);
@@ -182,10 +192,21 @@ class dismissed_notice extends table_sql implements renderable {
     }
 
     /**
-     * Title columns
+     * Custom link count column.
+     * @param $row acknowledged notice record
      * @return string
+     * @throws \dml_exception
      */
-    protected function col_title() {
-        return $this->title;
+    protected function col_hlinkcount($row) {
+        if ($this->currentuser == $row->userid) {
+            return '';
+        }
+        $this->currentuser = $row->userid;
+        $hlinkcount = '';
+        $linkcounts = helper::count_clicked_notice_links($row->userid, $row->noticeid);
+        foreach ($linkcounts as $count) {
+            $hlinkcount .= "<a href=\"{$count->link}\">{$count->text}</a>: $count->count <br/>";
+        }
+        return $hlinkcount;
     }
 }

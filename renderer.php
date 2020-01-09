@@ -23,7 +23,8 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-use local_sitenotice\table\dismissed_notice;
+use local_sitenotice\table\dismissed_notice;;
+use local_sitenotice\table\acknowledged_notice;;
 
 class local_sitenotice_renderer extends plugin_renderer_base {
 
@@ -33,6 +34,19 @@ class local_sitenotice_renderer extends plugin_renderer_base {
      * @return false|string
      */
     public function render_dismissed_notice(dismissed_notice $table) {
+        ob_start();
+        $table->out($table->pagesize, false);
+        $o = ob_get_contents();
+        ob_end_clean();
+        return $o;
+    }
+
+    /**
+     * Render table.
+     * @param dismissed_notice $table dismissed notice table
+     * @return false|string
+     */
+    public function render_acknowledged_notice(acknowledged_notice $table) {
         ob_start();
         $table->out($table->pagesize, false);
         $o = ob_get_contents();

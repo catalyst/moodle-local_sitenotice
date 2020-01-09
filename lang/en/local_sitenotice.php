@@ -90,6 +90,7 @@ $string['privacy:metadata:userid'] = 'User ID';
 
 // Notification.
 $string['notification:noack'] = 'There is no acknowledgment for this notice';
+$string['notification:nodis'] = 'There is no dismission for this notice';
 $string['notification:noticedoesnotexist'] = 'The notice does not exist';
 $string['notification:nodeleteallowed'] = 'Notice deletion is not allowed';
 $string['notification:noupdateallowed'] = 'Notice update is not allowed';
@@ -104,6 +105,6 @@ $string['button:accept'] = 'ACCEPT';
 // Report.
 $string['report:dismissed'] = 'notice_dismissed_{$a}.csv';
 $string['report:dismissed_desc'] = 'List of users who dismissed the notice.';
-$string['report:acknowledge'] = 'notice_acknowledged_{$a}.csv';
-$string['report:acknowledge_desc'] = 'List of users who dismiss the notice.';
+$string['report:acknowledged'] = 'notice_acknowledged_{$a}.csv';
+$string['report:acknowledge_desc'] = 'List of users who acknowledged the notice.';
 $string['report:timeformat:sortable'] = '%Y.%m.%d-%H:%M:%S.';
