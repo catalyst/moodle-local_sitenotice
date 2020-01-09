@@ -48,8 +48,14 @@ If the user does not accept the notice, he/she will be logged out of the site.
 * Go to Manage Notices: Site administration > Site Notice > Manage Notice
 * Click on the 'trash' icon to delete notice
 
-### View/Download Notice Report
+### View/Download Notice Acknowledgement Report
 * Go to Manage Notices: Site administration > Site Notice > Manage Notice
 * Click on the 'chart' icon to view notice report
 * Apply "Date range" filter if required
-* Click on "Download in text format" to download csv report of the notice
+* Choose a file format and click on download button
+
+### View/Download Notice Dismiss Report
+* Go to Manage Notices: Site administration > Site Notice > Manage Notice
+* Click on the 'risk' icon to view notice report
+* Apply "Date range" filter if required
+* Choose a file format and click on download button
