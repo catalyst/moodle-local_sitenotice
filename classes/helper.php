@@ -372,6 +372,32 @@ class helper {
     }
 
     /**
+     * Create new acknowledgement record.
+     * @param $noticeid notice id
+     * @param $action dismissed or acknowledged
+     * @return \core\persistent
+     * @throws \coding_exception
+     * @throws \core\invalid_persistent_exception
+     */
+    private static function create_new_acknowledge_record($noticeid, $action) {
+        global $USER;
+        $notice = sitenotice::get_record(['id' => $noticeid]);
+
+        // New record.
+        $data = new \stdClass();
+        $data->userid = $USER->id;
+        $data->username = $USER->username;
+        $data->firstname = $USER->firstname;
+        $data->lastname = $USER->lastname;
+        $data->idnumber = $USER->idnumber;
+        $data->noticeid = $noticeid;
+        $data->noticetitle = $notice->get('title');
+        $data->action = $action;
+        $persistent = new acknowledgement(0, $data);
+        return $persistent->create();
+    }
+
+    /**
      * Dismiss the notice
      * @param $noticeid notice id
      * @return array
@@ -386,23 +412,28 @@ class helper {
 
         $result = array();
         $notice = sitenotice::get_record(['id' => $noticeid]);
+        // Check if require acknowledgement.
         if ($notice && $notice->get('reqack')) {
+            // Record dismiss action.
+            self::create_new_acknowledge_record($noticeid, acknowledgement::ACTION_DISMISSED);
+
+            // Log user out.
             require_logout();
             $loginpage = new \moodle_url("/login/index.php");
             $result['redirecturl'] = $loginpage->out();
+
+            // Log dismissed event.
+            $params = array(
+                'context' => \context_system::instance(),
+                'objectid' => $noticeid,
+                'relateduserid' => $userid,
+            );
+            $event = \local_sitenotice\event\sitenotice_dismissed::create($params);
+            $event->trigger();
         }
 
         // Mark notice as viewed.
         self::add_to_viewed_notices($noticeid, $userid, acknowledgement::ACTION_DISMISSED);
-
-        // Log dismissed event.
-        $params = array(
-            'context' => \context_system::instance(),
-            'objectid' => $noticeid,
-            'relateduserid' => $userid,
-        );
-        $event = \local_sitenotice\event\sitenotice_dismissed::create($params);
-        $event->trigger();
 
         $result['status'] = true;
         return $result;
@@ -417,36 +448,24 @@ class helper {
      * @throws \core\invalid_persistent_exception
      */
     public static function acknowledge_notice($noticeid) {
-        global $USER;
-        // Acknowledgement Record.
-        $notice = sitenotice::get_record(['id' => $noticeid]);
-
-        $data = new \stdClass();
-        $data->userid = $USER->id;
-        $data->username = $USER->username;
-        $data->firstname = $USER->firstname;
-        $data->lastname = $USER->lastname;
-        $data->idnumber = $USER->idnumber;
-        $data->noticeid = $noticeid;
-        $data->noticetitle = $notice->get('title');
-        $data->action = acknowledgement::ACTION_ACKNOWLEDGED;
-        $persistent = new acknowledgement(0, $data);
-        $persistent = $persistent->create();
-
-        // Mark notice as viewed.
-        self::add_to_viewed_notices($noticeid, $USER->id, acknowledgement::ACTION_ACKNOWLEDGED);
-
-        // Log acknowledged event.
-        $params = array(
-            'context' => \context_system::instance(),
-            'objectid' => $noticeid,
-            'relateduserid' => $persistent->get('usermodified'),
-        );
-        $event = \local_sitenotice\event\sitenotice_acknowledged::create($params);
-        $event->trigger();
-
         $result = array();
-        $result['status'] = true;
+        // Record Acknowledge action
+        $persistent = self::create_new_acknowledge_record($noticeid, acknowledgement::ACTION_ACKNOWLEDGED);
+        if ($persistent) {
+            // Mark notice as viewed.
+            self::add_to_viewed_notices($noticeid, $persistent->get('id'), acknowledgement::ACTION_ACKNOWLEDGED);
+            // Log acknowledged event.
+            $params = array(
+                'context' => \context_system::instance(),
+                'objectid' => $noticeid,
+                'relateduserid' => $persistent->get('usermodified'),
+            );
+            $event = \local_sitenotice\event\sitenotice_acknowledged::create($params);
+            $event->trigger();
+            $result['status'] = true;
+        } else {
+            $result['status'] = false;
+        }
         return $result;
     }
 
