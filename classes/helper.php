@@ -497,7 +497,7 @@ class helper {
      * Hyperlink interaction on a notice.
      * @param $userid user id
      * @param $noticeid notice id
-     * @param $linkid hyperlink  id
+     * @param int $linkid hyperlink  id
      * @return array
      * @throws \dml_exception
      */
