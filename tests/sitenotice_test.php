@@ -41,6 +41,7 @@ class local_sitenotice_test extends advanced_testcase {
      * @throws \core\invalid_persistent_exception
      * @throws coding_exception
      * @throws dml_exception
+     * @throws required_capability_exception
      */
     private function create_notice1() {
         $formdata = new stdClass();
@@ -54,6 +55,7 @@ class local_sitenotice_test extends advanced_testcase {
      * @throws \core\invalid_persistent_exception
      * @throws coding_exception
      * @throws dml_exception
+     * @throws required_capability_exception
      */
     private function create_notice2() {
         $formdata = new stdClass();
@@ -67,6 +69,7 @@ class local_sitenotice_test extends advanced_testcase {
      * @throws \core\invalid_persistent_exception
      * @throws coding_exception
      * @throws dml_exception
+     * @throws required_capability_exception
      */
     private function create_cohort_notice1() {
         $formdata = new stdClass();
@@ -82,6 +85,7 @@ class local_sitenotice_test extends advanced_testcase {
      * @throws \core\invalid_persistent_exception
      * @throws coding_exception
      * @throws dml_exception
+     * @throws required_capability_exception
      */
     private function create_cohort_notice2() {
         $formdata = new stdClass();
@@ -97,8 +101,10 @@ class local_sitenotice_test extends advanced_testcase {
      * @throws \core\invalid_persistent_exception
      * @throws coding_exception
      * @throws dml_exception
+     * @throws required_capability_exception
      */
     public function test_create_notices() {
+        $this->setAdminUser();
         $this->create_notice1();
         $allnotices = helper::retrieve_enabled_notices();
         // There is only one notice.
@@ -159,8 +165,10 @@ class local_sitenotice_test extends advanced_testcase {
      * @throws \core\invalid_persistent_exception
      * @throws coding_exception
      * @throws dml_exception
+     * @throws required_capability_exception
      */
     public function test_reset_notices() {
+        $this->setAdminUser();
         $this->create_notice1();
         $this->create_notice2();
         $allnotices = helper::retrieve_enabled_notices();
@@ -185,8 +193,10 @@ class local_sitenotice_test extends advanced_testcase {
      * @throws \core\invalid_persistent_exception
      * @throws coding_exception
      * @throws dml_exception
+     * @throws required_capability_exception
      */
     public function test_enable_notices() {
+        $this->setAdminUser();
         $this->create_notice1();
         $this->create_notice2();
         $allnotices = helper::retrieve_enabled_notices();
@@ -232,13 +242,14 @@ class local_sitenotice_test extends advanced_testcase {
      */
     public function test_user_notice() {
         global $USER;
+        $this->setAdminUser();
         $this->create_notice1();
         $this->create_notice2();
         $this->create_cohort_notice1();
         $this->create_cohort_notice2();
         $user1 = $this->getDataGenerator()->create_user();
-        $this->setUser($user1);
 
+        // Four active notices.
         $allnotices = helper::retrieve_enabled_notices();
         $this->assertEquals(4, count($allnotices));
         $notice1 = array_shift($allnotices);
@@ -246,30 +257,46 @@ class local_sitenotice_test extends advanced_testcase {
         $cohortnotice1 = array_shift($allnotices);
         $cohortnotice2 = array_shift($allnotices);
 
+        // Only notice 1 and notice 2 are applied to user 1.
+        $this->setUser($user1);
         $usernotices = helper::retrieve_user_notices();
         $this->assertEquals(2, count($usernotices));
 
+        $this->setAdminUser();
         helper::disable_notice($notice2->id);
+
+        // Only Notice 1 applied to user 1.
+        $this->setUser($user1);
         $usernotices = helper::retrieve_user_notices();
         $this->assertEquals(1, count($usernotices));
+        $notice = reset($usernotices);
+        $this->assertEquals('Notice 1', $notice->title);
 
+        // Add user 1 to cohorts of cohort notice 1 and cohort notice 2, there will be 3 notices for the user.
         cohort_add_member($cohortnotice1->audience, $user1->id);
         cohort_add_member($cohortnotice2->audience, $user1->id);
         $usernotices = helper::retrieve_user_notices();
         $this->assertEquals(3, count($usernotices));
 
+        // User 1 dismissed notice 1, there will be 2 notices for the user.
         helper::dismiss_notice($notice1->id);
         $usernotices = helper::retrieve_user_notices();
         $this->assertEquals(2, count($usernotices));
         $this->assertEquals(1, count($USER->viewednotices));
 
+        // User 1 acknowledged notice 1, there will be 1 notice for the user.
         helper::acknowledge_notice($cohortnotice1->id);
         $usernotices = helper::retrieve_user_notices();
         $this->assertEquals(1, count($usernotices));
         $this->assertEquals(2, count($USER->viewednotices));
 
+        // Admin user reset notice 1.
         sleep(1);
+        $this->setAdminUser();
         helper::reset_notice($notice1->id);
+
+        // There will be 2 notices for user 1.
+        $this->setUser($user1);
         $usernotices = helper::retrieve_user_notices();
         $this->assertEquals(2, count($usernotices));
         $this->assertEquals(1, count($USER->viewednotices));
@@ -280,8 +307,10 @@ class local_sitenotice_test extends advanced_testcase {
      * @throws \core\invalid_persistent_exception
      * @throws coding_exception
      * @throws dml_exception
+     * @throws required_capability_exception
      */
     public function test_user_hlink_interact() {
+        $this->setAdminUser();
         $this->create_notice1();
         $user1 = $this->getDataGenerator()->create_user();
         $this->setUser($user1);
