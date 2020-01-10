@@ -88,19 +88,4 @@ class acknowledgement extends persistent {
         $DB->delete_records(static::TABLE, ['noticeid' => $noticeid]);
     }
 
-    /**
-     * Get acknowledgement records related to a notice.
-     * @param $filtersql filter
-     * @param $params parameter
-     * @return array
-     * @throws \dml_exception
-     */
-    public static function get_notice_acknowledgement($filtersql, $params) {
-        global $DB;
-        $sql = "SELECT *
-                  FROM {local_sitenotice_ack}
-                 WHERE $filtersql
-              ORDER BY userid ASC, timecreated DESC";
-        return $DB->get_records_sql($sql, $params);
-    }
 }
