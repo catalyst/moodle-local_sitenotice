@@ -324,7 +324,7 @@ class helper {
             $notice = $notices[$noticeid];
             if ($data['timeviewed'] < $notice->timemodified
                 || (($notice->resetinterval > 0) && ($data['timeviewed'] + $notice->resetinterval < time()))
-                || ($data['action'] === 'dismissed' && $notice->reqack == true)) {
+                || ($data['action'] === acknowledgement::ACTION_DISMISSED && $notice->reqack == true)) {
                 unset($USER->viewednotices[$noticeid]);
             }
         }
@@ -392,6 +392,9 @@ class helper {
             $result['redirecturl'] = $loginpage->out();
         }
 
+        // Mark notice as viewed.
+        self::add_to_viewed_notices($noticeid, $userid, acknowledgement::ACTION_DISMISSED);
+
         // Log dismissed event.
         $params = array(
             'context' => \context_system::instance(),
@@ -429,6 +432,9 @@ class helper {
         $data->action = acknowledgement::ACTION_ACKNOWLEDGED;
         $persistent = new acknowledgement(0, $data);
         $persistent = $persistent->create();
+
+        // Mark notice as viewed.
+        self::add_to_viewed_notices($noticeid, $USER->id, acknowledgement::ACTION_ACKNOWLEDGED);
 
         // Log acknowledged event.
         $params = array(
