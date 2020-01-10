@@ -322,8 +322,12 @@ class helper {
                 continue;
             }
             $notice = $notices[$noticeid];
-            if ($data['timeviewed'] < $notice->timemodified
+            if (
+                // Notice has been updated/reset/enabled.
+                $data['timeviewed'] < $notice->timemodified
+                // The reset interval has been past.
                 || (($notice->resetinterval > 0) && ($data['timeviewed'] + $notice->resetinterval < time()))
+                // The previous action is 'dismiss', so still require acknowledgement.
                 || ($data['action'] === acknowledgement::ACTION_DISMISSED && $notice->reqack == true)) {
                 unset($USER->viewednotices[$noticeid]);
             }
@@ -364,10 +368,10 @@ class helper {
      * @throws \coding_exception
      * @throws \core\invalid_persistent_exception
      */
-    public static function add_to_viewed_notices($noticeid, $userid, $action) {
+    private static function add_to_viewed_notices($noticeid, $action) {
         global $USER;
         // Add to viewed notices.
-        $noticeview = noticeview::add_notice_view($noticeid, $userid, $action);
+        $noticeview = noticeview::add_notice_view($noticeid, $USER->id, $action);
         $USER->viewednotices[$noticeid] = ['timeviewed' => $noticeview->get('timemodified'), 'action' => $action];
     }
 
@@ -433,7 +437,7 @@ class helper {
         }
 
         // Mark notice as viewed.
-        self::add_to_viewed_notices($noticeid, $userid, acknowledgement::ACTION_DISMISSED);
+        self::add_to_viewed_notices($noticeid, acknowledgement::ACTION_DISMISSED);
 
         $result['status'] = true;
         return $result;
@@ -449,11 +453,11 @@ class helper {
      */
     public static function acknowledge_notice($noticeid) {
         $result = array();
-        // Record Acknowledge action
+        // Record Acknowledge action.
         $persistent = self::create_new_acknowledge_record($noticeid, acknowledgement::ACTION_ACKNOWLEDGED);
         if ($persistent) {
             // Mark notice as viewed.
-            self::add_to_viewed_notices($noticeid, $persistent->get('id'), acknowledgement::ACTION_ACKNOWLEDGED);
+            self::add_to_viewed_notices($noticeid, acknowledgement::ACTION_ACKNOWLEDGED);
             // Log acknowledged event.
             $params = array(
                 'context' => \context_system::instance(),
