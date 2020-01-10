@@ -104,6 +104,7 @@ class acknowledged_notice extends table_sql implements renderable {
                 'hlinkcount' => get_string('notice:hlinkcount', 'local_sitenotice'),
                 'timecreated' => get_string('event:timecreated', 'local_sitenotice'),
             );
+            $this->no_sorting('hlinkcount');
         }
 
         $this->define_columns(array_keys($cols));
