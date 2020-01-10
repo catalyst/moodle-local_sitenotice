@@ -87,6 +87,10 @@ $string['privacy:metadata:local_sitenotice_ack'] = 'Notice Acknowledgement';
 $string['privacy:metadata:local_sitenotice_hlinks_his'] = 'Hyperlink Tracking';
 $string['privacy:metadata:local_sitenotice_lastview'] = 'Notice last view';
 $string['privacy:metadata:userid'] = 'User ID';
+$string['privacy:metadata:username'] = 'Username';
+$string['privacy:metadata:firstname'] = 'First name';
+$string['privacy:metadata:lastname'] = 'Last name';
+$string['privacy:metadata:idnumber'] = 'ID number';
 
 // Notification.
 $string['notification:noack'] = 'There is no acknowledgment for this notice';
