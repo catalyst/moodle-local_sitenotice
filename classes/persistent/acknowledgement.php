@@ -31,6 +31,12 @@ class acknowledgement extends persistent {
     /** Table name for the persistent. */
     const TABLE = 'local_sitenotice_ack';
 
+    /** Dismiss Action */
+    const ACTION_DISMISSED = 0;
+
+    /** Acknowledge Action */
+    const ACTION_ACKNOWLEDGED = 1;
+
     /**
      * @inheritdoc
      */
@@ -64,6 +70,11 @@ class acknowledgement extends persistent {
                 'type' => PARAM_RAW_TRIMMED,
                 'null' => NULL_NOT_ALLOWED,
             ],
+            'action' => [
+                'type' => PARAM_INT,
+                'null' => NULL_NOT_ALLOWED,
+                'default' => self::ACTION_DISMISSED,
+            ],
         ];
     }
 
@@ -78,7 +89,7 @@ class acknowledgement extends persistent {
     }
 
     /**
-     * Get acknoledgement records related to a notice.
+     * Get acknowledgement records related to a notice.
      * @param $filtersql filter
      * @param $params parameter
      * @return array

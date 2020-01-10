@@ -426,6 +426,7 @@ class helper {
         $data->idnumber = $USER->idnumber;
         $data->noticeid = $noticeid;
         $data->noticetitle = $notice->get('title');
+        $data->action = acknowledgement::ACTION_ACKNOWLEDGED;
         $persistent = new acknowledgement(0, $data);
         $persistent = $persistent->create();
 

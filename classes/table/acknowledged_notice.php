@@ -25,6 +25,8 @@ namespace local_sitenotice\table;
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/tablelib.php');
+
+use local_sitenotice\persistent\acknowledgement;
 use table_sql;
 use renderable;
 use local_sitenotice\helper;
@@ -158,8 +160,9 @@ class acknowledged_notice extends table_sql implements renderable {
      * @return array
      */
     protected function get_filters_sql_and_params() {
-        $filter = "noticeid = :noticeid";
-        $params = ['noticeid' => $this->noticeid];
+        $filter = "noticeid = :noticeid AND action = :ackaction";
+        $params = ['noticeid' => $this->noticeid,
+            'ackaction' => acknowledgement::ACTION_ACKNOWLEDGED];
         if (!empty($this->filters->filtersql)) {
             $filter .= " AND {$this->filters->filtersql}";
             $params = array_merge($this->filters->params, $params);
