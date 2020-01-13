@@ -248,4 +248,14 @@ class all_notices extends table_sql implements renderable {
         }
     }
 
+    /**
+     * Custome content column.
+     * @param $row $row a notice record.
+     * @return string
+     * @throws \coding_exception
+     */
+    protected function col_content($row) {
+        return html_writer::link("#", get_string('view'),
+            ['class' => 'notice-preview', 'data-noticecontent' => $row->content]);
+    }
 }
