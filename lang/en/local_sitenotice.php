@@ -75,9 +75,6 @@ $string['event:disable'] = 'disable';
 $string['event:delete'] = 'delete';
 $string['event:timecreated'] = 'Time';
 
-// Report.
-$string['report:name'] = 'Notice Report';
-
 // Time format.
 $string['timeformat:resetinterval'] = '%a day(s), %h hour(s), %i minute(s) and %s second(s)';
 $string['booleanformat:true'] = 'YES';
@@ -108,6 +105,8 @@ $string['button:close'] = 'CLOSE';
 $string['button:accept'] = 'ACCEPT';
 
 // Report.
+$string['report:button:ack'] = 'Notice acknowledgement report';
+$string['report:button:dis'] = 'Notice dismiss Report';
 $string['report:dismissed'] = 'notice_dismissed_{$a}';
 $string['report:dismissed_desc'] = 'List of users who dismissed the notice.';
 $string['report:acknowledged'] = 'notice_acknowledged_{$a}';

@@ -189,14 +189,14 @@ class all_notices extends table_sql implements renderable {
             // Acknowledge Report.
             $editparams = ['noticeid' => $row->id, 'action' => 'acknowledged_report', 'sesskey' => sesskey()];
             $editurl = new moodle_url($editnotice, $editparams);
-            $icon = $OUTPUT->pix_icon('i/report', get_string('report'));
+            $icon = $OUTPUT->pix_icon('i/report', get_string('report:button:ack', 'local_sitenotice'));
             $editlink = html_writer::link($editurl, $icon);
             $links .= ' ' . $editlink;
 
             // Dismiss Report.
             $editparams = ['noticeid' => $row->id, 'action' => 'dismissed_report', 'sesskey' => sesskey()];
             $editurl = new moodle_url($editnotice, $editparams);
-            $icon = $OUTPUT->pix_icon('i/risk_xss', get_string('report'));
+            $icon = $OUTPUT->pix_icon('i/risk_xss', get_string('report:button:dis', 'local_sitenotice'));
             $editlink = html_writer::link($editurl, $icon);
             $links .= ' ' . $editlink;
         }
