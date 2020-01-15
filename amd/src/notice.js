@@ -50,7 +50,7 @@ define(
                     modal = newmodal;
 
                     modal.setNoticeId(nextnotice.id);
-                    modal.setRequiredAcknoledgement(nextnotice.reqack);
+                    modal.setRequiredAcknowledgement(nextnotice.reqack);
 
                     // Event listener for close button.
                     modal.getModal().on('click', modal.getCloseButtonID(), function() {
@@ -79,7 +79,7 @@ define(
                 modal.setTitle(nextnotice.title);
                 modal.setBody(nextnotice.content);
                 modal.setNoticeId(nextnotice.id);
-                modal.setRequiredAcknoledgement(nextnotice.reqack);
+                modal.setRequiredAcknowledgement(nextnotice.reqack);
                 modal.show();
             }
 

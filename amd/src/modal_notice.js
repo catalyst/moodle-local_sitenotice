@@ -84,10 +84,10 @@ define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry'],
         };
 
         /**
-         * Add Checkbox if the notice requires acknowlegement.
+         * Add Checkbox if the notice requires acknowledgement.
          * @param reqack
          */
-        ModalNotice.prototype.setRequiredAcknoledgement = function(reqack) {
+        ModalNotice.prototype.setRequiredAcknowledgement = function(reqack) {
             if (reqack == 1) {
                 var body = this.getBody();
                 var ackcheckbox = $("<input>", {type: "checkbox", id: SELECTORS.ACK_CHECKBOX});
