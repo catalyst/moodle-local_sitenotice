@@ -6,8 +6,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry'],
-    function($, Notification, Modal, ModalRegistry) {
+define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry', 'core/key_codes'],
+    function($, Notification, Modal, ModalRegistry, KeyCodes) {
 
         var registered = false;
 
@@ -101,6 +101,20 @@ define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry'],
             }
         };
 
+        /**
+         * Remove escape key event.
+         */
+        ModalNotice.prototype.registerEventListeners = function() {
+            this.getRoot().on('keydown', function(e) {
+                if (!this.isVisible()) {
+                    return;
+                }
+
+                if (e.keyCode == KeyCodes.tab) {
+                    this.handleTabLock(e);
+                }
+            }.bind(this));
+        };
         return ModalNotice;
     }
 );
