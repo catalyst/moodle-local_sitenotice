@@ -108,7 +108,7 @@ class all_notices extends table_sql implements renderable {
                   FROM {local_sitenotice}";
 
         if (!$count ) {
-            $sql .= "  ORDER BY enabled DESC, timecreated DESC";
+            $sql .= "  ORDER BY enabled DESC, timemodified DESC";
         }
 
         return array($sql, []);
