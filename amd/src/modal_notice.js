@@ -15,6 +15,7 @@ define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry', 'cor
             CLOSE_BUTTON: '[data-action="close"]',
             ACCEPT_BUTTON: '[data-action="accept"]',
             ACK_CHECKBOX: 'sitenotice-modal-ackcheckbox',
+            CAN_RECEIVE_FOCUS: 'input:not([type="hidden"]), a[href], button:not([disabled])',
         };
 
         var ATTRIBUTE = {
@@ -115,6 +116,30 @@ define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry', 'cor
                 }
             }.bind(this));
         };
+
+        /**
+         * CAN_RECEIVE_FOCUS in modal.js does not check if the disabled or hidden button
+         * @param e
+         */
+        ModalNotice.prototype.handleTabLock = function(e) {
+            if (!this.hasFocus()) {
+                return;
+            }
+
+            var target = $(document.activeElement);
+            var focusableElements = this.modal.find(SELECTORS.CAN_RECEIVE_FOCUS).filter(":visible");
+            var firstFocusable = focusableElements.first();
+            var lastFocusable = focusableElements.last();
+
+            if (target.is(firstFocusable) && e.shiftKey) {
+                lastFocusable.focus();
+                e.preventDefault();
+            } else if (target.is(lastFocusable) && !e.shiftKey) {
+                firstFocusable.focus();
+                e.preventDefault();
+            }
+        };
+
         return ModalNotice;
     }
 );
