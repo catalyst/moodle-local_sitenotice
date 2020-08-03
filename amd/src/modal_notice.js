@@ -16,6 +16,7 @@ define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry', 'cor
             ACCEPT_BUTTON: '[data-action="accept"]',
             ACK_CHECKBOX: 'sitenotice-modal-ackcheckbox',
             CAN_RECEIVE_FOCUS: 'input:not([type="hidden"]), a[href], button:not([disabled])',
+            TOOL_TIP_WRAPPER: '#tooltip-wrapper',
         };
 
         var ATTRIBUTE = {
@@ -97,9 +98,25 @@ define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry', 'cor
                 body.append(ackcheckbox);
                 body.append(ackcheckboxlabel);
                 this.getFooter().find(SELECTORS.ACCEPT_BUTTON).attr('disabled', true);
+                // Tooltip for disabled box.
+                this.turnonToolTip();
             } else {
                 this.getFooter().find(SELECTORS.ACCEPT_BUTTON).css('display', 'none');
             }
+        };
+
+        /**
+         * Turn off tool tip
+         */
+        ModalNotice.prototype.turnoffToolTip = function() {
+            this.getFooter().find(SELECTORS.TOOL_TIP_WRAPPER).tooltip('disable');
+        };
+
+        /**
+         * Turn on tool tip
+         */
+        ModalNotice.prototype.turnonToolTip = function() {
+            this.getFooter().find(SELECTORS.TOOL_TIP_WRAPPER).tooltip('enable');
         };
 
         /**

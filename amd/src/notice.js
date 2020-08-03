@@ -69,7 +69,13 @@ define(
                     });
                     // Event listener for ack checkbox.
                     modal.getModal().on('click', modal.getAckCheckboxID(), function() {
-                        $(modal.getAcceptButtonID()).attr('disabled', !$(modal.getAckCheckboxID()).is(":checked"));
+                        var ischecked = $(modal.getAckCheckboxID()).is(":checked");
+                        $(modal.getAcceptButtonID()).attr('disabled', !ischecked);
+                        if (!ischecked) {
+                            modal.turnonToolTip();
+                        } else {
+                            modal.turnoffToolTip();
+                        }
                     });
 
                     modal.show();

@@ -4,12 +4,20 @@
 
 #sitenotice-modal-ackcheckbox {
     transform: scale(1.5);
+    -ms-transform: scale(1.5);
+    -moz-transform: scale(1.5);
+    -webkit-transform: scale(1.5);
+    -o-transform: scale(1.5);
 }
 
 #sitenotice-acceptbtn:disabled, #sitenotice-acceptbtn:hover:disabled {
     border-color: grey;
     color: grey;
-    cursor: initial;
+    cursor: not-allowed;
+}
+
+#tooltip-wrapper #sitenotice-acceptbtn:disabled {
+    pointer-events: none;
 }
 
 .sitenotice .modal-header {

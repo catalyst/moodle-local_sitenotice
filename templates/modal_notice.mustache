@@ -36,9 +36,11 @@
                     <button id="sitenotice-closebtn" type="button" class="btn btn-primary" data-action="close">
                         {{#str}} button:close, local_sitenotice  {{/str}}
                     </button>
-                    <button id="sitenotice-acceptbtn" type="button" class="btn btn-secondary" data-action="accept">
-                        {{#str}} button:accept, local_sitenotice {{/str}}
-                    </button>
+                    <div id="tooltip-wrapper" data-title="Tooltip message here">
+                        <button id="sitenotice-acceptbtn" type="button" class="btn btn-secondary" data-action="accept">
+                            {{#str}} button:accept, local_sitenotice {{/str}}
+                        </button>
+                    </div>
                 {{/footer}}
             </div>
         </div>
