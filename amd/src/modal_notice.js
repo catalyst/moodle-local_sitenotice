@@ -6,8 +6,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry', 'core/key_codes'],
-    function($, Notification, Modal, ModalRegistry, KeyCodes) {
+define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry', 'core/key_codes', 'core/str'],
+    function($, Notification, Modal, ModalRegistry, KeyCodes, str) {
 
         var registered = false;
 
@@ -90,16 +90,18 @@ define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry', 'cor
          * @param reqack
          */
         ModalNotice.prototype.setRequiredAcknowledgement = function(reqack) {
+            var modal  = this;
             if (reqack == 1) {
-                var body = this.getBody();
-                var ackcheckbox = $("<input>", {type: "checkbox", id: SELECTORS.ACK_CHECKBOX});
-                var labeltext = "I have read and understand the notice (Closing this notice will log you off this site).";
-                var ackcheckboxlabel = $("<label>", {for: SELECTORS.ACK_CHECKBOX, text: labeltext});
-                body.append(ackcheckbox);
-                body.append(ackcheckboxlabel);
-                this.getFooter().find(SELECTORS.ACCEPT_BUTTON).attr('disabled', true);
-                // Tooltip for disabled box.
-                this.turnonToolTip();
+                str.get_string('modal:checkboxtext', 'local_sitenotice').then(function(langString) {
+                    var body = modal.getBody();
+                    var ackcheckbox = $("<input>", {type: "checkbox", id: SELECTORS.ACK_CHECKBOX});
+                    var ackcheckboxlabel = $("<label>", {for: SELECTORS.ACK_CHECKBOX, text: langString});
+                    body.append(ackcheckbox);
+                    body.append(ackcheckboxlabel);
+                    modal.getFooter().find(SELECTORS.ACCEPT_BUTTON).attr('disabled', true);
+                    // Tooltip for disabled box.
+                    modal.turnonToolTip();
+                }).catch(Notification.exception);
             } else {
                 this.getFooter().find(SELECTORS.ACCEPT_BUTTON).css('display', 'none');
             }
