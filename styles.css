@@ -1,3 +1,18 @@
 .noticecontent {
     width: 50%;
 }
+
+#sitenotice-modal-ackcheckbox {
+    transform: scale(1.5);
+}
+
+#sitenotice-acceptbtn:disabled, #sitenotice-acceptbtn:hover:disabled {
+    border-color: grey;
+    color: grey;
+    cursor: initial;
+}
+
+.sitenotice .modal-header {
+    color: white;
+    background-color: #ef3829;
+}
