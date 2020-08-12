@@ -102,7 +102,7 @@ define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry', 'cor
                     body.append(checkboxdiv);
                     modal.getFooter().find(SELECTORS.ACCEPT_BUTTON).attr('disabled', true);
                     // Tooltip for disabled box.
-                    modal.turnonToolTip();
+                    modal.getFooter().find(SELECTORS.TOOL_TIP_WRAPPER).tooltip();
                 }).catch(Notification.exception);
             } else {
                 this.getFooter().find(SELECTORS.ACCEPT_BUTTON).css('display', 'none');
