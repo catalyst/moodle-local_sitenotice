@@ -79,6 +79,7 @@ define(
                     });
 
                     modal.show();
+                    modal.getModal().focus();
                 });
             } else {
                 // Update with new details.
@@ -87,8 +88,8 @@ define(
                 modal.setNoticeId(nextnotice.id);
                 modal.setRequiredAcknowledgement(nextnotice.reqack);
                 modal.show();
+                modal.getModal().focus();
             }
-
         };
 
         /**
