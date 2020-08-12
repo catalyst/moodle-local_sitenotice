@@ -94,10 +94,12 @@ define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry', 'cor
             if (reqack == 1) {
                 str.get_string('modal:checkboxtext', 'local_sitenotice').then(function(langString) {
                     var body = modal.getBody();
+                    var checkboxdiv =  $("<div>", {});
                     var ackcheckbox = $("<input>", {type: "checkbox", id: SELECTORS.ACK_CHECKBOX});
-                    var ackcheckboxlabel = $("<label>", {for: SELECTORS.ACK_CHECKBOX, text: langString});
-                    body.append(ackcheckbox);
-                    body.append(ackcheckboxlabel);
+                    var ackcheckboxlabel = langString;
+                    checkboxdiv.append(ackcheckbox);
+                    checkboxdiv.append(ackcheckboxlabel);
+                    body.append(checkboxdiv);
                     modal.getFooter().find(SELECTORS.ACCEPT_BUTTON).attr('disabled', true);
                     // Tooltip for disabled box.
                     modal.turnonToolTip();
