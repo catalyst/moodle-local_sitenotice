@@ -135,6 +135,15 @@ define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry', 'cor
                 if (e.keyCode == KeyCodes.tab) {
                     this.handleTabLock(e);
                 }
+
+            }.bind(this));
+
+            this.getRoot().on('mousedown', function(e) {
+                if (!this.isVisible()) {
+                    return;
+                }
+                e.preventDefault();
+
             }.bind(this));
         };
 
