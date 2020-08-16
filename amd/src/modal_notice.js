@@ -127,7 +127,7 @@ define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry', 'cor
          * Remove escape key event.
          */
         ModalNotice.prototype.registerEventListeners = function() {
-            this.getRoot().on('keydown', function(e) {
+            $(document).on('keydown', function(e) {
                 if (!this.isVisible()) {
                     return;
                 }
@@ -138,7 +138,7 @@ define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry', 'cor
 
             }.bind(this));
 
-            this.getRoot().on('mousedown', function(e) {
+            $(document).on('mousedown', function(e) {
                 if (!this.isVisible()) {
                     return;
                 }
@@ -152,21 +152,42 @@ define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry', 'cor
          * @param e
          */
         ModalNotice.prototype.handleTabLock = function(e) {
-            if (!this.hasFocus()) {
-                return;
-            }
-
             var target = $(document.activeElement);
+
             var focusableElements = this.modal.find(SELECTORS.CAN_RECEIVE_FOCUS).filter(":visible");
             var firstFocusable = focusableElements.first();
             var lastFocusable = focusableElements.last();
 
-            if (target.is(firstFocusable) && e.shiftKey) {
-                lastFocusable.focus();
+            var focusable = false;
+            var previous = 0;
+            focusableElements.each(function(index) {
+                if (target.is(this)) {
+                    focusable = true;
+                    previous = index;
+                }
+            });
+
+            // Focus to first element.
+            if (focusable == false) {
                 e.preventDefault();
-            } else if (target.is(lastFocusable) && !e.shiftKey) {
                 firstFocusable.focus();
-                e.preventDefault();
+                return;
+            } else {
+                if (target.is(firstFocusable) && e.shiftKey) {
+                    lastFocusable.focus();
+                    e.preventDefault();
+                } else if (target.is(lastFocusable) && !e.shiftKey) {
+                    firstFocusable.focus();
+                    e.preventDefault();
+                } else {
+                    if (!e.shiftKey) {
+                        var next = focusableElements.get(previous+1);
+                    } else {
+                        var next = focusableElements.get(previous-1);
+                    }
+                    next.focus();
+                    e.preventDefault();
+                }
             }
         };
 
