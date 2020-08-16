@@ -24,3 +24,7 @@
     color: white;
     background-color: #ef3829;
 }
+
+.checkboxlabel {
+    margin-left: 5px;
+}

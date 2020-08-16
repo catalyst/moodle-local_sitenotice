@@ -96,9 +96,10 @@ define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry', 'cor
                     var body = modal.getBody();
                     var checkboxdiv =  $("<div>", {});
                     var ackcheckbox = $("<input>", {type: "checkbox", id: SELECTORS.ACK_CHECKBOX});
-                    var ackcheckboxlabel = langString;
+                    var labelspan =  $("<span>", {class: "checkboxlabel"});
+                    labelspan.append(langString);
                     checkboxdiv.append(ackcheckbox);
-                    checkboxdiv.append(ackcheckboxlabel);
+                    checkboxdiv.append(labelspan);
                     body.append(checkboxdiv);
                     modal.getFooter().find(SELECTORS.ACCEPT_BUTTON).attr('disabled', true);
                     // Tooltip for disabled box.
