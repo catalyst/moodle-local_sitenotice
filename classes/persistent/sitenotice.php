@@ -44,6 +44,10 @@ class sitenotice extends persistent {
                 'type' => PARAM_RAW,
                 'null' => NULL_NOT_ALLOWED,
             ],
+            'contentformat' => array(
+                'type' => PARAM_INT,
+                'default' => FORMAT_HTML
+            ),
             'audience' => [
                 'type' => PARAM_INT,
                 'null' => NULL_NOT_ALLOWED,

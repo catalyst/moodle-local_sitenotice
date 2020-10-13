@@ -45,9 +45,8 @@ class notice_form extends \core\form\persistent {
         $mform->setType('title', PARAM_TEXT);
         $mform->addRule('title', get_string('required'), 'required', null, 'client');
 
-        $mform->addElement('htmleditor', 'content',
+        $mform->addElement('editor', 'content',
             get_string('notice:content', 'local_sitenotice'), [], ['class' => 'noticecontent']);
-
         $mform->setType('content', PARAM_RAW);
         $mform->addRule('content', get_string('required'), 'required', null, 'client');
 
