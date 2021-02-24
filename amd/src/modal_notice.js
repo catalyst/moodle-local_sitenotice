@@ -101,7 +101,9 @@ define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry', 'cor
                     checkboxdiv.append(ackcheckbox);
                     checkboxdiv.append(labelspan);
                     body.append(checkboxdiv);
-                    modal.getFooter().find(SELECTORS.ACCEPT_BUTTON).attr('disabled', true);
+                    var acceptbutton = modal.getFooter().find(SELECTORS.ACCEPT_BUTTON);
+                    acceptbutton.show();
+                    acceptbutton.attr('disabled', true);
                     // Tooltip for disabled box.
                     modal.getFooter().find(SELECTORS.TOOL_TIP_WRAPPER).tooltip();
                 }).catch(Notification.exception);
