@@ -111,7 +111,9 @@ $string['report:dismissed'] = 'notice_dismissed_{$a}';
 $string['report:dismissed_desc'] = 'List of users who dismissed the notice.';
 $string['report:acknowledged'] = 'notice_acknowledged_{$a}';
 $string['report:acknowledge_desc'] = 'List of users who acknowledged the notice.';
-$string['report:timeformat:sortable'] = '%Y.%m.%d-%H:%M:%S.';
+$string['report:timeformat:sortable'] = '%Y-%m-%d %H:%M:%S';
+$string['report:timecreated_server'] = 'Server Time';
+$string['report:timecreated_spreadsheet'] = 'Spreadsheet timestamp';
 
 // Modal
 $string['modal:checkboxtext'] = 'I have read and understand the notice (Closing this notice will log you off this site).';

@@ -36,6 +36,9 @@ class dismissed_notice extends table_sql implements renderable {
     // Table alias for standard log.
     const TABLE_ALIAS = 'dis';
 
+    // Days (in seconds) different between  1 January 1900 and 1 January 1970.
+    const DAY_SECS_SPREADSHEET_DIFF = 25569;
+
     /**
      * Construct table with headers.
      * @param $uniqueid
@@ -53,15 +56,15 @@ class dismissed_notice extends table_sql implements renderable {
         $this->filters = (object)$filters;
         $this->noticeid = $noticeid;
 
+        // Set download status.
+        $currenttime = userdate(time(), get_string('report:timeformat:sortable', 'local_sitenotice'), null, false);
+        $this->is_downloading($download, get_string('report:dismissed', 'local_sitenotice', $currenttime));
+
         // Define columns in the table.
         $this->define_table_columns();
 
         // Define configs.
         $this->define_table_configs($url);
-
-        // Set download status.
-        $currenttime = userdate(time(), get_string('report:timeformat:sortable', 'local_sitenotice'), null, false);
-        $this->is_downloading($download, get_string('report:dismissed', 'local_sitenotice', $currenttime));
     }
 
     /**
@@ -74,9 +77,15 @@ class dismissed_notice extends table_sql implements renderable {
             'username' => get_string('username'),
             'firstname' => get_string('firstname'),
             'lastname' => get_string('lastname'),
-            'idnumber' => get_string('idnumber'),
-            'timecreated' => get_string('event:timecreated', 'local_sitenotice'),
+            'idnumber' => get_string('idnumber')
         );
+
+        if ($this->is_downloading()) {
+            $cols['timecreated'] = get_string('report:timecreated_server', 'local_sitenotice');
+            $cols['timecreated_spreadsheet'] = get_string('report:timecreated_spreadsheet', 'local_sitenotice');
+        } else {
+            $cols['timecreated'] = get_string('report:timecreated_server', 'local_sitenotice');
+        }
 
         $this->define_columns(array_keys($cols));
         $this->define_headers(array_values($cols));
@@ -176,7 +185,21 @@ class dismissed_notice extends table_sql implements renderable {
      */
     protected function col_timecreated($row) {
         if ($row->timecreated) {
-            return userdate($row->timecreated);
+            return userdate($row->timecreated, get_string('report:timeformat:sortable', 'local_sitenotice'), null, false);
+        } else {
+            return '-';
+        }
+    }
+
+    /**
+     * Custom time for spreadsheet date time.
+     *
+     * @param $row dismissed notice record
+     * @return string
+     */
+    protected function col_timecreated_spreadsheet($row) {
+        if ($row->timecreated) {
+            return self::DAY_SECS_SPREADSHEET_DIFF + ($row->timecreated / DAYSECS);
         } else {
             return '-';
         }

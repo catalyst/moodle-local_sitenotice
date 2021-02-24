@@ -38,6 +38,9 @@ class acknowledged_notice extends table_sql implements renderable {
     // Table alias for standard log.
     const TABLE_ALIAS = 'ack';
 
+    // Days (in seconds) different between  1 January 1900 and 1 January 1970.
+    const DAY_SECS_SPREADSHEET_DIFF = 25569;
+
     // To check next user.
     protected $previoususer = '';
 
@@ -93,7 +96,8 @@ class acknowledged_notice extends table_sql implements renderable {
             foreach ($hlinks as $link) {
                 $cols[$link->id] = "$link->text ($link->link)";
             }
-            $cols['timecreated'] = get_string('event:timecreated', 'local_sitenotice');
+            $cols['timecreated'] = get_string('report:timecreated_server', 'local_sitenotice');
+            $cols['timecreated_spreadsheet'] = get_string('report:timecreated_spreadsheet', 'local_sitenotice');
         } else {
             $cols = array(
                 'noticetitle' => get_string('notice:title', 'local_sitenotice'),
@@ -102,7 +106,7 @@ class acknowledged_notice extends table_sql implements renderable {
                 'lastname' => get_string('lastname'),
                 'idnumber' => get_string('idnumber'),
                 'hlinkcount' => get_string('notice:hlinkcount', 'local_sitenotice'),
-                'timecreated' => get_string('event:timecreated', 'local_sitenotice'),
+                'timecreated' => get_string('report:timecreated_server', 'local_sitenotice'),
             );
             $this->no_sorting('hlinkcount');
         }
@@ -206,7 +210,21 @@ class acknowledged_notice extends table_sql implements renderable {
     protected function col_timecreated($row) {
         $this->previoususer = $row->userid;
         if ($row->timecreated) {
-            return userdate($row->timecreated);
+            return userdate($row->timecreated, get_string('report:timeformat:sortable', 'local_sitenotice'), null, false);
+        } else {
+            return '-';
+        }
+    }
+
+    /**
+     * Custom time for spreadsheet date time.
+     *
+     * @param $row dismissed notice record
+     * @return string
+     */
+    protected function col_timecreated_spreadsheet($row) {
+        if ($row->timecreated) {
+            return self::DAY_SECS_SPREADSHEET_DIFF + ($row->timecreated / DAYSECS);
         } else {
             return '-';
         }
