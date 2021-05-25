@@ -452,6 +452,12 @@ class helper {
      * @throws \core\invalid_persistent_exception
      */
     public static function acknowledge_notice($noticeid) {
+        global $USER;
+        // Check if the notice has been acknowledged by the user in another browser.
+        if (self::check_if_already_acknowledged_by_user($noticeid, $USER->id)) {
+            return;
+        }
+
         $result = array();
         // Record Acknowledge action.
         $persistent = self::create_new_acknowledge_record($noticeid, acknowledgement::ACTION_ACKNOWLEDGED);
@@ -562,5 +568,29 @@ class helper {
     public static function check_manage_capability() {
         $syscontext = \context_system::instance();
         require_capability('local/sitenotice:manage', $syscontext);
+    }
+
+    private static function check_if_already_acknowledged_by_user($noticeid, $userid) {
+        global $USER;
+        $latestview = noticeview::get_record(['noticeid' => $noticeid, 'userid' => $userid]);
+        if (empty($latestview)) {
+            return false;
+        }
+
+        $notice = sitenotice::get_record(['id' => $noticeid]);
+
+        $latestview = $latestview->to_record();
+        $notice = $notice->to_record();
+        if (
+            // Notice has been updated/reset/enabled.
+            $latestview->timemodified < $notice->timemodified
+            // The reset interval has been past.
+            || (($notice->resetinterval > 0) && ($latestview->timemodified + $notice->resetinterval < time()))
+            // The previous action is 'dismiss', so still require acknowledgement.
+            || ($latestview->action === acknowledgement::ACTION_DISMISSED && $notice->reqack == true)) {
+            return false;
+        }
+        $USER->viewednotices[$noticeid] = ['timeviewed' => $latestview->timemodified, 'action' => $latestview->action];
+        return true;
     }
 }
