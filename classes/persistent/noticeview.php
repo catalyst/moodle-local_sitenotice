@@ -14,18 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- *
- * @package local_sitenotice
- * @author  Nathan Nguyen <nathannguyen@catalyst-au.net>
- * @copyright  Catalyst IT
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 namespace local_sitenotice\persistent;
 use core\persistent;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Notice view class.
+ *
+ * @package    local_sitenotice
+ * @author     Nathan Nguyen <nathannguyen@catalyst-au.net>
+ * @copyright  Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class noticeview extends persistent {
 
     /** Table name for the persistent. */

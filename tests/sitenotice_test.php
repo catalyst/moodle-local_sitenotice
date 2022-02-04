@@ -14,37 +14,31 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace local_sitenotice;
+
 /**
  * Test cases
- * @package package
- * @author  Nathan Nguyen <nathannguyen@catalyst-au.net>
+ *
+ * @package    local_sitenotice
+ * @author     Nathan Nguyen <nathannguyen@catalyst-au.net>
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
-use local_sitenotice\helper;
-
-class local_sitenotice_test extends advanced_testcase {
+class sitenotice_test extends \advanced_testcase {
 
     /**
      * Initial set up.
      */
-    protected function setUp() {
+    protected function setUp(): void {
         parent::setup();
         $this->resetAfterTest(true);
     }
 
     /**
      * Create sample notice.
-     * @throws \core\invalid_persistent_exception
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws required_capability_exception
      */
     private function create_notice1() {
-        $formdata = new stdClass();
+        $formdata = new \stdClass();
         $formdata->title = "Notice 1";
         $formdata->content = "Notice 1 <a href=\"www.example1.com\">Link 1</a> <a href=\"www.example2.com\">Link 2</a>";
         helper::create_new_notice($formdata);
@@ -52,13 +46,9 @@ class local_sitenotice_test extends advanced_testcase {
 
     /**
      * Create sample notice.
-     * @throws \core\invalid_persistent_exception
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws required_capability_exception
      */
     private function create_notice2() {
-        $formdata = new stdClass();
+        $formdata = new \stdClass();
         $formdata->title = "Notice 2";
         $formdata->content = "Notice 2 <a href=\"www.example3.com\">Link 3</a> <a href=\"www.example4.com\">Link 4</a>";
         helper::create_new_notice($formdata);
@@ -66,13 +56,9 @@ class local_sitenotice_test extends advanced_testcase {
 
     /**
      * Create sample notice (with targeted audience)
-     * @throws \core\invalid_persistent_exception
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws required_capability_exception
      */
     private function create_cohort_notice1() {
-        $formdata = new stdClass();
+        $formdata = new \stdClass();
         $formdata->title = "Cohort Notice 1";
         $formdata->content = "Cohort Notice 1 <a href=\"www.example5.com\">Link 5</a> <a href=\"www.example6.com\">Link 6</a>";
         $cohort = $this->getDataGenerator()->create_cohort();
@@ -82,13 +68,9 @@ class local_sitenotice_test extends advanced_testcase {
 
     /**
      * Create sample notice (with targeted audience)
-     * @throws \core\invalid_persistent_exception
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws required_capability_exception
      */
     private function create_cohort_notice2() {
-        $formdata = new stdClass();
+        $formdata = new \stdClass();
         $formdata->title = "Cohort Notice 2";
         $formdata->content = "Cohort Notice 2 <a href=\"www.example7.com\">Link 7</a> <a href=\"www.example8.com\">Link 8</a>";
         $cohort = $this->getDataGenerator()->create_cohort();
@@ -98,10 +80,6 @@ class local_sitenotice_test extends advanced_testcase {
 
     /**
      * Test notice creation.
-     * @throws \core\invalid_persistent_exception
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws required_capability_exception
      */
     public function test_create_notices() {
         $this->setAdminUser();
@@ -130,8 +108,8 @@ class local_sitenotice_test extends advanced_testcase {
         $this->assertEquals('Link 2', $link2->text);
         $this->assertEquals('www.example2.com', $link2->link);
 
-        $this->assertContains('data-linkid', $notice1->content);
-        $this->assertContains('data-linkid', $notice2->content);
+        $this->assertStringContainsString('data-linkid', $notice1->content);
+        $this->assertStringContainsString('data-linkid', $notice2->content);
 
         // Do not allow deletion by default.
         helper::delete_notice($notice2->id);
@@ -162,10 +140,6 @@ class local_sitenotice_test extends advanced_testcase {
 
     /**
      * Test set reset notice.
-     * @throws \core\invalid_persistent_exception
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws required_capability_exception
      */
     public function test_reset_notices() {
         $this->setAdminUser();
@@ -190,10 +164,6 @@ class local_sitenotice_test extends advanced_testcase {
 
     /**
      * Test enable/disable notice.
-     * @throws \core\invalid_persistent_exception
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws required_capability_exception
      */
     public function test_enable_notices() {
         $this->setAdminUser();
@@ -221,7 +191,6 @@ class local_sitenotice_test extends advanced_testcase {
 
     /**
      * Test audience options.
-     * @throws coding_exception
      */
     public function test_audience_options() {
         $this->getDataGenerator()->create_cohort();
@@ -235,10 +204,6 @@ class local_sitenotice_test extends advanced_testcase {
 
     /**
      * Test user notice interaction.
-     * @throws \core\invalid_persistent_exception
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws moodle_exception
      */
     public function test_user_notice() {
         global $USER;
@@ -304,10 +269,6 @@ class local_sitenotice_test extends advanced_testcase {
 
     /**
      * Test user link interaction
-     * @throws \core\invalid_persistent_exception
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws required_capability_exception
      */
     public function test_user_hlink_interact() {
         $this->setAdminUser();
@@ -332,13 +293,12 @@ class local_sitenotice_test extends advanced_testcase {
 
     /**
      * Test time interval format.
-     * @throws coding_exception
      */
     public function test_format_interval_time() {
         // The interval is 1 day(s) 2 hour(s) 3 minute(s) 4 second(s).
         $timeinterval = 93784;
         $formatedtime = helper::format_interval_time($timeinterval);
         // Assume the time format is '%a day(s), %h hour(s), %i minute(s) and %s second(s)'.
-        $this->assertContains('1 day(s), 2 hour(s), 3 minute(s) and 4 second(s)', $formatedtime);
+        $this->assertStringContainsString('1 day(s), 2 hour(s), 3 minute(s) and 4 second(s)', $formatedtime);
     }
 }

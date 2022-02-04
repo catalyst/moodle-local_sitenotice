@@ -22,8 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 use local_sitenotice\helper;
 
 function local_sitenotice_extend_navigation(global_navigation $navigation) {

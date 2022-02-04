@@ -1,7 +1,6 @@
 /**
  * User interaction with notice
- * @package local_sitenotice
- * @author  Nathan Nguyen <nathannguyen@catalyst-au.net>
+ * @author     Nathan Nguyen <nathannguyen@catalyst-au.net>
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
