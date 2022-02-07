@@ -101,8 +101,8 @@ $string['notification:noupdateallowed'] = 'Notice update is not allowed';
 $string['confirmation:deletenotice'] = 'Do you really want to delete the notice "{$a}"';
 
 // Modal Buttons.
-$string['button:close'] = 'CLOSE';
-$string['button:accept'] = 'ACCEPT';
+$string['button:close'] = 'Close';
+$string['button:accept'] = 'Accept';
 
 // Report.
 $string['report:button:ack'] = 'Notice acknowledgement report';
