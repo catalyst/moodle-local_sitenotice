@@ -255,7 +255,7 @@ class helper {
      */
     public static function built_audience_options() {
         $option = ['0' => get_string('notice:audience:all', 'local_sitenotice')];
-        $cohorts = cohort_get_all_cohorts();
+        $cohorts = cohort_get_all_cohorts(0, 0);
         foreach ($cohorts['cohorts'] as $cohort) {
             $option[$cohort->id] = $cohort->name;
         }
