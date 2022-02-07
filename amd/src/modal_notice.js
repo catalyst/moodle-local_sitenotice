@@ -90,7 +90,7 @@ define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry', 'cor
          */
         ModalNotice.prototype.setRequiredAcknowledgement = function(reqack) {
             var modal  = this;
-            if (reqack === 1) {
+            if (reqack == 1) {
                 str.get_string('modal:checkboxtext', 'local_sitenotice').then(function(langString) {
                     var body = modal.getBody();
                     var checkboxdiv = $("<div>", {});
