@@ -301,6 +301,7 @@ class helper {
      */
     public static function retrieve_user_notices() {
         global $USER;
+
         $notices = self::retrieve_enabled_notices();
 
         if (empty($notices)) {
@@ -309,6 +310,7 @@ class helper {
 
         // Only load at login time.
         if (!isset($USER->viewednotices)) {
+            // TODO: Cache viewed notices.
             self::load_viewed_notices();
         }
         /*

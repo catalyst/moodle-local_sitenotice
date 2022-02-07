@@ -72,6 +72,49 @@ class sitenotice extends persistent {
     }
 
     /**
+     * Get cache instance.
+     *
+     * @return \cache
+     */
+    private static function get_enabled_notices_cache(): \cache {
+        return \cache::make('local_sitenotice', 'enabled_notices');
+    }
+
+    /**
+     * Purge related caches.
+     */
+    protected function purge_caches() {
+        self::get_enabled_notices_cache()->purge();
+    }
+
+    /**
+     * Run after update.
+     *
+     * @param bool $result Result of update.
+     */
+    protected function after_update($result) {
+        if ($result) {
+            self::purge_caches();
+        }
+    }
+
+    /**
+     * Run after created.
+     */
+    protected function after_create() {
+        self::purge_caches();
+    }
+
+    /**
+     * Run after deleted.
+     *
+     * @param bool $result Result of delete.
+     */
+    protected function after_delete($result) {
+        self::purge_caches();
+    }
+
+    /**
      * Enable a notice.
      * @param $noticeid notice id
      * @return sitenotice
@@ -113,29 +156,32 @@ class sitenotice extends persistent {
     }
 
     /**
-     * Get enabled notices
-     * @param string $sort field to sort
-     * @param string $order sort order
-     * @return persistent[]
+     * Get enabled notices.
+     *
+     * @return \stdClass[]
      */
-    public static function get_enabled_notices($sort = 'id', $order = 'ASC') {
-        $persistents = self::get_records(['enabled' => 1], $sort, $order);
-        $result = [];
-        foreach ($persistents as $persistent) {
-            $record = $persistent->to_record();
-            $result[$record->id] = $record;
+    public static function get_enabled_notices(): array {
+        if (!$result = self::get_enabled_notices_cache()->get('records')) {
+            $persistents = self::get_records(['enabled' => 1], 'id');
+            $result = [];
+            foreach ($persistents as $persistent) {
+                $record = $persistent->to_record();
+                $result[$record->id] = $record;
+            }
+
+            self::get_enabled_notices_cache()->set('records', $result);
         }
+
         return $result;
     }
 
     /**
      * Get all notices
-     * @param string $sort field to sort
-     * @param string $order sort order
-     * @return persistent[]
+     *
+     * @return \stdClass[]
      */
-    public static function get_all_notice_records($sort = 'timemodified', $order = 'DESC') {
-        $persistents = self::get_records([], $sort, $order);
+    public static function get_all_notice_records(): array {
+        $persistents = self::get_records([], 'timemodified', 'DESC');
         $result = [];
         foreach ($persistents as $persistent) {
             $record = $persistent->to_record();

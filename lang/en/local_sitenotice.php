@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Site Notice';
+$string['cachedef_enabled_notices'] = 'A list of enabled notices';
 
 // Settings.
 $string['setting:settings'] = 'Settings';
