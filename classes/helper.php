@@ -36,7 +36,7 @@ class helper {
 
     /**
      * Create new notice
-     * @param $data form data
+     * @param \stdClass $data form data
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \core\invalid_persistent_exception
@@ -65,7 +65,7 @@ class helper {
     /**
      * Update existing notice.
      * @param sitenotice $sitenotice site notice persistent
-     * @param $data form data
+     * @param \stdClass $data form data
      * @throws \coding_exception
      * @throws \core\invalid_persistent_exception
      * @throws \dml_exception
@@ -104,7 +104,7 @@ class helper {
     private static function update_hyperlinks($noticeid, $content) {
         // Extract hyperlinks from the content of the notice, which is then used for link clicked tracking.
         $dom = new \DOMDocument();
-        $content = format_text($content, FORMAT_HTML);
+        $content = format_text($content, FORMAT_HTML, ['noclean' => true]);
         $content = mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8' );
         $dom->loadHTML($content);
         // Current links in the notice.

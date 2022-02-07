@@ -16,9 +16,10 @@
 
 namespace local_sitenotice;
 
+use local_sitenotice\persistent\sitenotice;
+
 /**
  * Test cases
- *
  * @package    local_sitenotice
  * @author     Dmitrii Metelkin <dmitriim@catalyst-au.net>
  * @copyright  Catalyst IT
@@ -43,6 +44,33 @@ class helper_test extends \advanced_testcase {
         foreach ($expected as $id => $name) {
             $this->assertSame($actual[$id], $name);
         }
+    }
+
+    /**
+     * Test that we can have full HTML in a notice content.
+     */
+    public function test_can_have_html_in_notice_content() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        set_config('allow_update', 1, 'local_sitenotice');
+
+        $formdata = new \stdClass();
+        $formdata->title = "What is Moodle?";
+        $formdata->content = 'Moodle <iframe width="1280" height="720" src="https://www.youtube.com/embed/3ORsUGVNxGs"></iframe>';
+        helper::create_new_notice($formdata);
+
+        $allnotices = helper::retrieve_all_notices();
+        $actual = reset($allnotices);
+        $this->assertStringContainsString($formdata->content, $actual->content);
+
+        $formdata->title = 'Updated notice';
+        $formdata->content = 'Updated  <iframe width="1280" height="720" src="https://www.youtube.com/embed/wop3FMhoLGs"></iframe>';
+        $sitenotice = sitenotice::get_record(['id' => $actual->id]);
+        helper::update_notice($sitenotice, $formdata);
+
+        $allnotices = helper::retrieve_all_notices();
+        $actual = reset($allnotices);
+        $this->assertStringContainsString($formdata->content, $actual->content);
     }
 
 }
