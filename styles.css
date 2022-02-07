@@ -10,7 +10,8 @@
     -o-transform: scale(1.5);
 }
 
-#sitenotice-acceptbtn:disabled, #sitenotice-acceptbtn:hover:disabled {
+#sitenotice-acceptbtn:disabled,
+#sitenotice-acceptbtn:hover:disabled {
     border-color: grey;
     color: grey;
     cursor: not-allowed;

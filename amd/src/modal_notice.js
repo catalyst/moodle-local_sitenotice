@@ -1,7 +1,6 @@
 /**
  * Notice modal.
- * @package local_sitenotice
- * @author  Nathan Nguyen <nathannguyen@catalyst-au.net>
+ * @author     Nathan Nguyen <nathannguyen@catalyst-au.net>
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -71,7 +70,7 @@ define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry', 'cor
 
         /**
          * Set Notice ID to the current modal.
-         * @param noticeid
+         * @param {Integer} noticeid
          */
         ModalNotice.prototype.setNoticeId = function(noticeid) {
             this.getModal().attr(ATTRIBUTE.NOTICE_ID, noticeid);
@@ -87,16 +86,16 @@ define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry', 'cor
 
         /**
          * Add Checkbox if the notice requires acknowledgement.
-         * @param reqack
+         * @param {Integer} reqack
          */
         ModalNotice.prototype.setRequiredAcknowledgement = function(reqack) {
             var modal  = this;
-            if (reqack == 1) {
+            if (reqack === 1) {
                 str.get_string('modal:checkboxtext', 'local_sitenotice').then(function(langString) {
                     var body = modal.getBody();
-                    var checkboxdiv =  $("<div>", {});
+                    var checkboxdiv = $("<div>", {});
                     var ackcheckbox = $("<input>", {type: "checkbox", id: SELECTORS.ACK_CHECKBOX});
-                    var labelspan =  $("<span>", {class: "checkboxlabel"});
+                    var labelspan = $("<span>", {class: "checkboxlabel"});
                     labelspan.append(langString);
                     checkboxdiv.append(ackcheckbox);
                     checkboxdiv.append(labelspan);
@@ -152,7 +151,7 @@ define(['jquery', 'core/notification', 'core/modal', 'core/modal_registry', 'cor
 
         /**
          * CAN_RECEIVE_FOCUS in modal.js does not check if the disabled or hidden button
-         * @param e
+         * @param {Event} e
          */
         ModalNotice.prototype.handleTabLock = function(e) {
             var target = $(document.activeElement);

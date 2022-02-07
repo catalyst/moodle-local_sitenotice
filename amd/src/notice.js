@@ -1,7 +1,6 @@
 /**
  * User interaction with notice
- * @package local_sitenotice
- * @author  Nathan Nguyen <nathannguyen@catalyst-au.net>
+ * @author     Nathan Nguyen <nathannguyen@catalyst-au.net>
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -136,7 +135,7 @@ define(
 
         /**
          * Link tracking.
-         * @param linkid
+         * @param {Integer} linkid
          */
         var trackLink = function (linkid) {
             var promises = ajax.call([
@@ -154,7 +153,6 @@ define(
 
         /**
          * Initial Modal with user notices.
-         * @param jsnotices
          */
         SiteNotice.init = function() {
             var promises = ajax.call([

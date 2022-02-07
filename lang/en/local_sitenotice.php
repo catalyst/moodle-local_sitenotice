@@ -115,6 +115,6 @@ $string['report:timeformat:sortable'] = '%Y-%m-%d %H:%M:%S';
 $string['report:timecreated_server'] = 'Server Time';
 $string['report:timecreated_spreadsheet'] = 'Spreadsheet timestamp';
 
-// Modal
+// Modal.
 $string['modal:checkboxtext'] = 'I have read and understand the notice (Closing this notice will log you off this site).';
 $string['modal:acceptbtntooltip'] = 'Please tick the above check box.';

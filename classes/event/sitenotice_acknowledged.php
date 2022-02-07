@@ -14,18 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace local_sitenotice\event;
+
 /**
  * Notice Acknowledged event
- * @package local_sitenotice
- * @author  Nathan Nguyen <nathannguyen@catalyst-au.net>
+ *
+ * @package    local_sitenotice
+ * @author     Nathan Nguyen <nathannguyen@catalyst-au.net>
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace local_sitenotice\event;
-
-defined('MOODLE_INTERNAL') || die();
-
 class sitenotice_acknowledged extends \core\event\base {
 
     protected function init() {
