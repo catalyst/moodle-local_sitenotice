@@ -301,6 +301,7 @@ class helper {
      */
     public static function retrieve_user_notices() {
         global $USER;
+
         $notices = self::retrieve_enabled_notices();
 
         if (empty($notices)) {
@@ -337,10 +338,20 @@ class helper {
         // Check if user is in the targeted audience.
         $usernotices = $notices;
         if (!empty($notices)) {
-            $usercohort = cohort_get_user_cohorts($USER->id);
+            $checkaudiences = false;
             foreach ($notices as $notice) {
-                if ($notice->audience > 0 && !array_key_exists($notice->audience, $usercohort)) {
-                    unset($usernotices[$notice->id]);
+                if ($notice->audience > 0) {
+                    $checkaudiences = true;
+                    break;
+                }
+            }
+
+            if ($checkaudiences) {
+                $usercohorts = cohort_get_user_cohorts($USER->id);
+                foreach ($notices as $notice) {
+                    if ($notice->audience > 0 && !array_key_exists($notice->audience, $usercohorts)) {
+                        unset($usernotices[$notice->id]);
+                    }
                 }
             }
         }

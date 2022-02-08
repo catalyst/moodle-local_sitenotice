@@ -14,19 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+
 /**
- * Version details.
+ * Cache details.
  *
  * @package    local_sitenotice
- * @author     Nathan Nguyen <nathannguyen@catalyst-au.net>
+ * @author     Dmitrii Metelkin <dmitriim@catalyst-au.net>
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_sitenotice'; // Full name of the plugin (used for diagnostics).
-$plugin->release = 2020010702;
-$plugin->version = 2020010702;           // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires = 2018051709;          // Requires this Moodle version.
-$plugin->maturity = MATURITY_STABLE;
+$definitions = [
+    'enabled_notices' => [
+        'mode' => cache_store::MODE_APPLICATION
+    ],
+    'notice_view' => [
+        'mode' => cache_store::MODE_APPLICATION
+    ]
+];
