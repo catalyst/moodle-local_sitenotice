@@ -26,6 +26,7 @@ namespace local_sitenotice;
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/cohort/lib.php');
+require_once($CFG->dirroot.'/lib/completionlib.php');
 use \local_sitenotice\persistent\sitenotice;
 use \local_sitenotice\persistent\noticelink;
 use \local_sitenotice\persistent\linkhistory;
@@ -300,7 +301,7 @@ class helper {
      * @throws \dml_exception
      */
     public static function retrieve_user_notices() {
-        global $USER;
+        global $DB, $USER;
 
         $notices = self::retrieve_enabled_notices();
 
@@ -335,22 +336,40 @@ class helper {
         }
         $notices = array_diff_key($notices, $USER->viewednotices);
 
-        // Check if user is in the targeted audience.
         $usernotices = $notices;
         if (!empty($notices)) {
             $checkaudiences = false;
+            $checkcompletion = false;
+
             foreach ($notices as $notice) {
                 if ($notice->audience > 0) {
                     $checkaudiences = true;
-                    break;
+                }
+                if ($notice->reqcourse > 0) {
+                    $checkcompletion = true;
                 }
             }
 
+            // Filter out notices by cohorts.
             if ($checkaudiences) {
                 $usercohorts = cohort_get_user_cohorts($USER->id);
                 foreach ($notices as $notice) {
                     if ($notice->audience > 0 && !array_key_exists($notice->audience, $usercohorts)) {
                         unset($usernotices[$notice->id]);
+                    }
+                }
+            }
+
+            // Filter out notices by course completion.
+            if ($checkcompletion) {
+                foreach ($notices as $notice) {
+                    if ($notice->reqcourse > 0) {
+                        if ($course = $DB->get_record('course', ['id' => $notice->reqcourse])) {
+                            $completion = new \completion_info($course);
+                            if ($completion->is_course_complete($USER->id)) {
+                                unset($usernotices[$notice->id]);
+                            }
+                        }
                     }
                 }
             }
@@ -569,6 +588,27 @@ class helper {
     public static function get_audience_name($audienceid) {
         $audiences = self::built_audience_options();
         return $audiences[$audienceid];
+    }
+
+    /**
+     * Get course name
+     * @param int $courseid course id
+     * @return mixed
+     * @throws \coding_exception
+     */
+    public static function get_course_name($courseid) {
+        global $DB;
+
+        if ($courseid == 0) {
+            return 'No';
+        }
+
+        $course = $DB->get_record('course', array('id' => $courseid));
+        if ($course) {
+            return $course->fullname;
+        } else {
+            return '--';
+        }
     }
 
     /**
