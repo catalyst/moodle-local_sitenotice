@@ -29,5 +29,8 @@ defined('MOODLE_INTERNAL') || die();
 $definitions = [
     'enabled_notices' => [
         'mode' => cache_store::MODE_APPLICATION
+    ],
+    'notice_view' => [
+        'mode' => cache_store::MODE_APPLICATION
     ]
 ];

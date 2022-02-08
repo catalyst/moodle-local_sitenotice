@@ -310,7 +310,6 @@ class helper {
 
         // Only load at login time.
         if (!isset($USER->viewednotices)) {
-            // TODO: Cache viewed notices.
             self::load_viewed_notices();
         }
         /*

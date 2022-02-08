@@ -76,7 +76,7 @@ class sitenotice extends persistent {
      *
      * @return \cache
      */
-    private static function get_enabled_notices_cache(): \cache {
+    protected static function get_enabled_notices_cache(): \cache {
         return \cache::make('local_sitenotice', 'enabled_notices');
     }
 
