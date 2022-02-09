@@ -301,7 +301,7 @@ class helper {
      * @throws \dml_exception
      */
     public static function retrieve_user_notices() {
-        global $DB, $USER;
+        global $DB, $USER, $SESSION;
 
         $notices = self::retrieve_enabled_notices();
 
@@ -310,14 +310,14 @@ class helper {
         }
 
         // Only load at login time.
-        if (!isset($USER->viewednotices)) {
+        if (!isset($SESSION->viewednotices)) {
             self::load_viewed_notices();
         }
         /*
          * Check for updated notice
          * Exclude it from viewed notices if it is updated (based on timemodified)
          */
-        $viewednotices = $USER->viewednotices;
+        $viewednotices = $SESSION->viewednotices;
         foreach ($viewednotices as $noticeid => $data) {
             // The notice is disabled during the current session.
             if (!isset($notices[$noticeid])) {
@@ -331,10 +331,10 @@ class helper {
                 || (($notice->resetinterval > 0) && ($data['timeviewed'] + $notice->resetinterval < time()))
                 // The previous action is 'dismiss', so still require acknowledgement.
                 || ($data['action'] === acknowledgement::ACTION_DISMISSED && $notice->reqack == true)) {
-                unset($USER->viewednotices[$noticeid]);
+                unset($SESSION->viewednotices[$noticeid]);
             }
         }
-        $notices = array_diff_key($notices, $USER->viewednotices);
+        $notices = array_diff_key($notices, $SESSION->viewednotices);
 
         $usernotices = $notices;
         if (!empty($notices)) {
@@ -383,11 +383,11 @@ class helper {
      * @throws \dml_exception
      */
     private static function load_viewed_notices() {
-        global $USER;
+        global $SESSION;
         $records = noticeview::get_user_viewed_notice_records();
-        $USER->viewednotices = [];
+        $SESSION->viewednotices = [];
         foreach ($records as $record) {
-            $USER->viewednotices[$record->id] = ["timeviewed" => $record->timemodified, 'action' => $record->action];
+            $SESSION->viewednotices[$record->id] = ["timeviewed" => $record->timemodified, 'action' => $record->action];
         }
     }
 
@@ -399,10 +399,10 @@ class helper {
      * @throws \core\invalid_persistent_exception
      */
     private static function add_to_viewed_notices($noticeid, $action) {
-        global $USER;
+        global $USER, $SESSION;
         // Add to viewed notices.
         $noticeview = noticeview::add_notice_view($noticeid, $USER->id, $action);
-        $USER->viewednotices[$noticeid] = ['timeviewed' => $noticeview->get('timemodified'), 'action' => $action];
+        $SESSION->viewednotices[$noticeid] = ['timeviewed' => $noticeview->get('timemodified'), 'action' => $action];
     }
 
     /**
@@ -622,7 +622,7 @@ class helper {
     }
 
     private static function check_if_already_acknowledged_by_user($noticeid, $userid) {
-        global $USER;
+        global $SESSION;
         $latestview = noticeview::get_record(['noticeid' => $noticeid, 'userid' => $userid]);
         if (empty($latestview)) {
             return false;
@@ -641,7 +641,7 @@ class helper {
             || ($latestview->action === acknowledgement::ACTION_DISMISSED && $notice->reqack == true)) {
             return false;
         }
-        $USER->viewednotices[$noticeid] = ['timeviewed' => $latestview->timemodified, 'action' => $latestview->action];
+        $SESSION->viewednotices[$noticeid] = ['timeviewed' => $latestview->timemodified, 'action' => $latestview->action];
         return true;
     }
 }

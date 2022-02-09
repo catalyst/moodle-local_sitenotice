@@ -28,6 +28,16 @@ use local_sitenotice\persistent\sitenotice;
 class helper_test extends \advanced_testcase {
 
     /**
+     * Tear down after tests.
+     */
+    protected function tearDown(): void {
+        global $SESSION;
+
+        parent::tearDown();
+        unset($SESSION->viewednotices);
+    }
+
+    /**
      * Test a list of cohorts is built properly.
      */
     public function test_built_audience_options() {

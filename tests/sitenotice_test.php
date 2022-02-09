@@ -35,6 +35,16 @@ class sitenotice_test extends \advanced_testcase {
     }
 
     /**
+     * Tear down after tests.
+     */
+    protected function tearDown(): void {
+        global $SESSION;
+
+        parent::tearDown();
+        unset($SESSION->viewednotices);
+    }
+
+    /**
      * Create sample notice.
      */
     private function create_notice1() {
@@ -206,7 +216,7 @@ class sitenotice_test extends \advanced_testcase {
      * Test user notice interaction.
      */
     public function test_user_notice() {
-        global $USER;
+        global $SESSION;
         $this->setAdminUser();
         $this->create_notice1();
         $this->create_notice2();
@@ -247,13 +257,13 @@ class sitenotice_test extends \advanced_testcase {
         helper::dismiss_notice($notice1->id);
         $usernotices = helper::retrieve_user_notices();
         $this->assertEquals(2, count($usernotices));
-        $this->assertEquals(1, count($USER->viewednotices));
+        $this->assertEquals(1, count($SESSION->viewednotices));
 
         // User 1 acknowledged notice 1, there will be 1 notice for the user.
         helper::acknowledge_notice($cohortnotice1->id);
         $usernotices = helper::retrieve_user_notices();
         $this->assertEquals(1, count($usernotices));
-        $this->assertEquals(2, count($USER->viewednotices));
+        $this->assertEquals(2, count($SESSION->viewednotices));
 
         // Admin user reset notice 1.
         sleep(1);
@@ -264,7 +274,7 @@ class sitenotice_test extends \advanced_testcase {
         $this->setUser($user1);
         $usernotices = helper::retrieve_user_notices();
         $this->assertEquals(2, count($usernotices));
-        $this->assertEquals(1, count($USER->viewednotices));
+        $this->assertEquals(1, count($SESSION->viewednotices));
     }
 
     /**
