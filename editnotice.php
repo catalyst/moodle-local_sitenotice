@@ -27,19 +27,19 @@ use local_sitenotice\helper;
 use local_sitenotice\persistent\sitenotice;
 
 require_once(__DIR__.'/../../config.php');
+require_once($CFG->libdir.'/adminlib.php');
 
-require_login();
-require_sesskey();
+admin_externalpage_setup('local_sitenotice_managenotice');
 helper::check_manage_capability();
-$PAGE->set_context(context_system::instance());
-$PAGE->requires->css('/local/sitenotice/styles.css');
 
-$managenoticepage = new moodle_url('/local/sitenotice/managenotice.php');
-$PAGE->navbar->add(get_string('setting:managenotice', 'local_sitenotice'), $managenoticepage);
+require_sesskey();
+$PAGE->set_context(context_system::instance());
+$PAGE->navbar->add(get_string('notice:notice', 'local_sitenotice'));
 
 $noticeid = optional_param('noticeid', 0, PARAM_INT);
 $action = optional_param('action', 'create', PARAM_TEXT);
 
+$managenoticepage = new moodle_url('/local/sitenotice/managenotice.php');
 $thispage = new moodle_url('/local/sitenotice/editnotice.php', ['noticeid' => $noticeid]);
 $PAGE->set_url($thispage);
 $PAGE->requires->js_call_amd('local_sitenotice/notice_form', 'init', array());

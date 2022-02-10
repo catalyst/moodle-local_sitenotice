@@ -65,6 +65,8 @@ $string['notice:hlinkcount'] = 'Hyperlink Counts';
 $string['notice:resetinterval'] = 'Reset every';
 $string['notice:resetinterval_help'] = 'The notice will be displayed to user again once the specified period elapses.';
 $string['notice:redirectmsg'] = 'Required Course not completed. Not allowed to submit assignment';
+$string['notice:notice'] = 'Notice';
+
 
 // Capability.
 $string['sitenotice:manage'] = 'Manage Site notice';
