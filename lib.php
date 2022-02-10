@@ -31,8 +31,13 @@ function local_sitenotice_extend_navigation(global_navigation $navigation) {
         return;
     }
 
-    $usernotices = helper::retrieve_user_notices();
-    if (!empty($usernotices)) {
-        $PAGE->requires->js_call_amd('local_sitenotice/notice', 'init', array());
+    try {
+        $usernotices = helper::retrieve_user_notices();
+        if (!empty($usernotices)) {
+            $PAGE->requires->js_call_amd('local_sitenotice/notice', 'init', array());
+        }
+    } catch (Exception $exception) {
+        debugging($exception->getMessage());
+        return;
     }
 }
