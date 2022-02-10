@@ -67,6 +67,7 @@ class all_notices extends table_sql implements renderable {
             'title' => get_string('notice:title', 'local_sitenotice'),
             'resetinterval' => get_string('notice:resetinterval', 'local_sitenotice'),
             'reqack' => get_string('notice:reqack', 'local_sitenotice'),
+            'reqcourse' => get_string('notice:reqcourse', 'local_sitenotice'),
             'audience' => get_string('notice:audience', 'local_sitenotice'),
             'content' => get_string('notice:content', 'local_sitenotice'),
             'actions' => get_string('actions'),
@@ -232,6 +233,16 @@ class all_notices extends table_sql implements renderable {
      */
     protected function col_reqack($row) {
         return helper::format_boolean($row->reqack);
+    }
+
+    /**
+     * Custom require course completion column.
+     * @param $row a notice record.
+     * @return mixed
+     * @throws \coding_exception
+     */
+    protected function col_reqcourse($row) {
+        return helper::get_course_name($row->reqcourse);
     }
 
     /**

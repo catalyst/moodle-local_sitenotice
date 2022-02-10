@@ -42,6 +42,7 @@ $action = optional_param('action', 'create', PARAM_TEXT);
 
 $thispage = new moodle_url('/local/sitenotice/editnotice.php', ['noticeid' => $noticeid]);
 $PAGE->set_url($thispage);
+$PAGE->requires->js_call_amd('local_sitenotice/notice_form', 'init', array());
 
 $sitenotice = sitenotice::get_record(['id' => $noticeid]);
 $customdata = [

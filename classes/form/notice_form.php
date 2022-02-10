@@ -64,6 +64,15 @@ class notice_form extends \core\form\persistent {
         $mform->addElement('select', 'audience', get_string('notice:audience', 'local_sitenotice'), $audience);
         $mform->setDefault('audience', 0);
 
+        $options = array(
+            'multiple' => false,
+            'noselectionstring' => 'No',
+        );
+        $mform->addElement('course', 'reqcourse', get_string('notice:reqcourse', 'local_sitenotice'), $options);
+        $mform->setType('reqcourse', PARAM_INT);
+        $mform->addHelpButton('reqcourse', 'notice:reqcourse', 'local_sitenotice');
+        $mform->setDefault('reqcourse', 0);
+
         $mform->addElement('selectyesno', 'enabled', get_string('notice:enable', 'local_sitenotice'));
         $mform->setDefault('enabled', 1);
 

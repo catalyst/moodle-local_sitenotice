@@ -58,6 +58,11 @@ class sitenotice extends persistent {
                 'null' => NULL_NOT_ALLOWED,
                 'default' => 0,
             ],
+            'reqcourse' => [
+                'type' => PARAM_INT,
+                'null' => NULL_NOT_ALLOWED,
+                'default' => 0,
+            ],
             'enabled' => [
                 'type' => PARAM_INT,
                 'null' => NULL_NOT_ALLOWED,

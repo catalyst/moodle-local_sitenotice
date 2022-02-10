@@ -301,4 +301,60 @@ class sitenotice_test extends \advanced_testcase {
         // Assume the time format is '%a day(s), %h hour(s), %i minute(s) and %s second(s)'.
         $this->assertStringContainsString('1 day(s), 2 hour(s), 3 minute(s) and 4 second(s)', $formatedtime);
     }
+
+    /**
+     * Test course completion option.
+     */
+    public function test_user_required_completion() {
+        global $DB;
+        $this->setAdminUser();
+
+        $formdata = new \stdClass();
+        $formdata->title = "Course Notice 1";
+        $formdata->content = "Course Notice 1 <a href=\"www.examplecourse1.com\">Link Course 1</a> <a href=\"www.examplecourse2.com\">Link Course 2</a>";
+
+        // Create a course with completion enabled.
+        $course = $this->getDataGenerator()->create_course(array('enablecompletion' => 1));
+
+        // Finish creating the notice.
+        $formdata->reqcourse = $course->id;
+        helper::create_new_notice($formdata);
+
+        // Enrol a user in the course.
+        $user = $this->getDataGenerator()->create_user();
+        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+        $this->getDataGenerator()->enrol_user($user->id, $course->id, $studentrole->id);
+
+        // Add two activities that use completion.
+        $assign = $this->getDataGenerator()->create_module('assign', array('course' => $course->id),
+            array('completion' => 1));
+        $data = $this->getDataGenerator()->create_module('data', array('course' => $course->id),
+            array('completion' => 1));
+
+        // Now retrieve all the user notices.
+        $this->setUser($user);
+        $usernotices = helper::retrieve_user_notices();
+        // There is only one notice.
+        $this->assertEquals(1, count($usernotices));
+        $this->assertEquals("Course Notice 1", reset($usernotices)->title);
+
+        // Mark one of them as completed for a user.
+        $cmassign = get_coursemodule_from_id('assign', $assign->cmid);
+        $completion = new \completion_info($course);
+        $completion->update_state($cmassign, COMPLETION_COMPLETE, $user->id);
+
+        // Now retrieve all the user notices.
+        $usernotices = helper::retrieve_user_notices();
+        // There should still be one notice.
+        $this->assertEquals(1, count($usernotices));
+
+        // Now, mark the course as completed.
+        $ccompletion = new \completion_completion(array('course' => $course->id, 'userid' => $user->id));
+        $ccompletion->mark_complete();
+
+        // Now retrieve all the user notices.
+        $usernotices = helper::retrieve_user_notices();
+        // There should not be any user notices.
+        $this->assertEquals(0, count($usernotices));
+    }
 }

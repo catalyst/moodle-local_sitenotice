@@ -138,7 +138,7 @@ class noticeview extends persistent {
             $sql = "SELECT sn.id, lv.timecreated, lv.action, lv.timemodified
                       FROM {local_sitenotice} sn
                       JOIN {local_sitenotice_lastview} lv ON sn.id = lv.noticeid
-                     WHERE lv.userid = :userid AND sn.enabled = 1";
+                     WHERE lv.userid = :userid AND sn.enabled = 1 AND sn.reqcourse = 0";
             $params = ['userid' => $USER->id];
             $records = $DB->get_records_sql($sql, $params);
 

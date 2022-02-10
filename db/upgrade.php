@@ -15,18 +15,35 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details.
+ * Upgrade code.
  *
  * @package    local_sitenotice
- * @author     Nathan Nguyen <nathannguyen@catalyst-au.net>
- * @copyright  Catalyst IT
+ * @author     Jwalit Shah <jwalitshah@catalyst-au.net>
+ * @copyright  2021 Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+/**
+ * Function to upgrade local_sitenotice.
+ * @param int $oldversion the version we are upgrading from
+ * @return bool result
+ */
+function xmldb_local_sitenotice_upgrade($oldversion) {
+    global $CFG, $DB;
 
-$plugin->component = 'local_sitenotice'; // Full name of the plugin (used for diagnostics).
-$plugin->release = 2021021300;
-$plugin->version = 2021021300;           // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires = 2018051709;          // Requires this Moodle version.
-$plugin->maturity = MATURITY_STABLE;
+    $dbman = $DB->get_manager();
+
+    if ($oldversion < 2021021300) {
+
+        if (!$dbman->field_exists('local_sitenotice', 'reqcourse')) {
+
+            $table = new xmldb_table('local_sitenotice');
+            $field = new xmldb_field('reqcourse', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2021021300, 'local', 'sitenotice');
+    }
+
+    return true;
+}
