@@ -41,3 +41,42 @@ function local_sitenotice_extend_navigation(global_navigation $navigation) {
         return;
     }
 }
+/**
+ * Serve the files from the MYPLUGIN file areas
+ *
+ * @param stdClass $course the course object
+ * @param stdClass $cm the course module object
+ * @param stdClass $context the context
+ * @param string $filearea the name of the file area
+ * @param array $args extra arguments (itemid, path)
+ * @param bool $forcedownload whether or not force download
+ * @param array $options additional options affecting the file serving
+ * @return bool false if the file not found, just send the file otherwise and do not return anything
+ */
+function local_sitenotice_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=[]) {
+    if ($context->contextlevel != CONTEXT_SYSTEM) {
+        return false;
+    }
+
+    if ($filearea !== 'content') {
+        return false;
+    }
+
+    require_login($course, true, $cm);
+
+    $itemid = array_shift($args);
+    $filename = array_pop($args);
+    if (!$args) {
+        $filepath = '/';
+    } else {
+        $filepath = '/'.implode('/', $args).'/';
+    }
+
+    $fs = get_file_storage();
+    $file = $fs->get_file($context->id, 'local_sitenotice', $filearea, $itemid, $filepath, $filename);
+    if (!$file) {
+        return false;
+    }
+
+    send_stored_file($file, null, 0, $forcedownload, $options);
+}

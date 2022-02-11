@@ -103,6 +103,10 @@ class helper {
      * @throws \dml_exception
      */
     private static function update_hyperlinks($noticeid, $content) {
+        // Replace file URLs before processing.
+        $content = file_rewrite_pluginfile_urls($content, 'pluginfile.php',
+            \context_system::instance()->id, 'local_sitenotice', 'content', $noticeid);
+
         // Extract hyperlinks from the content of the notice, which is then used for link clicked tracking.
         $dom = new \DOMDocument();
         $content = format_text($content, FORMAT_HTML, ['noclean' => true]);
@@ -643,5 +647,22 @@ class helper {
         }
         $USER->viewednotices[$noticeid] = ['timeviewed' => $latestview->timemodified, 'action' => $latestview->action];
         return true;
+    }
+
+    /**
+     * Return options for file editor.
+     * @return array
+     */
+    public static function get_file_editor_options(): array {
+        global $CFG;
+
+        return [
+            'subdirs' => true,
+            'maxbytes' => $CFG->maxbytes,
+            'maxfiles' => EDITOR_UNLIMITED_FILES,
+            'context' => \context_system::instance(),
+            'trusttext' => true,
+            'class' => 'noticecontent'
+        ];
     }
 }
