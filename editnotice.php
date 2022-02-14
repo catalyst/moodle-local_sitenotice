@@ -51,8 +51,27 @@ $customdata = [
 ];
 $mform = new notice_form($thispage, $customdata);
 
+$itemid = null;
+if ($sitenotice) {
+    $itemid = $sitenotice->get('id');
+}
+
+$options = helper::get_file_editor_options();
+$draftitemid = file_get_submitted_draft_itemid('content');
+file_prepare_draft_area($draftitemid, context_system::instance()->id, 'local_sitenotice', 'content', $itemid, $options);
+
 // Proccess form data.
 if ($formdata = $mform->get_data()) {
+
+    $formdata->content = file_save_draft_area_files(
+        $draftitemid,
+        context_system::instance()->id,
+        'local_sitenotice', 'content',
+        $itemid,
+        $options,
+        $formdata->content
+    );
+
     if (!$sitenotice) {
         // Create new notice.
         helper::create_new_notice($formdata);
