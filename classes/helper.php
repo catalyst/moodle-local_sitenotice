@@ -36,6 +36,26 @@ use \local_sitenotice\persistent\noticeview;
 class helper {
 
     /**
+     * Perform all required manipulations with content.
+     *
+     * @param \local_sitenotice\persistent\sitenotice|\core\persistent $sitenotice
+     */
+    public static function process_content(sitenotice $sitenotice) {
+        $draftitemid = file_get_submitted_draft_itemid('content');
+        $content = file_save_draft_area_files(
+            $draftitemid,
+            \context_system::instance()->id,
+            'local_sitenotice', 'content',
+            $sitenotice->get('id'),
+            self::get_file_editor_options(),
+            $sitenotice->get('content')
+        );
+
+        $content = self::update_hyperlinks($sitenotice->get('id'), $content);
+        $sitenotice->set('content', $content);
+    }
+
+    /**
      * Create new notice
      * @param \stdClass $data form data
      * @throws \coding_exception
@@ -47,16 +67,14 @@ class helper {
         self::check_manage_capability();
         // Create new notice.
         $sitenotice = sitenotice::create_new_notice($data);
-        // Extract hyperlinks and set ids for them.
-        $noticeid = $sitenotice->get('id');
-        $content = $sitenotice->get('content');
-        $newcontent = self::update_hyperlinks($noticeid, $content);
-        sitenotice::update_notice_content($sitenotice, $newcontent);
+
+        self::process_content($sitenotice);
+        sitenotice::update_notice_content($sitenotice, $sitenotice->get('content'));
 
         // Log created event.
         $params = array(
             'context' => \context_system::instance(),
-            'objectid' => $noticeid,
+            'objectid' => $sitenotice->get('id'),
             'relateduserid' => $sitenotice->get('usermodified'),
         );
         $event = \local_sitenotice\event\sitenotice_created::create($params);
@@ -77,16 +95,16 @@ class helper {
         if (!get_config('local_sitenotice', 'allow_update')) {
             return;
         }
-        // Check if there is any changes in the hyperlinks.
-        $noticeid = $sitenotice->get('id');
-        $data->content = self::update_hyperlinks($noticeid, $data->content);
-        // Update notice.
+
         sitenotice::update_notice_data($sitenotice, $data);
+
+        self::process_content($sitenotice);
+        sitenotice::update_notice_content($sitenotice, $sitenotice->get('content'));
 
         // Log updated event.
         $params = array(
             'context' => \context_system::instance(),
-            'objectid' => $noticeid,
+            'objectid' => $sitenotice->get('id'),
             'relateduserid' => $sitenotice->get('usermodified'),
         );
         $event = \local_sitenotice\event\sitenotice_updated::create($params);
@@ -95,12 +113,9 @@ class helper {
 
     /**
      * Extract hyperlink from notice content.
-     * @param $noticeid notice id
-     * @param $content notice content
+     * @param int $noticeid notice id
+     * @param string $content notice content
      * @return string
-     * @throws \coding_exception
-     * @throws \core\invalid_persistent_exception
-     * @throws \dml_exception
      */
     private static function update_hyperlinks($noticeid, $content) {
         // Replace file URLs before processing.
@@ -659,7 +674,7 @@ class helper {
         return [
             'subdirs' => true,
             'maxbytes' => $CFG->maxbytes,
-            'maxfiles' => EDITOR_UNLIMITED_FILES,
+            'maxfiles' => -1, // Unlimited files.
             'context' => \context_system::instance(),
             'trusttext' => true,
             'class' => 'noticecontent'

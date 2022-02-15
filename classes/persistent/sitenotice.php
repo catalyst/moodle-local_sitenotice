@@ -197,7 +197,7 @@ class sitenotice extends persistent {
 
     /**
      * Create new notice
-     * @param $data
+     * @param \stdClass $data
      * @return persistent
      * @throws \coding_exception
      * @throws \core\invalid_persistent_exception
@@ -210,7 +210,7 @@ class sitenotice extends persistent {
     /**
      * Update content of the notice
      * @param sitenotice $persistent site notice persistent object
-     * @param $content new content
+     * @param string $content new content
      * @return bool
      * @throws \coding_exception
      * @throws \core\invalid_persistent_exception
@@ -223,7 +223,7 @@ class sitenotice extends persistent {
     /**
      * Update data of the notice
      * @param sitenotice $persistent site notice persistent object
-     * @param $data new data
+     * @param \stdClass $data new data
      * @return bool
      * @throws \coding_exception
      * @throws \core\invalid_persistent_exception
