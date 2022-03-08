@@ -3,6 +3,14 @@
 # Site Notice
 This plugin displays notices to users.
 
+## Features
+ * Site wide notices displayed in a modal pop up.
+ * Ability to limit your notices to a specific cohort.
+ * Re display a notice in a configurable period of time.
+ * Keep displaying a notice until a specific course is completed.
+ * Optionally request users to accept a notice, or they will be logged out from LMS.
+ * Reporting on who accepted / dismissed a notice. 
+
 ## Configuration 
 
 ### Enable the plugin
@@ -11,7 +19,6 @@ Site administration > Site Notice > Settings: "Enabled"
 ### Allow updating notices
 Site administration > Site Notice > Settings: "Allow notice update"
 If the config is enabled, user will be able to update existing notice.
-
 
 ### Allow deleting notices
 Site administration > Site Notice > Settings: "Allow notice deletion"
@@ -61,3 +68,22 @@ If the user does not accept the notice, he/she will be logged out of the site.
 * Click on the 'risk' icon to view notice report
 * Apply "Date range" filter if required
 * Choose a file format and click on download button
+
+# Crafted by Catalyst IT
+
+This plugin was developed by Catalyst IT Australia:
+
+https://www.catalyst-au.net/
+
+
+# Contributing and Support
+
+Issues, and pull requests using github are welcome and encouraged!
+
+https://github.com/catalyst/moodle-local_sitenotice/issues
+
+If you would like commercial support or would like to sponsor additional improvements
+to this plugin please contact us:
+
+https://www.catalyst-au.net/contact-us
+
