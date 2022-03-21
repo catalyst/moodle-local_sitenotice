@@ -1,7 +1,3 @@
-.noticecontent {
-    width: 50%;
-}
-
 #sitenotice-modal-ackcheckbox {
     transform: scale(1.5);
     -ms-transform: scale(1.5);
@@ -21,6 +17,6 @@
     pointer-events: none;
 }
 
-.checkboxlabel {
+.sitenotice .checkboxlabel {
     margin-left: 5px;
 }
