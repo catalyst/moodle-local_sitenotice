@@ -45,5 +45,25 @@ function xmldb_local_sitenotice_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2021021300, 'local', 'sitenotice');
     }
 
+    if ($oldversion < 2022061300) {
+
+        if (!$dbman->field_exists('local_sitenotice', 'timestart')) {
+
+            $table = new xmldb_table('local_sitenotice');
+            $field = new xmldb_field('timestart', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $dbman->add_field($table, $field);
+        }
+
+        if (!$dbman->field_exists('local_sitenotice', 'timeend')) {
+
+            $table = new xmldb_table('local_sitenotice');
+            $field = new xmldb_field('timeend', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2022061300, 'local', 'sitenotice');
+    }
+
     return true;
+
 }

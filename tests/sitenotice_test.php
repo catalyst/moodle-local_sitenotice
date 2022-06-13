@@ -79,6 +79,30 @@ class sitenotice_test extends \advanced_testcase {
     }
 
     /**
+     * Create sample notice (with a start and end date).
+     */
+    private function create_notice_with_start_and_end1() {
+        $formdata = new \stdClass();
+        $formdata->title = "Date range Notice 1";
+        $formdata->content = "Date range Notice 1 <a href=\"www.example3.com\">Link 3</a> <a href=\"www.example4.com\">Link 9</a>";
+        $formdata->timestart = time() + HOURSECS;
+        $formdata->timeend = time() + DAYSECS;
+        helper::create_new_notice($formdata);
+    }
+
+    /**
+     * Create sample notice (with a start and end date).
+     */
+    private function create_notice_with_start_and_end2() {
+        $formdata = new \stdClass();
+        $formdata->title = "Date range Notice 1";
+        $formdata->content = "Date range Notice 1 <a href=\"www.example3.com\">Link 3</a> <a href=\"www.example4.com\">Link 9</a>";
+        $formdata->timestart = time() - DAYSECS;
+        $formdata->timeend = time() - HOURSECS;
+        helper::create_new_notice($formdata);
+    }
+
+    /**
      * Test notice creation.
      */
     public function test_create_notices() {
@@ -212,11 +236,15 @@ class sitenotice_test extends \advanced_testcase {
         $this->create_notice2();
         $this->create_cohort_notice1();
         $this->create_cohort_notice2();
+        $this->create_notice_with_start_and_end1();
+        $this->create_notice_with_start_and_end2();
         $user1 = $this->getDataGenerator()->create_user();
 
-        // Four active notices.
+        // Even though we made 6 notices, we should only get 5 here.
+        // That's because create_notice_with_start_and_end2 creates a notice
+        // with an expiry date in the past.
         $allnotices = helper::retrieve_enabled_notices();
-        $this->assertEquals(4, count($allnotices));
+        $this->assertEquals(5, count($allnotices));
         $notice1 = array_shift($allnotices);
         $notice2 = array_shift($allnotices);
         $cohortnotice1 = array_shift($allnotices);

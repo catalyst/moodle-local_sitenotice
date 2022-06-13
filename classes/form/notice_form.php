@@ -73,6 +73,19 @@ class notice_form extends \core\form\persistent {
         $mform->addHelpButton('reqcourse', 'notice:reqcourse', 'local_sitenotice');
         $mform->setDefault('reqcourse', 0);
 
+        $mform->addElement('selectyesno', 'perpetual', get_string('notice:perpetual', 'local_sitenotice'));
+        $mform->setDefault('perpetual', 1);
+
+        $activeoptions = ['startyear' => date("Y"), 'stopyear'  => 2030];
+        $mform->addElement('date_time_selector', 'timestart', get_string('notice:activefrom', 'local_sitenotice'), $activeoptions);
+        $mform->addHelpButton('timestart', 'notice:activefrom', 'local_sitenotice');
+        $mform->hideIf('timestart', 'perpetual', 'eq', 1);
+
+        $expiryoptions = ['startyear' => date("Y"), 'stopyear'  => 2030, 'defaulttime' => time() + HOURSECS];
+        $mform->addElement('date_time_selector', 'timeend', get_string('notice:expiry', 'local_sitenotice'), $expiryoptions);
+        $mform->addHelpButton('timeend', 'notice:expiry', 'local_sitenotice');
+        $mform->hideIf('timeend', 'perpetual', 'eq', 1);
+
         $mform->addElement('selectyesno', 'enabled', get_string('notice:enable', 'local_sitenotice'));
         $mform->setDefault('enabled', 1);
 
@@ -82,5 +95,12 @@ class notice_form extends \core\form\persistent {
         $buttonarray[] = $mform->createElement('cancel');
 
         $mform->addGroup($buttonarray, 'buttonar', '', ' ', false);
+    }
+
+    protected function get_default_data() {
+        $data = parent::get_default_data();
+        $data->perpetual = $data->timestart == 0 && $data->timeend == 0;
+
+        return $data;
     }
 }

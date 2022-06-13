@@ -68,6 +68,8 @@ class all_notices extends table_sql implements renderable {
             'resetinterval' => get_string('notice:resetinterval', 'local_sitenotice'),
             'reqack' => get_string('notice:reqack', 'local_sitenotice'),
             'reqcourse' => get_string('notice:reqcourse', 'local_sitenotice'),
+            'timestart' => get_string('notice:activefrom', 'local_sitenotice'),
+            'timeend' => get_string('notice:expiry', 'local_sitenotice'),
             'audience' => get_string('notice:audience', 'local_sitenotice'),
             'content' => get_string('notice:content', 'local_sitenotice'),
             'actions' => get_string('actions'),
@@ -233,6 +235,26 @@ class all_notices extends table_sql implements renderable {
      */
     protected function col_reqack($row) {
         return helper::format_boolean($row->reqack);
+    }
+
+    /**
+     * The timestart column.
+     *
+     * @param \stdClass $row The row data
+     * @return string
+     */
+    protected function col_timestart(\stdClass $row): string {
+        return $row->timestart == 0 ? "-" : userdate($row->timestart);
+    }
+
+    /**
+     * The timeend column.
+     *
+     * @param \stdClass $row The row data
+     * @return string
+     */
+    protected function col_timeend(\stdClass $row): string {
+        return $row->timeend == 0 ? '-' : userdate($row->timeend);
     }
 
     /**

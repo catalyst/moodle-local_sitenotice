@@ -63,6 +63,16 @@ class sitenotice extends persistent {
                 'null' => NULL_NOT_ALLOWED,
                 'default' => 0,
             ],
+            'timestart' => [
+                'type' => PARAM_INT,
+                'null' => NULL_NOT_ALLOWED,
+                'default' => 0
+            ],
+            'timeend' => [
+                'type' => PARAM_INT,
+                'null' => NULL_NOT_ALLOWED,
+                'default' => 0
+            ],
             'enabled' => [
                 'type' => PARAM_INT,
                 'null' => NULL_NOT_ALLOWED,
@@ -167,7 +177,8 @@ class sitenotice extends persistent {
      */
     public static function get_enabled_notices(): array {
         if (!$result = self::get_enabled_notices_cache()->get('records')) {
-            $persistents = self::get_records(['enabled' => 1], 'id');
+            $select = "enabled = ? AND ((timeend = 0 AND timestart = 0) OR (timeend <> 0 AND timestart <> 0 AND ? < timeend))";
+            $persistents = self::get_records_select($select, [1, time()], 'id');
             $result = [];
             foreach ($persistents as $persistent) {
                 $record = $persistent->to_record();

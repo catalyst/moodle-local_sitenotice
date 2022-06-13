@@ -57,6 +57,10 @@ file_prepare_draft_area($draftitemid, context_system::instance()->id, 'local_sit
 
 // Proccess form data.
 if ($formdata = $mform->get_data()) {
+    if ($formdata->perpetual == 1) {
+        $formdata->timestart = 0;
+        $formdata->timeend = 0;
+    }
 
     if (!$sitenotice) {
         // Create new notice.

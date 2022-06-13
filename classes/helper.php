@@ -353,7 +353,15 @@ class helper {
                 unset($USER->viewednotices[$noticeid]);
             }
         }
-        $notices = array_diff_key($notices, $USER->viewednotices);
+        $notices = array_filter(
+            array_diff_key($notices, $USER->viewednotices),
+            function (\stdClass $notice): bool {
+                $now = time();
+                $isperpetual = $notice->timestart == 0 && $notice->timeend == 0;
+                $isinactivewindow = $now >= $notice->timestart && $now < $notice->timeend;
+                return $isperpetual || (!$isperpetual && $isinactivewindow);
+            }
+        );
 
         $usernotices = $notices;
         if (!empty($notices)) {
