@@ -126,7 +126,9 @@ class sitenotice extends persistent {
      * @param bool $result Result of delete.
      */
     protected function after_delete($result) {
-        self::purge_caches();
+        if ($result) {
+            self::purge_caches();
+        }
     }
 
     /**

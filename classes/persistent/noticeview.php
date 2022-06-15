@@ -90,7 +90,9 @@ class noticeview extends persistent {
      * @param bool $result Result of delete.
      */
     protected function after_delete($result) {
-        self::purge_cache($this->get('userid'));
+        if ($result) {
+            self::purge_cache($this->get('userid'));
+        }
     }
 
     /**

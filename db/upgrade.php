@@ -29,7 +29,7 @@
  * @return bool result
  */
 function xmldb_local_sitenotice_upgrade($oldversion) {
-    global $CFG, $DB;
+    global $DB;
 
     $dbman = $DB->get_manager();
 
