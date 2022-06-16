@@ -619,14 +619,14 @@ class helper {
         global $DB;
 
         if ($courseid == 0) {
-            return 'No';
+            return get_string('booleanformat:false', 'local_sitenotice');
         }
 
         $course = $DB->get_record('course', array('id' => $courseid));
         if ($course) {
             return $course->fullname;
         } else {
-            return '--';
+            return '-';
         }
     }
 
