@@ -35,142 +35,66 @@ class sitenotice_test extends \advanced_testcase {
     }
 
     /**
-     * Create sample notice.
-     */
-    private function create_notice1() {
-        $formdata = new \stdClass();
-        $formdata->title = "Notice 1";
-        $formdata->content = "Notice 1 <a href=\"www.example1.com\">Link 1</a> <a href=\"www.example2.com\">Link 2</a>";
-        helper::create_new_notice($formdata);
-    }
-
-    /**
-     * Create sample notice.
-     */
-    private function create_notice2() {
-        $formdata = new \stdClass();
-        $formdata->title = "Notice 2";
-        $formdata->content = "Notice 2 <a href=\"www.example3.com\">Link 3</a> <a href=\"www.example4.com\">Link 4</a>";
-        helper::create_new_notice($formdata);
-    }
-
-    /**
-     * Create sample notice (with targeted audience)
-     */
-    private function create_cohort_notice1() {
-        $formdata = new \stdClass();
-        $formdata->title = "Cohort Notice 1";
-        $formdata->content = "Cohort Notice 1 <a href=\"www.example5.com\">Link 5</a> <a href=\"www.example6.com\">Link 6</a>";
-        $cohort = $this->getDataGenerator()->create_cohort();
-        $formdata->audience = $cohort->id;
-        helper::create_new_notice($formdata);
-    }
-
-    /**
-     * Create sample notice (with targeted audience)
-     */
-    private function create_cohort_notice2() {
-        $formdata = new \stdClass();
-        $formdata->title = "Cohort Notice 2";
-        $formdata->content = "Cohort Notice 2 <a href=\"www.example7.com\">Link 7</a> <a href=\"www.example8.com\">Link 8</a>";
-        $cohort = $this->getDataGenerator()->create_cohort();
-        $formdata->audience = $cohort->id;
-        helper::create_new_notice($formdata);
-    }
-
-    /**
-     * Create sample notice (with a start and end date).
-     */
-    private function create_notice_with_start_and_end1() {
-        $formdata = new \stdClass();
-        $formdata->title = "Date range Notice 1";
-        $formdata->content = "Date range Notice 1 <a href=\"www.example3.com\">Link 3</a> <a href=\"www.example4.com\">Link 9</a>";
-        $formdata->timestart = time() + HOURSECS;
-        $formdata->timeend = time() + DAYSECS;
-        helper::create_new_notice($formdata);
-    }
-
-    /**
-     * Create sample notice (with a start and end date).
-     */
-    private function create_notice_with_start_and_end2() {
-        $formdata = new \stdClass();
-        $formdata->title = "Date range Notice 1";
-        $formdata->content = "Date range Notice 1 <a href=\"www.example3.com\">Link 3</a> <a href=\"www.example4.com\">Link 9</a>";
-        $formdata->timestart = time() - DAYSECS;
-        $formdata->timeend = time() - HOURSECS;
-        helper::create_new_notice($formdata);
-    }
-
-    /**
      * Test notice creation.
+     *
+     * @dataProvider create_notices_provider
+     * @param array $formdata Array of form data to create notices
+     * @param bool $allowdeletion Whether or not to allow deletion of notices
+     * @param bool $cleanup Whether or not to clean up extra link data after notice deletion
+     * @param array $expected Array of expected testcase results
      */
-    public function test_create_notices() {
+    public function test_create_notices(array $formdata, bool $allowdeletion, bool $cleanup, array $expected) {
         $this->setAdminUser();
-        $this->create_notice1();
+        set_config('allow_delete', $allowdeletion, 'local_sitenotice');
+        set_config('cleanup_deleted_notice', $cleanup, 'local_sitenotice');
+
+        foreach ($formdata as $data) {
+            if (property_exists($data, 'audience')) {
+                $data->audience = $this->getDataGenerator()->create_cohort()->id;
+            }
+            helper::create_new_notice($data);
+        }
+
+        $allnotices = array_values(helper::retrieve_enabled_notices());
+        $this->assertEquals($expected['noticecount'], count($allnotices));
+
+        foreach ($allnotices as $noticeindex => $notice) {
+            $this->assertEquals($expected['titles'][$noticeindex], $notice->title);
+
+            $allinks = helper::retrieve_notice_links($notice->id);
+            $this->assertEquals($expected['linkcounts'][$noticeindex], count($allinks));
+            $this->assertStringContainsString('data-linkid', $notice->content);
+            $this->assertEquals($expected['linktexts'][$noticeindex], array_column($allinks, 'text'));
+            $this->assertEquals($expected['linkurls'][$noticeindex], array_column($allinks, 'link'));
+        }
+
+        $idtodelete = $allnotices[0]->id;
+        helper::delete_notice($idtodelete);
         $allnotices = helper::retrieve_enabled_notices();
-        // There is only one notice.
-        $this->assertEquals(1, count($allnotices));
-        $this->assertEquals("Notice 1", reset($allnotices)->title);
+        $this->assertEquals($expected['noticecount'] - (int)$allowdeletion, count($allnotices));
 
-        $this->create_notice2();
-        $allnotices = helper::retrieve_enabled_notices();
-        // There are two notices.
-        $this->assertEquals(2, count($allnotices));
-        $notice1 = array_shift($allnotices);
-        $this->assertEquals("Notice 1", $notice1->title);
-        $notice2 = array_shift($allnotices);
-        $this->assertEquals("Notice 2", $notice2->title);
-
-        // Check notice links.
-        $allinks = helper::retrieve_notice_links($notice1->id);
-        $this->assertEquals(2, count($allinks));
-        $link1 = array_shift($allinks);
-        $this->assertEquals('Link 1', $link1->text);
-        $this->assertEquals('www.example1.com', $link1->link);
-        $link2 = array_shift($allinks);
-        $this->assertEquals('Link 2', $link2->text);
-        $this->assertEquals('www.example2.com', $link2->link);
-
-        $this->assertStringContainsString('data-linkid', $notice1->content);
-        $this->assertStringContainsString('data-linkid', $notice2->content);
-
-        // Do not allow deletion by default.
-        helper::delete_notice($notice2->id);
-        $allnotices = helper::retrieve_enabled_notices();
-        $this->assertEquals(2, count($allnotices));
-
-        // Delete notice without cleaning up.
-        set_config('allow_delete', true, 'local_sitenotice');
-        helper::delete_notice($notice2->id);
-        $allnotices = helper::retrieve_enabled_notices();
-        // There is only one notice.
-        $this->assertEquals(1, count($allnotices));
-        $this->assertEquals("Notice 1", reset($allnotices)->title);
-        // Leftover hyperlinks of notice 2.
-        $allinks = helper::retrieve_notice_links($notice2->id);
-        $this->assertEquals(2, count($allinks));
-
-        // Allow cleaning up.
-        set_config('cleanup_deleted_notice', true, 'local_sitenotice');
-        helper::delete_notice($notice1->id);
-        $allnotices = helper::retrieve_enabled_notices();
-        $this->assertEquals(0, count($allnotices));
-        // Leftover hyperlinks of notice 1.
-        $allinks = helper::retrieve_notice_links($notice1->id);
-        $this->assertEquals(0, count($allinks));
-
+        $allinks = helper::retrieve_notice_links($idtodelete);
+        $this->assertEquals($cleanup ? 0 : $expected['linkcounts'][0], count($allinks));
     }
 
     /**
      * Test set reset notice.
+     *
+     * @dataProvider generic_provider()
+     * @param array $formdata Array of form data to create notices
      */
-    public function test_reset_notices() {
+    public function test_reset_notices(array $formdata) {
         $this->setAdminUser();
-        $this->create_notice1();
-        $this->create_notice2();
+
+        foreach ($formdata as $data) {
+            if (property_exists($data, 'audience')) {
+                $data->audience = $this->getDataGenerator()->create_cohort()->id;
+            }
+            helper::create_new_notice($data);
+        }
+
         $allnotices = helper::retrieve_enabled_notices();
-        $this->assertEquals(2, count($allnotices));
+        $this->assertEquals(4, count($allnotices));
         $oldnotice1 = array_shift($allnotices);
         $oldnotice2 = array_shift($allnotices);
         // Only reset Notice 1.
@@ -188,11 +112,20 @@ class sitenotice_test extends \advanced_testcase {
 
     /**
      * Test enable/disable notice.
+     *
+     * @dataProvider generic_provider()
+     * @param array $formdata Array of form data to create notices
      */
-    public function test_enable_notices() {
+    public function test_enable_notices(array $formdata) {
         $this->setAdminUser();
-        $this->create_notice1();
-        $this->create_notice2();
+
+        foreach ($formdata as $data) {
+            if (property_exists($data, 'audience')) {
+                $data->audience = $this->getDataGenerator()->create_cohort()->id;
+            }
+            helper::create_new_notice($data);
+        }
+
         $allnotices = helper::retrieve_enabled_notices();
         $notice1 = array_shift($allnotices);
         $this->assertEquals("Notice 1", $notice1->title);
@@ -200,7 +133,7 @@ class sitenotice_test extends \advanced_testcase {
         // Only disable Notice 1.
         helper::disable_notice($notice1->id);
         $allnotices = helper::retrieve_enabled_notices();
-        $this->assertEquals(1, count($allnotices));
+        $this->assertEquals(3, count($allnotices));
         $notice2 = array_shift($allnotices);
         $this->assertEquals("Notice 2", $notice2->title);
 
@@ -208,7 +141,7 @@ class sitenotice_test extends \advanced_testcase {
         helper::enable_notice($notice1->id);
         helper::disable_notice($notice2->id);
         $allnotices = helper::retrieve_enabled_notices();
-        $this->assertEquals(1, count($allnotices));
+        $this->assertEquals(3, count($allnotices));
         $notice1 = array_shift($allnotices);
         $this->assertEquals("Notice 1", $notice1->title);
     }
@@ -228,23 +161,23 @@ class sitenotice_test extends \advanced_testcase {
 
     /**
      * Test user notice interaction.
+     *
+     * @dataProvider generic_provider()
      */
-    public function test_user_notice() {
+    public function test_user_notice($formdata) {
         global $USER;
-        $this->setAdminUser();
-        $this->create_notice1();
-        $this->create_notice2();
-        $this->create_cohort_notice1();
-        $this->create_cohort_notice2();
-        $this->create_notice_with_start_and_end1();
-        $this->create_notice_with_start_and_end2();
-        $user1 = $this->getDataGenerator()->create_user();
 
-        // Even though we made 6 notices, we should only get 5 here.
-        // That's because create_notice_with_start_and_end2 creates a notice
-        // with an expiry date in the past.
+        $this->setAdminUser();
+        foreach ($formdata as $data) {
+            if (property_exists($data, 'audience')) {
+                $data->audience = $this->getDataGenerator()->create_cohort()->id;
+            }
+            helper::create_new_notice($data);
+        }
+
+        $user1 = $this->getDataGenerator()->create_user();
         $allnotices = helper::retrieve_enabled_notices();
-        $this->assertEquals(5, count($allnotices));
+        $this->assertEquals(4, count($allnotices));
         $notice1 = array_shift($allnotices);
         $notice2 = array_shift($allnotices);
         $cohortnotice1 = array_shift($allnotices);
@@ -297,14 +230,22 @@ class sitenotice_test extends \advanced_testcase {
 
     /**
      * Test user link interaction
+     *
+     * @dataProvider generic_provider()
      */
-    public function test_user_hlink_interact() {
+    public function test_user_hlink_interact($formdata) {
         $this->setAdminUser();
-        $this->create_notice1();
+        foreach ($formdata as $data) {
+            if (property_exists($data, 'audience')) {
+                $data->audience = $this->getDataGenerator()->create_cohort()->id;
+            }
+            helper::create_new_notice($data);
+        }
+
         $user1 = $this->getDataGenerator()->create_user();
         $this->setUser($user1);
         $allnotices = helper::retrieve_enabled_notices();
-        $this->assertEquals(1, count($allnotices));
+        $this->assertEquals(4, count($allnotices));
         $notice1 = array_shift($allnotices);
 
         $links = helper::retrieve_notice_links($notice1->id);
@@ -384,5 +325,215 @@ class sitenotice_test extends \advanced_testcase {
         $usernotices = helper::retrieve_user_notices();
         // There should not be any user notices.
         $this->assertEquals(0, count($usernotices));
+    }
+
+    /**
+     * Generic data provider to set up multiple tests.
+     *
+     * @return array
+     */
+    public function generic_provider() {
+        return [
+            'formdata' => [
+                [
+                    (object)[
+                        'title' => 'Notice 1',
+                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>'
+                    ],
+                    (object)[
+                        'title' => 'Notice 2',
+                        'content' => 'Notice 2 <a href="www.example3.com">Link 3</a> <a href="www.example4.com">Link 4</a>'
+                    ],
+                    (object)[
+                        'title' => 'Cohort Notice 1',
+                        'content' => 'Cohort Notice 1 <a href="www.example5.com">Link 5</a> <a href="www.example6.com">Link 6</a>',
+                        'audience' => null
+                    ],
+                    (object)[
+                        'title' => 'Cohort Notice 2',
+                        'content' => 'Cohort Notice 2 <a href="www.example7.com">Link 7</a> <a href="www.example8.com">Link 8</a>',
+                        'audience' => null
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * Data provider for test_create_notices
+     *
+     * @return array
+     */
+    public function create_notices_provider(): array {
+        return [
+            'one basic notice with deletion not allowed' => [
+                'formdata' => [
+                    (object)[
+                        'title' => 'Notice 1',
+                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>'
+                    ],
+                ],
+                'allowdeltion' => false,
+                'cleanup' => false,
+                'expected' => [
+                    'noticecount' => 1,
+                    'titles' => ['Notice 1'],
+                    'linkcounts' => [2],
+                    'linktexts' => [['Link 1', 'Link 2']],
+                    'linkurls' => [['www.example1.com', 'www.example2.com']]
+                ]
+            ],
+            'two basic notices with deletion not allowed' => [
+                'formdata' => [
+                    (object)[
+                        'title' => 'Notice 1',
+                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>'
+                    ],
+                    (object)[
+                        'title' => 'Notice 2',
+                        'content' => 'Notice 2 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 4</a>'
+                    ],
+                ],
+                'allowdeletion' => false,
+                'cleanup' => false,
+                'expected' => [
+                    'noticecount' => 2,
+                    'titles' => ['Notice 1', 'Notice 2'],
+                    'linkcounts' => [2, 2],
+                    'linktexts' => [['Link 1', 'Link 2'], ['Link 1', 'Link 4']],
+                    'linkurls' => [['www.example1.com', 'www.example2.com'], ['www.example1.com', 'www.example2.com']]
+                ]
+            ],
+            'two basic notices and one notice with expiry in the future' => [
+                'formdata' => [
+                    (object)[
+                        'title' => 'Notice 1',
+                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>'
+                    ],
+                    (object)[
+                        'title' => 'Notice 2',
+                        'content' => 'Notice 2 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 4</a>'
+                    ],
+                    (object)[
+                        'title' => 'Notice 3',
+                        'content' => 'Notice 3 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 4</a>',
+                        'timestart' => time() + HOURSECS,
+                        'timeend' => time() + DAYSECS
+                    ],
+                ],
+                'allowdeletion' => false,
+                'cleanup' => false,
+                'expected' => [
+                    'noticecount' => 3,
+                    'titles' => ['Notice 1', 'Notice 2', 'Notice 3'],
+                    'linkcounts' => [2, 2, 2],
+                    'linktexts' => [['Link 1', 'Link 2'], ['Link 1', 'Link 4'], ['Link 1', 'Link 4']],
+                    'linkurls' => [['www.example1.com', 'www.example2.com'], ['www.example1.com', 'www.example2.com'], ['www.example1.com', 'www.example2.com']]
+                ]
+            ],
+            'two basic notices and one notice with expiry in the past' => [
+                'formdata' => [
+                    (object)[
+                        'title' => 'Notice 1',
+                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>'
+                    ],
+                    (object)[
+                        'title' => 'Notice 2',
+                        'content' => 'Notice 2 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 4</a>'
+                    ],
+                    (object)[
+                        'title' => 'Notice 3',
+                        'content' => 'Notice 3 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 4</a>',
+                        'timestart' => time() - DAYSECS,
+                        'timeend' => time() - HOURSECS
+                    ],
+                ],
+                'allowdeletion' => false,
+                'cleanup' => false,
+                'expected' => [
+                    'noticecount' => 2,
+                    'titles' => ['Notice 1', 'Notice 2'],
+                    'linkcounts' => [2, 2],
+                    'linktexts' => [['Link 1', 'Link 2'], ['Link 1', 'Link 4']],
+                    'linkurls' => [['www.example1.com', 'www.example2.com'], ['www.example1.com', 'www.example2.com']]
+                ]
+            ],
+            'one basic notice with deletion allowed and cleanup disabled' => [
+                'formdata' => [
+                    (object)[
+                        'title' => 'Notice 1',
+                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>'
+                    ],
+                ],
+                'allowdeltion' => true,
+                'cleanup' => false,
+                'expected' => [
+                    'noticecount' => 1,
+                    'titles' => ['Notice 1'],
+                    'linkcounts' => [2],
+                    'linktexts' => [['Link 1', 'Link 2']],
+                    'linkurls' => [['www.example1.com', 'www.example2.com']]
+                ]
+            ],
+            'two basic notices with deletion allowed and cleanup disabled' => [
+                'formdata' => [
+                    (object)[
+                        'title' => 'Notice 1',
+                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>'
+                    ],
+                    (object)[
+                        'title' => 'Notice 2',
+                        'content' => 'Notice 2 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 4</a>'
+                    ],
+                ],
+                'allowdeletion' => true,
+                'cleanup' => false,
+                'expected' => [
+                    'noticecount' => 2,
+                    'titles' => ['Notice 1', 'Notice 2'],
+                    'linkcounts' => [2, 2],
+                    'linktexts' => [['Link 1', 'Link 2'], ['Link 1', 'Link 4']],
+                    'linkurls' => [['www.example1.com', 'www.example2.com'], ['www.example1.com', 'www.example2.com']]
+                ]
+            ],
+            'one basic notice with deletion allowed and cleanup enabled' => [
+                'formdata' => [
+                    (object)[
+                        'title' => 'Notice 1',
+                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>'
+                    ],
+                ],
+                'allowdeltion' => true,
+                'cleanup' => true,
+                'expected' => [
+                    'noticecount' => 1,
+                    'titles' => ['Notice 1'],
+                    'linkcounts' => [2],
+                    'linktexts' => [['Link 1', 'Link 2']],
+                    'linkurls' => [['www.example1.com', 'www.example2.com']]
+                ]
+            ],
+            'two basic notices with deletion allowed and cleanup enabled' => [
+                'formdata' => [
+                    (object)[
+                        'title' => 'Notice 1',
+                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>'
+                    ],
+                    (object)[
+                        'title' => 'Notice 2',
+                        'content' => 'Notice 2 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 4</a>'
+                    ],
+                ],
+                'allowdeletion' => true,
+                'cleanup' => true,
+                'expected' => [
+                    'noticecount' => 2,
+                    'titles' => ['Notice 1', 'Notice 2'],
+                    'linkcounts' => [2, 2],
+                    'linktexts' => [['Link 1', 'Link 2'], ['Link 1', 'Link 4']],
+                    'linkurls' => [['www.example1.com', 'www.example2.com'], ['www.example1.com', 'www.example2.com']]
+                ]
+            ]
+        ];
     }
 }
