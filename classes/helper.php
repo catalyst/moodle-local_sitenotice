@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot.'/cohort/lib.php');
 require_once($CFG->dirroot.'/lib/completionlib.php');
 
-use core_customfield\field;
 use \local_sitenotice\persistent\sitenotice;
 use \local_sitenotice\persistent\noticelink;
 use \local_sitenotice\persistent\linkhistory;
