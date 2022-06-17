@@ -45,9 +45,13 @@ user last view will also be deleted';
 // Notice Management.
 $string['notice:title'] = 'Title';
 $string['notice:content'] = 'Content';
+$string['notice:activefrom'] = 'Active from';
+$string['notice:activefrom_help'] = 'The time and date from which the message will be active .';
 $string['notice:audience'] = 'Audience';
 $string['notice:audience:all'] = 'All users';
 $string['notice:enable'] = 'Enable notice';
+$string['notice:expiry'] = 'Expiry';
+$string['notice:expiry_help'] = 'The time and date the messages expires and will not be shown to users anymore.';
 $string['notice:reqack'] = 'Requires acknowledgement';
 $string['notice:reqack_help'] = 'If enabled, the user will need to accept the notice before they can continue to use the LMS site.
 If the user does not accept the notice, he/she will be logged out of the site.';
@@ -66,7 +70,8 @@ $string['notice:resetinterval'] = 'Reset every';
 $string['notice:resetinterval_help'] = 'The notice will be displayed to user again once the specified period elapses.';
 $string['notice:redirectmsg'] = 'Required Course not completed. Not allowed to submit assignment';
 $string['notice:notice'] = 'Notice';
-
+$string['notice:perpetual'] = 'Is perpetual';
+$string['notice:perpetual_help'] = 'When set to yes, the notice will always be displayed (unless disabled). If set to no, a date and time range for the notice must be specified';
 
 // Capability.
 $string['sitenotice:manage'] = 'Manage site notice';
