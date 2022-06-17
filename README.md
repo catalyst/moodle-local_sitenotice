@@ -7,6 +7,7 @@ This plugin displays notices to users.
  * Site wide notices displayed in a modal pop up.
  * Ability to limit your notices to a specific cohort.
  * Re display a notice in a configurable period of time.
+ * Set a start date and expiry date for a notice
  * Keep displaying a notice until a specific course is completed.
  * Optionally request users to accept a notice, or they will be logged out from LMS.
  * Reporting on who accepted / dismissed a notice. 
@@ -37,6 +38,7 @@ If the config is enabled (and "notice deletion" is also allowed), when deleting 
 * Enter Title
 * Enter Content
 * Set up reset interval ('reset every') if required. The notice will be displayed to user again once the specified period elapses.
+* Set up start and end dates if required. Set "Is perpetual" to "Yes" and start/end dates will become available.
 * Requires Acknowledgement. If enabled, the user will need to accept the notice before they can continue to use the LMS site.
 If the user does not accept the notice, he/she will be logged out of the site.
 * Set up target audience (cohort) 
