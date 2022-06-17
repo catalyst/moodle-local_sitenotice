@@ -338,21 +338,25 @@ class sitenotice_test extends \advanced_testcase {
                 [
                     (object)[
                         'title' => 'Notice 1',
-                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>'
+                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>',
+                        'perpetual' => 1,
                     ],
                     (object)[
                         'title' => 'Notice 2',
-                        'content' => 'Notice 2 <a href="www.example3.com">Link 3</a> <a href="www.example4.com">Link 4</a>'
+                        'content' => 'Notice 2 <a href="www.example3.com">Link 3</a> <a href="www.example4.com">Link 4</a>',
+                        'perpetual' => 1,
                     ],
                     (object)[
                         'title' => 'Cohort Notice 1',
                         'content' => 'Cohort Notice 1 <a href="www.example5.com">Link 5</a> <a href="www.example6.com">Link 6</a>',
-                        'audience' => null
+                        'audience' => null,
+                        'perpetual' => 1,
                     ],
                     (object)[
                         'title' => 'Cohort Notice 2',
                         'content' => 'Cohort Notice 2 <a href="www.example7.com">Link 7</a> <a href="www.example8.com">Link 8</a>',
-                        'audience' => null
+                        'audience' => null,
+                        'perpetual' => 1,
                     ]
                 ]
             ]
@@ -370,7 +374,8 @@ class sitenotice_test extends \advanced_testcase {
                 'formdata' => [
                     (object)[
                         'title' => 'Notice 1',
-                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>'
+                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>',
+                        'perpetual' => 1,
                     ],
                 ],
                 'allowdeltion' => false,
@@ -387,11 +392,13 @@ class sitenotice_test extends \advanced_testcase {
                 'formdata' => [
                     (object)[
                         'title' => 'Notice 1',
-                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>'
+                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>',
+                        'perpetual' => 1,
                     ],
                     (object)[
                         'title' => 'Notice 2',
-                        'content' => 'Notice 2 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 4</a>'
+                        'content' => 'Notice 2 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 4</a>',
+                        'perpetual' => 1,
                     ],
                 ],
                 'allowdeletion' => false,
@@ -408,15 +415,18 @@ class sitenotice_test extends \advanced_testcase {
                 'formdata' => [
                     (object)[
                         'title' => 'Notice 1',
-                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>'
+                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>',
+                        'perpetual' => 1,
                     ],
                     (object)[
                         'title' => 'Notice 2',
-                        'content' => 'Notice 2 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 4</a>'
+                        'content' => 'Notice 2 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 4</a>',
+                        'perpetual' => 1,
                     ],
                     (object)[
                         'title' => 'Notice 3',
                         'content' => 'Notice 3 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 4</a>',
+                        'perpetual' => 0,
                         'timestart' => time() + HOURSECS,
                         'timeend' => time() + DAYSECS
                     ],
@@ -435,15 +445,18 @@ class sitenotice_test extends \advanced_testcase {
                 'formdata' => [
                     (object)[
                         'title' => 'Notice 1',
-                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>'
+                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>',
+                        'perpetual' => 1,
                     ],
                     (object)[
                         'title' => 'Notice 2',
-                        'content' => 'Notice 2 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 4</a>'
+                        'content' => 'Notice 2 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 4</a>',
+                        'perpetual' => 1,
                     ],
                     (object)[
                         'title' => 'Notice 3',
                         'content' => 'Notice 3 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 4</a>',
+                        'perpetual' => 0,
                         'timestart' => time() - DAYSECS,
                         'timeend' => time() - HOURSECS
                     ],
@@ -462,7 +475,8 @@ class sitenotice_test extends \advanced_testcase {
                 'formdata' => [
                     (object)[
                         'title' => 'Notice 1',
-                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>'
+                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>',
+                        'perpetual' => 1,
                     ],
                 ],
                 'allowdeltion' => true,
@@ -479,11 +493,13 @@ class sitenotice_test extends \advanced_testcase {
                 'formdata' => [
                     (object)[
                         'title' => 'Notice 1',
-                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>'
+                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>',
+                        'perpetual' => 1,
                     ],
                     (object)[
                         'title' => 'Notice 2',
-                        'content' => 'Notice 2 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 4</a>'
+                        'content' => 'Notice 2 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 4</a>',
+                        'perpetual' => 1,
                     ],
                 ],
                 'allowdeletion' => true,
@@ -500,7 +516,8 @@ class sitenotice_test extends \advanced_testcase {
                 'formdata' => [
                     (object)[
                         'title' => 'Notice 1',
-                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>'
+                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>',
+                        'perpetual' => 1,
                     ],
                 ],
                 'allowdeltion' => true,
@@ -517,11 +534,13 @@ class sitenotice_test extends \advanced_testcase {
                 'formdata' => [
                     (object)[
                         'title' => 'Notice 1',
-                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>'
+                        'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>',
+                        'perpetual' => 1,
                     ],
                     (object)[
                         'title' => 'Notice 2',
-                        'content' => 'Notice 2 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 4</a>'
+                        'content' => 'Notice 2 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 4</a>',
+                        'perpetual' => 1,
                     ],
                 ],
                 'allowdeletion' => true,

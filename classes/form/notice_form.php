@@ -35,6 +35,9 @@ class notice_form extends \core\form\persistent {
     /** @var string Persistent class name. */
     protected static $persistentclass = 'local_sitenotice\persistent\sitenotice';
 
+    /** @var array Fields to remove from the persistent validation. */
+    protected static $foreignfields = array('perpetual');
+
     public function definition () {
         $mform =& $this->_form;
 

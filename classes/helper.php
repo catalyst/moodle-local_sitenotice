@@ -27,6 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/cohort/lib.php');
 require_once($CFG->dirroot.'/lib/completionlib.php');
+
+use core_customfield\field;
 use \local_sitenotice\persistent\sitenotice;
 use \local_sitenotice\persistent\noticelink;
 use \local_sitenotice\persistent\linkhistory;
@@ -66,6 +68,7 @@ class helper {
     public static function create_new_notice($data) {
         self::check_manage_capability();
         // Create new notice.
+        self::sanitise_data($data);
         $sitenotice = sitenotice::create_new_notice($data);
 
         self::process_content($sitenotice);
@@ -96,6 +99,7 @@ class helper {
             return;
         }
 
+        self::sanitise_data($data);
         sitenotice::update_notice_data($sitenotice, $data);
 
         self::process_content($sitenotice);
@@ -109,6 +113,19 @@ class helper {
         );
         $event = \local_sitenotice\event\sitenotice_updated::create($params);
         $event->trigger();
+    }
+
+    /**
+     * Sanitise submitted data before creating or updating a site notice.
+     *
+     * @param \stdClass $data
+     */
+    private static function sanitise_data(\stdClass $data) {
+        foreach ((array)$data as $key => $value) {
+            if (!key_exists($key, sitenotice::properties_definition())) {
+                unset($data->$key);
+            }
+        }
     }
 
     /**
