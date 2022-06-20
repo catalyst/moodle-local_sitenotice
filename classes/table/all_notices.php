@@ -67,6 +67,7 @@ class all_notices extends table_sql implements renderable {
             'title' => get_string('notice:title', 'local_sitenotice'),
             'resetinterval' => get_string('notice:resetinterval', 'local_sitenotice'),
             'reqack' => get_string('notice:reqack', 'local_sitenotice'),
+            'forcelogout' => get_string('notice:forcelogout', 'local_sitenotice'),
             'reqcourse' => get_string('notice:reqcourse', 'local_sitenotice'),
             'timestart' => get_string('notice:activefrom', 'local_sitenotice'),
             'timeend' => get_string('notice:expiry', 'local_sitenotice'),
@@ -235,6 +236,16 @@ class all_notices extends table_sql implements renderable {
      */
     protected function col_reqack($row) {
         return helper::format_boolean($row->reqack);
+    }
+
+    /**
+     * The force logout column.
+     *
+     * @param \stdClass $row The row data
+     * @return string
+     */
+    protected function col_forcelogout(\stdClass $row): string {
+        return helper::format_boolean($row->forcelogout);
     }
 
     /**

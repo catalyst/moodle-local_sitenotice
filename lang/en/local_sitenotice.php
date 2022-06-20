@@ -55,6 +55,8 @@ $string['notice:expiry_help'] = 'The time and date the messages expires and will
 $string['notice:reqack'] = 'Requires acknowledgement';
 $string['notice:reqack_help'] = 'If enabled, the user will need to accept the notice before they can continue to use the LMS site.
 If the user does not accept the notice, he/she will be logged out of the site.';
+$string['notice:forcelogout'] = 'Force logout';
+$string['notice:forcelogout_help'] = 'If enabled, the user will be logged out after closing the notice. This setting does not affect the site administrator. ';
 $string['notice:reqcourse'] = 'Requires course completion';
 $string['notice:reqcourse_help'] = 'If selected, the user will see the notice till the course is completed.';
 $string['notice:disable'] = 'Disable notice';

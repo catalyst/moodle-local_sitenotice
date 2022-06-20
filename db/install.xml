@@ -19,6 +19,7 @@
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp of when the notice was last modified."/>
         <FIELD NAME="timestart" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Time that the notice starts"/>
         <FIELD NAME="timeend" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Time that the notice ends (expires)."/>
+        <FIELD NAME="forcelogout" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Force user to be logged out after viewing the notice: 1 - YES, 0 - NO"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

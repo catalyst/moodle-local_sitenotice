@@ -62,6 +62,11 @@ class notice_form extends \core\form\persistent {
 
         $mform->setDefault('reqack', 0);
 
+        $mform->addElement('selectyesno', 'forcelogout', get_string('notice:forcelogout', 'local_sitenotice'));
+        $mform->addHelpButton('forcelogout', 'notice:forcelogout', 'local_sitenotice');
+
+        $mform->setDefault('forcelogout', 0);
+
         $audience = helper::built_audience_options();
 
         $mform->addElement('select', 'audience', get_string('notice:audience', 'local_sitenotice'), $audience);

@@ -494,11 +494,6 @@ class helper {
             // Record dismiss action.
             self::create_new_acknowledge_record($noticeid, acknowledgement::ACTION_DISMISSED);
 
-            // Log user out.
-            require_logout();
-            $loginpage = new \moodle_url("/login/index.php");
-            $result['redirecturl'] = $loginpage->out();
-
             // Log dismissed event.
             $params = array(
                 'context' => \context_system::instance(),
@@ -511,6 +506,12 @@ class helper {
 
         // Mark notice as viewed.
         self::add_to_viewed_notices($noticeid, acknowledgement::ACTION_DISMISSED);
+
+        if ((!is_siteadmin() && $notice->get('forcelogout')) || $notice->get('reqack')) {
+            require_logout();
+            $loginpage = new \moodle_url("/login/index.php");
+            $result['redirecturl'] = $loginpage->out();
+        }
 
         $result['status'] = true;
         return $result;
@@ -549,6 +550,14 @@ class helper {
         } else {
             $result['status'] = false;
         }
+
+        $notice = sitenotice::get_record(['id' => $noticeid]);
+        if ($notice && !is_siteadmin() && $notice->get('forcelogout')) {
+            require_logout();
+            $loginpage = new \moodle_url("/login/index.php");
+            $result['redirecturl'] = $loginpage->out();
+        }
+
         return $result;
     }
 
