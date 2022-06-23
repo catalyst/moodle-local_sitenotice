@@ -137,47 +137,6 @@ class sitenotice extends persistent {
     }
 
     /**
-     * Enable a notice.
-     * @param $noticeid notice id
-     * @return sitenotice
-     * @throws \coding_exception
-     * @throws \core\invalid_persistent_exception
-     */
-    public static function enable($noticeid) {
-        $persistent = new sitenotice($noticeid);
-        $persistent->set('enabled', 1);
-        $persistent->update();
-        return $persistent;
-    }
-
-    /**
-     * Disable a notice.
-     * @param $noticeid notice id
-     * @return sitenotice
-     * @throws \coding_exception
-     * @throws \core\invalid_persistent_exception
-     */
-    public static function disable($noticeid) {
-        $persistent = new sitenotice($noticeid);
-        $persistent->set('enabled', 0);
-        $persistent->update();
-        return $persistent;
-    }
-
-    /**
-     * Reset a notice.
-     * @param $noticeid notice id
-     * @return sitenotice
-     * @throws \coding_exception
-     * @throws \core\invalid_persistent_exception
-     */
-    public static function reset($noticeid) {
-        $persistent = new sitenotice($noticeid);
-        $persistent->update();
-        return $persistent;
-    }
-
-    /**
      * Get enabled notices.
      *
      * @return \stdClass[]
@@ -185,13 +144,7 @@ class sitenotice extends persistent {
     public static function get_enabled_notices(): array {
         if (!$result = self::get_enabled_notices_cache()->get('records')) {
             $select = "enabled = ? AND ((timeend = 0 AND timestart = 0) OR (timeend <> 0 AND timestart <> 0 AND ? < timeend))";
-            $persistents = self::get_records_select($select, [1, time()], 'id');
-            $result = [];
-            foreach ($persistents as $persistent) {
-                $record = $persistent->to_record();
-                $result[$record->id] = $record;
-            }
-
+            $result = self::get_records_select($select, [1, time()], 'id');
             self::get_enabled_notices_cache()->set('records', $result);
         }
 
@@ -203,14 +156,8 @@ class sitenotice extends persistent {
      *
      * @return \stdClass[]
      */
-    public static function get_all_notice_records(): array {
-        $persistents = self::get_records([], 'timemodified', 'DESC');
-        $result = [];
-        foreach ($persistents as $persistent) {
-            $record = $persistent->to_record();
-            $result[$record->id] = $record;
-        }
-        return $result;
+    public static function get_all_notices(): array {
+        return self::get_records([], 'timemodified', 'DESC');
     }
 
     /**
