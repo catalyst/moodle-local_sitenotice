@@ -10,6 +10,7 @@ This plugin displays notices to users.
  * Set a start date and expiry date for a notice
  * Keep displaying a notice until a specific course is completed.
  * Optionally request users to accept a notice, or they will be logged out from LMS.
+ * Force users to be logged out after seeing a notice.
  * Reporting on who accepted / dismissed a notice. 
 
 ## Configuration 
@@ -39,7 +40,8 @@ If the config is enabled (and "notice deletion" is also allowed), when deleting 
 * Enter Content
 * Set up reset interval ('reset every') if required. The notice will be displayed to user again once the specified period elapses.
 * Set up start and end dates if required. Set "Is perpetual" to "Yes" and start/end dates will become available.
-* Requires Acknowledgement. If enabled, the user will need to accept the notice before they can continue to use the LMS site.
+* Requires Acknowledgement: If enabled, the user will need to accept the notice before they can continue to use the LMS site.
+* Forece logout: If enabled, the user will be logged out of the site after closing the notice.
 If the user does not accept the notice, he/she will be logged out of the site.
 * Set up target audience (cohort) 
 

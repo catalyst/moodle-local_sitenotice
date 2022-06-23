@@ -64,6 +64,17 @@ function xmldb_local_sitenotice_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2022061300, 'local', 'sitenotice');
     }
 
-    return true;
+    if ($oldversion < 2022062000) {
 
+        if (!$dbman->field_exists('local_sitenotice', 'forcelogout')) {
+
+            $table = new xmldb_table('local_sitenotice');
+            $field = new xmldb_field('forcelogout', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2022062000, 'local', 'sitenotice');
+    }
+
+    return true;
 }

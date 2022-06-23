@@ -63,6 +63,11 @@ class sitenotice extends persistent {
                 'null' => NULL_NOT_ALLOWED,
                 'default' => 0,
             ],
+            'forcelogout' => [
+                'type' => PARAM_INT,
+                'null' => NULL_NOT_ALLOWED,
+                'default' => 0,
+            ],
             'timestart' => [
                 'type' => PARAM_INT,
                 'null' => NULL_NOT_ALLOWED,
