@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/externallib.php");
 use local_sitenotice\helper;
+use local_sitenotice\persistent\sitenotice;
 
 class local_sitenotice_external extends external_api {
 
@@ -40,7 +41,10 @@ class local_sitenotice_external extends external_api {
     public static function dismiss_notice($noticeid) {
         $params = self::validate_parameters(self::dismiss_notice_parameters(),
             array('noticeid' => $noticeid));
-         return helper::dismiss_notice($params['noticeid']);
+
+        if ($notice = sitenotice::get_record(['id' => $params['noticeid']])) {
+            return helper::dismiss_notice($notice);
+        }
     }
 
     public static function dismiss_notice_returns() {
@@ -63,7 +67,10 @@ class local_sitenotice_external extends external_api {
     public static function acknowledge_notice($noticeid) {
         $params = self::validate_parameters(self::acknowledge_notice_parameters(),
             array('noticeid' => $noticeid));
-        return helper::acknowledge_notice($params['noticeid']);
+
+        if ($notice = sitenotice::get_record(['id' => $params['noticeid']])) {
+            return helper::acknowledge_notice($notice);
+        }
     }
 
     public static function acknowledge_notice_returns() {
@@ -104,7 +111,15 @@ class local_sitenotice_external extends external_api {
     public static function get_notices() {
         $result = array();
         $result['status'] = true;
-        $result['notices'] = json_encode(helper::retrieve_user_notices());
+        $result['notices'] = json_encode(
+            array_map(
+                function(sitenotice $notice): \stdClass {
+                    return $notice->to_record();
+                },
+                helper::retrieve_user_notices()
+            )
+        );
+
         return $result;
     }
 

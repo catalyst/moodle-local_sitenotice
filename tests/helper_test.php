@@ -59,18 +59,18 @@ class helper_test extends \advanced_testcase {
         $formdata->content = 'Moodle <iframe width="1280" height="720" src="https://www.youtube.com/embed/3ORsUGVNxGs"></iframe>';
         helper::create_new_notice($formdata);
 
-        $allnotices = helper::retrieve_all_notices();
+        $allnotices = sitenotice::get_all_notices();
         $actual = reset($allnotices);
-        $this->assertStringContainsString($formdata->content, $actual->content);
+        $this->assertStringContainsString($formdata->content, $actual->get('content'));
 
         $formdata->title = 'Updated notice';
         $formdata->content = 'Updated  <iframe width="1280" height="720" src="https://www.youtube.com/embed/wop3FMhoLGs"></iframe>';
-        $sitenotice = sitenotice::get_record(['id' => $actual->id]);
+        $sitenotice = sitenotice::get_record(['id' => $actual->get('id')]);
         helper::update_notice($sitenotice, $formdata);
 
-        $allnotices = helper::retrieve_all_notices();
+        $allnotices = sitenotice::get_all_notices();
         $actual = reset($allnotices);
-        $this->assertStringContainsString($formdata->content, $actual->content);
+        $this->assertStringContainsString($formdata->content, $actual->get('content'));
     }
 
 }

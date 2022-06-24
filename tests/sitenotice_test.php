@@ -16,6 +16,10 @@
 
 namespace local_sitenotice;
 
+use local_sitenotice\persistent\sitenotice;
+use local_sitenotice\persistent\noticelink;
+use local_sitenotice\persistent\linkhistory;
+
 /**
  * Test cases
  *
@@ -55,25 +59,25 @@ class sitenotice_test extends \advanced_testcase {
             helper::create_new_notice($data);
         }
 
-        $allnotices = array_values(helper::retrieve_enabled_notices());
+        $allnotices = array_values(sitenotice::get_enabled_notices());
         $this->assertEquals($expected['noticecount'], count($allnotices));
 
         foreach ($allnotices as $noticeindex => $notice) {
-            $this->assertEquals($expected['titles'][$noticeindex], $notice->title);
+            $this->assertEquals($expected['titles'][$noticeindex], $notice->get('title'));
 
-            $allinks = helper::retrieve_notice_links($notice->id);
+            $allinks = noticelink::get_notice_link_records($notice->get('id'));
             $this->assertEquals($expected['linkcounts'][$noticeindex], count($allinks));
-            $this->assertStringContainsString('data-linkid', $notice->content);
+            $this->assertStringContainsString('data-linkid', $notice->get('content'));
             $this->assertEquals($expected['linktexts'][$noticeindex], array_column($allinks, 'text'));
             $this->assertEquals($expected['linkurls'][$noticeindex], array_column($allinks, 'link'));
         }
 
-        $idtodelete = $allnotices[0]->id;
-        helper::delete_notice($idtodelete);
-        $allnotices = helper::retrieve_enabled_notices();
+        $idtodelete = $allnotices[0]->get('id');
+        helper::delete_notice($allnotices[0]);
+        $allnotices = sitenotice::get_enabled_notices();
         $this->assertEquals($expected['noticecount'] - (int)$allowdeletion, count($allnotices));
 
-        $allinks = helper::retrieve_notice_links($idtodelete);
+        $allinks = noticelink::get_notice_link_records($idtodelete);
         $this->assertEquals($cleanup ? 0 : $expected['linkcounts'][0], count($allinks));
     }
 
@@ -93,21 +97,21 @@ class sitenotice_test extends \advanced_testcase {
             helper::create_new_notice($data);
         }
 
-        $allnotices = helper::retrieve_enabled_notices();
+        $allnotices = sitenotice::get_enabled_notices();
         $this->assertEquals(4, count($allnotices));
         $oldnotice1 = array_shift($allnotices);
         $oldnotice2 = array_shift($allnotices);
         // Only reset Notice 1.
         sleep(1);
-        helper::reset_notice($oldnotice1->id);
-        $allnotices = helper::retrieve_enabled_notices();
+        helper::reset_notice($oldnotice1);
+        $allnotices = sitenotice::get_enabled_notices();
         $newnotice1 = array_shift($allnotices);
         $newnotice2 = array_shift($allnotices);
-        $this->assertEquals("Notice 1", $newnotice1->title);
-        $this->assertGreaterThan($oldnotice1->timemodified, $newnotice1->timemodified);
-        $this->assertEquals($oldnotice1->timecreated, $newnotice1->timecreated);
-        $this->assertEquals($newnotice2->timemodified, $oldnotice2->timemodified);
-        $this->assertEquals($newnotice2->timecreated, $oldnotice2->timecreated);
+        $this->assertEquals("Notice 1", $newnotice1->get('title'));
+        $this->assertGreaterThan($oldnotice1->get('timemodified'), $newnotice1->get('timemodified'));
+        $this->assertEquals($oldnotice1->get('timecreated'), $newnotice1->get('timecreated'));
+        $this->assertEquals($newnotice2->get('timemodified'), $oldnotice2->get('timemodified'));
+        $this->assertEquals($newnotice2->get('timecreated'), $oldnotice2->get('timecreated'));
     }
 
     /**
@@ -126,24 +130,24 @@ class sitenotice_test extends \advanced_testcase {
             helper::create_new_notice($data);
         }
 
-        $allnotices = helper::retrieve_enabled_notices();
+        $allnotices = sitenotice::get_enabled_notices();
         $notice1 = array_shift($allnotices);
-        $this->assertEquals("Notice 1", $notice1->title);
+        $this->assertEquals("Notice 1", $notice1->get('title'));
 
         // Only disable Notice 1.
-        helper::disable_notice($notice1->id);
-        $allnotices = helper::retrieve_enabled_notices();
+        helper::disable_notice($notice1);
+        $allnotices = sitenotice::get_enabled_notices();
         $this->assertEquals(3, count($allnotices));
         $notice2 = array_shift($allnotices);
-        $this->assertEquals("Notice 2", $notice2->title);
+        $this->assertEquals("Notice 2", $notice2->get('title'));
 
         // Enable Notice 1, disable Notice 2.
-        helper::enable_notice($notice1->id);
-        helper::disable_notice($notice2->id);
-        $allnotices = helper::retrieve_enabled_notices();
+        helper::enable_notice($notice1);
+        helper::disable_notice($notice2);
+        $allnotices = sitenotice::get_enabled_notices();
         $this->assertEquals(3, count($allnotices));
         $notice1 = array_shift($allnotices);
-        $this->assertEquals("Notice 1", $notice1->title);
+        $this->assertEquals("Notice 1", $notice1->get('title'));
     }
 
     /**
@@ -176,7 +180,7 @@ class sitenotice_test extends \advanced_testcase {
         }
 
         $user1 = $this->getDataGenerator()->create_user();
-        $allnotices = helper::retrieve_enabled_notices();
+        $allnotices = sitenotice::get_enabled_notices();
         $this->assertEquals(4, count($allnotices));
         $notice1 = array_shift($allnotices);
         $notice2 = array_shift($allnotices);
@@ -189,29 +193,29 @@ class sitenotice_test extends \advanced_testcase {
         $this->assertEquals(2, count($usernotices));
 
         $this->setAdminUser();
-        helper::disable_notice($notice2->id);
+        helper::disable_notice($notice2);
 
         // Only Notice 1 applied to user 1.
         $this->setUser($user1);
         $usernotices = helper::retrieve_user_notices();
         $this->assertEquals(1, count($usernotices));
         $notice = reset($usernotices);
-        $this->assertEquals('Notice 1', $notice->title);
+        $this->assertEquals('Notice 1', $notice->get('title'));
 
         // Add user 1 to cohorts of cohort notice 1 and cohort notice 2, there will be 3 notices for the user.
-        cohort_add_member($cohortnotice1->audience, $user1->id);
-        cohort_add_member($cohortnotice2->audience, $user1->id);
+        cohort_add_member($cohortnotice1->get('audience'), $user1->id);
+        cohort_add_member($cohortnotice2->get('audience'), $user1->id);
         $usernotices = helper::retrieve_user_notices();
         $this->assertEquals(3, count($usernotices));
 
         // User 1 dismissed notice 1, there will be 2 notices for the user.
-        helper::dismiss_notice($notice1->id);
+        helper::dismiss_notice($notice1);
         $usernotices = helper::retrieve_user_notices();
         $this->assertEquals(2, count($usernotices));
         $this->assertEquals(1, count($USER->viewednotices));
 
         // User 1 acknowledged notice 1, there will be 1 notice for the user.
-        helper::acknowledge_notice($cohortnotice1->id);
+        helper::acknowledge_notice($cohortnotice1);
         $usernotices = helper::retrieve_user_notices();
         $this->assertEquals(1, count($usernotices));
         $this->assertEquals(2, count($USER->viewednotices));
@@ -219,7 +223,7 @@ class sitenotice_test extends \advanced_testcase {
         // Admin user reset notice 1.
         sleep(1);
         $this->setAdminUser();
-        helper::reset_notice($notice1->id);
+        helper::reset_notice($notice1);
 
         // There will be 2 notices for user 1.
         $this->setUser($user1);
@@ -244,11 +248,11 @@ class sitenotice_test extends \advanced_testcase {
 
         $user1 = $this->getDataGenerator()->create_user();
         $this->setUser($user1);
-        $allnotices = helper::retrieve_enabled_notices();
+        $allnotices = sitenotice::get_enabled_notices();
         $this->assertEquals(4, count($allnotices));
         $notice1 = array_shift($allnotices);
 
-        $links = helper::retrieve_notice_links($notice1->id);
+        $links = noticelink::get_notice_link_records($notice1->get('id'));
         $this->assertEquals(2, count($links));
         $link1 = array_shift($links);
         $link2 = array_shift($links);
@@ -256,7 +260,7 @@ class sitenotice_test extends \advanced_testcase {
         // Clink on links.
         helper::track_link($link1->id);
         helper::track_link($link2->id);
-        $userlinks = helper::count_clicked_notice_links($user1->id, $notice1->id);
+        $userlinks = linkhistory::count_clicked_links($user1->id, $notice1->get('id'));
         $this->assertEquals(2, count($userlinks));
     }
 
@@ -305,7 +309,7 @@ class sitenotice_test extends \advanced_testcase {
         $usernotices = helper::retrieve_user_notices();
         // There is only one notice.
         $this->assertEquals(1, count($usernotices));
-        $this->assertEquals("Course Notice 1", reset($usernotices)->title);
+        $this->assertEquals("Course Notice 1", reset($usernotices)->get('title'));
 
         // Mark one of them as completed for a user.
         $cmassign = get_coursemodule_from_id('assign', $assign->cmid);

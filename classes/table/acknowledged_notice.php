@@ -26,10 +26,11 @@ namespace local_sitenotice\table;
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/tablelib.php');
 
-use local_sitenotice\persistent\acknowledgement;
 use table_sql;
 use renderable;
 use local_sitenotice\helper;
+use local_sitenotice\persistent\acknowledgement;
+use local_sitenotice\persistent\linkhistory;
 
 class acknowledged_notice extends table_sql implements renderable {
     // Notice id.
@@ -242,7 +243,7 @@ class acknowledged_notice extends table_sql implements renderable {
             return '';
         }
         $hlinkcount = '';
-        $linkcounts = helper::count_clicked_notice_links($row->userid, $row->noticeid);
+        $linkcounts = linkhistory::count_clicked_links($row->userid, $row->noticeid);
         foreach ($linkcounts as $count) {
             $hlinkcount .= "<a href=\"{$count->link}\">{$count->text}</a>: $count->count <br/>";
         }
@@ -263,7 +264,7 @@ class acknowledged_notice extends table_sql implements renderable {
             if ($this->previoususer == $row->userid) {
                 return '';
             }
-            $linkcounts = helper::count_clicked_notice_links($row->userid, $row->noticeid, $column);
+            $linkcounts = linkhistory::count_clicked_links($row->userid, $row->noticeid, $column);
             if (isset($linkcounts[$column])) {
                 return $linkcounts[$column]->count;
             } else {
