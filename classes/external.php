@@ -41,8 +41,10 @@ class local_sitenotice_external extends external_api {
     public static function dismiss_notice($noticeid) {
         $params = self::validate_parameters(self::dismiss_notice_parameters(),
             array('noticeid' => $noticeid));
-        $notice = sitenotice::get_record(['id' => $params['noticeid']]);
-        return helper::dismiss_notice($notice);
+
+        if ($notice = sitenotice::get_record(['id' => $params['noticeid']])) {
+            return helper::dismiss_notice($notice);
+        }
     }
 
     public static function dismiss_notice_returns() {
@@ -65,8 +67,10 @@ class local_sitenotice_external extends external_api {
     public static function acknowledge_notice($noticeid) {
         $params = self::validate_parameters(self::acknowledge_notice_parameters(),
             array('noticeid' => $noticeid));
-        $notice = sitenotice::get_record(['id' => $params['noticeid']]);
-        return helper::acknowledge_notice($notice);
+
+        if ($notice = sitenotice::get_record(['id' => $params['noticeid']])) {
+            return helper::acknowledge_notice($notice);
+        }
     }
 
     public static function acknowledge_notice_returns() {
