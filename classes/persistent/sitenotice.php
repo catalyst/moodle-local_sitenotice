@@ -94,14 +94,10 @@ class sitenotice extends persistent {
     /**
      * Custom setter.
      *
-     * @param mixed $value
+     * @param array $value
      */
-    protected function set_cohorts($value) {
-        if (is_array($value)) {
-            $value = implode(',', $value);
-        }
-
-        $this->raw_set('cohorts', $value);
+    protected function set_cohorts(array $value) {
+        $this->raw_set('cohorts', implode(',', $value));
     }
 
     /**
