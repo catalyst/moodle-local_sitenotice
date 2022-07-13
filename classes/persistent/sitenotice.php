@@ -48,10 +48,10 @@ class sitenotice extends persistent {
                 'type' => PARAM_INT,
                 'default' => FORMAT_HTML
             ),
-            'audience' => [
-                'type' => PARAM_INT,
+            'cohorts' => [
+                'type' => PARAM_RAW,
                 'null' => NULL_NOT_ALLOWED,
-                'default' => 0,
+                'default' => '',
             ],
             'reqack' => [
                 'type' => PARAM_INT,
@@ -89,6 +89,32 @@ class sitenotice extends persistent {
                 'default' => 0,
             ],
         ];
+    }
+
+    /**
+     * Custom setter.
+     *
+     * @param mixed $value
+     */
+    protected function set_cohorts($value) {
+        if (is_array($value)) {
+            $value = implode(',', $value);
+        }
+
+        $this->raw_set('cohorts', $value);
+    }
+
+    /**
+     * Custom getter for building cohorts array.
+     *
+     * @return array
+     */
+    protected function get_cohorts(): array {
+        if (!empty($this->raw_get('cohorts'))) {
+            return explode(',', $this->raw_get('cohorts'));
+        }
+
+        return [];
     }
 
     /**
@@ -168,6 +194,12 @@ class sitenotice extends persistent {
      * @throws \core\invalid_persistent_exception
      */
     public static function create_new_notice($data) {
+        if (isset($data->cohorts) && is_array($data->cohorts)) {
+            $data->cohorts = implode(',', $data->cohorts);
+        } else {
+            $data->cohorts = '';
+        }
+
         $persistent = new self(0, $data);
         return $persistent->create();
     }
@@ -194,6 +226,12 @@ class sitenotice extends persistent {
      * @throws \core\invalid_persistent_exception
      */
     public static function update_notice_data(sitenotice $persistent, $data) {
+        if (isset($data->cohorts) && is_array($data->cohorts)) {
+            $data->cohorts = implode(',', $data->cohorts);
+        } else {
+            $data->cohorts = '';
+        }
+
         $persistent->from_record($data);
         return $persistent->update();
     }

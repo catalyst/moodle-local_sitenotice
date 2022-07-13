@@ -76,5 +76,46 @@ function xmldb_local_sitenotice_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2022062000, 'local', 'sitenotice');
     }
 
+    if ($oldversion < 2022071200) {
+        $notices = $DB->get_records('local_sitenotice');
+
+        $table = new xmldb_table('local_sitenotice');
+
+        // Define field cohorts to be added to local_sitenotice.
+        $field = new xmldb_field('cohorts', XMLDB_TYPE_TEXT, null, null, null, null, null, 'content');
+
+        // Conditionally launch add field audience.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Populate with old values.
+        if (!empty($notices)) {
+            foreach ($notices as $notice) {
+                $notice->cohorts = !empty($notice->audience) ? $notice->audience : '';
+                $DB->update_record('local_sitenotice', $notice);
+            }
+        }
+
+        // Define index en_au (not unique) to be dropped form local_sitenotice.
+        $index = new xmldb_index('en_au', XMLDB_INDEX_NOTUNIQUE, ['enabled', 'audience']);
+
+        // Conditionally launch drop index en_au.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Define field audience to be dropped from local_sitenotice.
+        $field = new xmldb_field('audience');
+
+        // Conditionally launch drop field audience.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Sitenotice savepoint reached.
+        upgrade_plugin_savepoint(true, 2022071200, 'local', 'sitenotice');
+    }
+
     return true;
 }

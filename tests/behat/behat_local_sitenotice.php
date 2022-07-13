@@ -51,7 +51,7 @@ class behat_local_sitenotice extends behat_base {
         // Add the discussions to the relevant forum.
         foreach ($noticedata->getHash() as $noticeinfo) {
             $now = time();
-            $noticeinfo['audience'] = $noticeinfo['audience'] ?? 0;
+            $noticeinfo['cohorts'] = $noticeinfo['cohorts'] ?? 0;
             $noticeinfo['reqack'] = $noticeinfo['reqack'] ?? 0;
             $noticeinfo['enabled'] = $noticeinfo['enabled'] ?? 1;
             $noticeinfo['resetinterval'] = $noticeinfo['resetinterval'] ?? 0;

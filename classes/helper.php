@@ -287,13 +287,13 @@ class helper {
      * @return array
      * @throws \coding_exception
      */
-    public static function built_audience_options() {
-        $option = ['0' => get_string('notice:audience:all', 'local_sitenotice')];
+    public static function built_cohorts_options() {
+        $options = [];
         $cohorts = cohort_get_all_cohorts(0, 0);
         foreach ($cohorts['cohorts'] as $cohort) {
-            $option[$cohort->id] = $cohort->name;
+            $options[$cohort->id] = $cohort->name;
         }
-        return $option;
+        return $options;
     }
 
     /**
@@ -361,12 +361,12 @@ class helper {
 
         $usernotices = $notices;
         if (!empty($notices)) {
-            $checkaudiences = false;
+            $checkcohorts = false;
             $checkcompletion = false;
 
             foreach ($notices as $notice) {
-                if ($notice->get('audience') > 0) {
-                    $checkaudiences = true;
+                if (!empty($notice->get('cohorts'))) {
+                    $checkcohorts = true;
                 }
                 if ($notice->get('reqcourse') > 0) {
                     $checkcompletion = true;
@@ -374,10 +374,11 @@ class helper {
             }
 
             // Filter out notices by cohorts.
-            if ($checkaudiences) {
+            if ($checkcohorts) {
                 $usercohorts = cohort_get_user_cohorts($USER->id);
                 foreach ($notices as $notice) {
-                    if ($notice->get('audience') > 0 && !array_key_exists($notice->get('audience'), $usercohorts)) {
+                    $cohorts = $notice->get('cohorts');
+                    if (!empty($cohorts) && !array_intersect($cohorts, array_keys($usercohorts))) {
                         unset($usernotices[$notice->get('id')]);
                     }
                 }
@@ -582,13 +583,19 @@ class helper {
 
     /**
      * Get audience name from the audience options.
-     * @param $audienceid audience id
+     *
+     * @param $cohortid Cohort id
+     *
      * @return mixed
      * @throws \coding_exception
      */
-    public static function get_audience_name($audienceid) {
-        $audiences = self::built_audience_options();
-        return $audiences[$audienceid];
+    public static function get_cohort_name($cohortid) {
+        if ($cohortid == 0) {
+            return get_string('notice:cohort:all', 'local_sitenotice');
+        }
+
+        $cohorts = self::built_cohorts_options();
+        return $cohorts[$cohortid];
     }
 
     /**

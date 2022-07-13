@@ -25,6 +25,8 @@ namespace local_sitenotice\table;
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/tablelib.php');
+
+use local_sitenotice\persistent\sitenotice;
 use table_sql;
 use renderable;
 use local_sitenotice\helper;
@@ -35,14 +37,12 @@ class all_notices extends table_sql implements renderable {
 
     /**
      * all_notices constructor.
-     * @param $uniqueid table unique id
+     * @param string$uniqueid table unique id
      * @param \moodle_url $url base url
      * @param int $page current page
      * @param int $perpage number of records per page
-     * @throws \coding_exception
-     * @throws \coding_exception
      */
-    public function __construct($uniqueid, \moodle_url $url, $page = 0, $perpage = 20) {
+    public function __construct(string $uniqueid, \moodle_url $url, int $page = 0, int $perpage = 20) {
         parent::__construct($uniqueid);
 
         $this->set_attribute('class', 'local_sitenotice sitenotices');
@@ -60,7 +60,6 @@ class all_notices extends table_sql implements renderable {
 
     /**
      * Table columns and corresponding headers.
-     * @throws \coding_exception
      */
     protected function define_table_columns() {
         $cols = array(
@@ -71,7 +70,7 @@ class all_notices extends table_sql implements renderable {
             'reqcourse' => get_string('notice:reqcourse', 'local_sitenotice'),
             'timestart' => get_string('notice:activefrom', 'local_sitenotice'),
             'timeend' => get_string('notice:expiry', 'local_sitenotice'),
-            'audience' => get_string('notice:audience', 'local_sitenotice'),
+            'cohort' => get_string('notice:cohort', 'local_sitenotice'),
             'content' => get_string('notice:content', 'local_sitenotice'),
             'actions' => get_string('actions'),
             'timemodified' => get_string('notice:timemodified', 'local_sitenotice'),
@@ -83,8 +82,8 @@ class all_notices extends table_sql implements renderable {
 
     /**
      * Define table configuration.
+     *
      * @param \moodle_url $url
-     * @throws \coding_exception
      */
     protected function define_table_configs(\moodle_url $url) {
         // Set table url.
@@ -97,44 +96,20 @@ class all_notices extends table_sql implements renderable {
     }
 
     /**
-     * Get sql query
-     * @param bool $count whether count or get records.
-     * @return array
-     */
-    protected function get_sql_and_params($count = false) {
-        if ($count) {
-            $select = "COUNT(1)";
-        } else {
-            $select = "*";
-        }
-
-        $sql = "SELECT {$select}
-                  FROM {local_sitenotice}";
-
-        if (!$count ) {
-            $sql .= "  ORDER BY enabled DESC, timemodified DESC";
-        }
-
-        return array($sql, []);
-    }
-
-    /**
      * Get data.
+     *
      * @param int $pagesize number of records to fetch
      * @param bool $useinitialsbar initial bar
-     * @throws \dml_exception
      */
-    public function query_db($pagesize, $useinitialsbar = true) {
-        global $DB;
-
-        list($countsql, $countparams) = $this->get_sql_and_params(true);
-        list($sql, $params) = $this->get_sql_and_params();
-        $total = $DB->count_records_sql($countsql, $countparams);
+    public function query_db($pagesize, $useinitialsbar = true): void {
+        $records = sitenotice::get_records([], 'enabled, timemodified', 'DESC', $this->pagesize * $this->page, $this->pagesize);
+        $total = count($records);
         $this->pagesize($pagesize, $total);
-        $records = $DB->get_records_sql($sql, $params, $this->pagesize * $this->page, $this->pagesize);
-        foreach ($records as $history) {
-            $this->rawdata[] = $history;
+
+        foreach ($records as $record) {
+            $this->rawdata[] = $record;
         }
+
         // Set initial bars.
         if ($useinitialsbar) {
             $this->initialbars($total > $pagesize);
@@ -143,16 +118,17 @@ class all_notices extends table_sql implements renderable {
 
     /**
      * Custom actions column.
-     * @param $row a notice record.
+     *
+     * @param sitenotice $sitenotice a notice record.
      * @return string
      */
-    protected function col_actions($row) {
+    protected function col_actions(sitenotice $sitenotice): string {
         global $OUTPUT;
         $links = null;
         $editnotice = '/local/sitenotice/editnotice.php';
         // Edit.
         if (get_config('local_sitenotice', 'allow_update')) {
-            $editparams = ['noticeid' => $row->id, 'action' => 'edit', 'sesskey' => sesskey()];
+            $editparams = ['noticeid' => $sitenotice->get('id'), 'action' => 'edit', 'sesskey' => sesskey()];
             $editurl = new moodle_url($editnotice, $editparams);
             $icon = $OUTPUT->pix_icon('t/edit', get_string('edit'));
             $editlink = html_writer::link($editurl, $icon);
@@ -160,13 +136,13 @@ class all_notices extends table_sql implements renderable {
         }
 
         // Enable/Disable.
-        if ($row->enabled) {
-            $editparams = ['noticeid' => $row->id, 'action' => 'disable', 'sesskey' => sesskey()];
+        if ($sitenotice->get('enabled')) {
+            $editparams = ['noticeid' => $sitenotice->get('id'), 'action' => 'disable', 'sesskey' => sesskey()];
             $editurl = new moodle_url($editnotice, $editparams);
             $icon = $OUTPUT->pix_icon('t/hide', get_string('notice:disable', 'local_sitenotice'));
             $editlink = html_writer::link($editurl, $icon);
         } else {
-            $editparams = ['noticeid' => $row->id, 'action' => 'enable', 'sesskey' => sesskey()];
+            $editparams = ['noticeid' => $sitenotice->get('id'), 'action' => 'enable', 'sesskey' => sesskey()];
             $editurl = new moodle_url($editnotice, $editparams);
             $icon = $OUTPUT->pix_icon('t/show', get_string('notice:enable', 'local_sitenotice'));
             $editlink = html_writer::link($editurl, $icon);
@@ -174,7 +150,7 @@ class all_notices extends table_sql implements renderable {
         $links .= ' ' . $editlink;
 
         // Reset.
-        $editparams = ['noticeid' => $row->id, 'action' => 'reset', 'sesskey' => sesskey()];
+        $editparams = ['noticeid' => $sitenotice->get('id'), 'action' => 'reset', 'sesskey' => sesskey()];
         $editurl = new moodle_url($editnotice, $editparams);
         $icon = $OUTPUT->pix_icon('t/reset', get_string('notice:reset', 'local_sitenotice'));
         $editlink = html_writer::link($editurl, $icon);
@@ -182,23 +158,23 @@ class all_notices extends table_sql implements renderable {
 
         // Delete.
         if (get_config('local_sitenotice', 'allow_delete')) {
-            $editparams = ['noticeid' => $row->id, 'action' => 'unconfirmeddelete', 'sesskey' => sesskey()];
+            $editparams = ['noticeid' => $sitenotice->get('id'), 'action' => 'unconfirmeddelete', 'sesskey' => sesskey()];
             $editurl = new moodle_url($editnotice, $editparams);
             $icon = $OUTPUT->pix_icon('t/delete', get_string('notice:delete', 'local_sitenotice'));
             $editlink = html_writer::link($editurl, $icon);
             $links .= ' ' . $editlink;
         }
 
-        if ($row->reqack) {
+        if ($sitenotice->get('reqack')) {
             // Acknowledge Report.
-            $editparams = ['noticeid' => $row->id, 'action' => 'acknowledged_report', 'sesskey' => sesskey()];
+            $editparams = ['noticeid' => $sitenotice->get('id'), 'action' => 'acknowledged_report', 'sesskey' => sesskey()];
             $editurl = new moodle_url($editnotice, $editparams);
             $icon = $OUTPUT->pix_icon('i/report', get_string('report:button:ack', 'local_sitenotice'));
             $editlink = html_writer::link($editurl, $icon);
             $links .= ' ' . $editlink;
 
             // Dismiss Report.
-            $editparams = ['noticeid' => $row->id, 'action' => 'dismissed_report', 'sesskey' => sesskey()];
+            $editparams = ['noticeid' => $sitenotice->get('id'), 'action' => 'dismissed_report', 'sesskey' => sesskey()];
             $editurl = new moodle_url($editnotice, $editparams);
             $icon = $OUTPUT->pix_icon('i/risk_xss', get_string('report:button:dis', 'local_sitenotice'));
             $editlink = html_writer::link($editurl, $icon);
@@ -209,97 +185,118 @@ class all_notices extends table_sql implements renderable {
     }
 
     /**
-     * Custom reset interval column.
-     * @param $row a notice record.
+     * Custom reset title column.
+     *
+     * @param sitenotice $sitenotice a notice record.
      * @return string
-     * @throws \coding_exception
      */
-    protected function col_resetinterval($row) {
-        return helper::format_interval_time($row->resetinterval);
+    protected function col_title(sitenotice $sitenotice): string {
+        return $sitenotice->get('title');
     }
 
     /**
-     * Custom reset audience column.
-     * @param $row a notice record.
-     * @return mixed
-     * @throws \coding_exception
+     * Custom reset interval column.
+     *
+     * @param sitenotice $sitenotice a notice record.
+     * @return string
      */
-    protected function col_audience($row) {
-        return helper::get_audience_name($row->audience);
+    protected function col_resetinterval(sitenotice $sitenotice): string {
+        return helper::format_interval_time($sitenotice->get('resetinterval'));
+    }
+
+    /**
+     * Custom reset cohort column.
+     *
+     * @param sitenotice $sitenotice a notice record.
+     * @return string
+     */
+    protected function col_cohort(sitenotice $sitenotice): string {
+        if (empty($sitenotice->get('cohorts'))) {
+            $cohort = get_string('notice:cohort:all', 'local_sitenotice');
+        } else {
+            $cohorts = array_map(function ($cohortid) {
+                return helper::get_cohort_name($cohortid);
+            }, $sitenotice->get('cohorts'));
+
+            $cohort = implode(', ', $cohorts);
+        }
+
+        return $cohort;
     }
 
     /**
      * Custom reset require acknowledge column.
-     * @param $row a notice record.
-     * @return mixed
-     * @throws \coding_exception
+     *
+     * @param sitenotice $sitenotice a notice record.
+     * @return string
      */
-    protected function col_reqack($row) {
-        return helper::format_boolean($row->reqack);
+    protected function col_reqack(sitenotice $sitenotice): string {
+        return helper::format_boolean($sitenotice->get('reqack'));
     }
 
     /**
      * The force logout column.
      *
-     * @param \stdClass $row The row data
+     * @param sitenotice $sitenotice a notice record.
      * @return string
      */
-    protected function col_forcelogout(\stdClass $row): string {
-        return helper::format_boolean($row->forcelogout);
+    protected function col_forcelogout(sitenotice $sitenotice): string {
+        return helper::format_boolean($sitenotice->get('forcelogout'));
     }
 
     /**
      * The timestart column.
      *
-     * @param \stdClass $row The row data
+     * @param sitenotice $sitenotice a notice record.
      * @return string
      */
-    protected function col_timestart(\stdClass $row): string {
-        return $row->timestart == 0 ? "-" : userdate($row->timestart);
+    protected function col_timestart(sitenotice $sitenotice): string {
+        return $sitenotice->get('timestart') == 0 ? "-" : userdate($sitenotice->get('timestart'));
     }
 
     /**
      * The timeend column.
      *
-     * @param \stdClass $row The row data
+     * @param sitenotice $sitenotice a notice record.
      * @return string
      */
-    protected function col_timeend(\stdClass $row): string {
-        return $row->timeend == 0 ? '-' : userdate($row->timeend);
+    protected function col_timeend(sitenotice $sitenotice): string {
+        return $sitenotice->get('timeend') == 0 ? '-' : userdate($sitenotice->get('timeend'));
     }
 
     /**
      * Custom require course completion column.
-     * @param $row a notice record.
-     * @return mixed
-     * @throws \coding_exception
+     *
+     * @param sitenotice $sitenotice a notice record.
+     * @return string
      */
-    protected function col_reqcourse($row) {
-        return helper::get_course_name($row->reqcourse);
+    protected function col_reqcourse(sitenotice $sitenotice): string {
+        return helper::get_course_name($sitenotice->get('reqcourse'));
     }
 
     /**
      * Custom reset time modified column.
-     * @param $row a notice record.
-     * @return mixed
-     * @throws \coding_exception
+     *
+     * @param sitenotice $sitenotice a notice record.
+     * @return string
      */
-    protected function col_timemodified($row) {
-        if ($row->timemodified) {
-            return userdate($row->timemodified);
+    protected function col_timemodified(sitenotice $sitenotice): string {
+        if ($sitenotice->get('timemodified')) {
+            return userdate($sitenotice->get('timemodified'));
         } else {
             return '-';
         }
     }
 
     /**
-     * Custome content column.
-     * @param $row $row a notice record.
+     * Custom content column.
+     *
+     * @param sitenotice $sitenotice a notice record.
      * @return string
-     * @throws \coding_exception
      */
-    protected function col_content($row) {
+    protected function col_content(sitenotice $sitenotice): string {
         return html_writer::link("#", get_string('view'),
-            ['class' => 'notice-preview', 'data-noticecontent' => $row->content]);
+            ['class' => 'notice-preview', 'data-noticecontent' => $sitenotice->get('content')]);
     }
+
 }
