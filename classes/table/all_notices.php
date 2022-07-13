@@ -298,5 +298,4 @@ class all_notices extends table_sql implements renderable {
         return html_writer::link("#", get_string('view'),
             ['class' => 'notice-preview', 'data-noticecontent' => $sitenotice->get('content')]);
     }
-
 }
