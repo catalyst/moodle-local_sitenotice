@@ -36,7 +36,7 @@ class notice_form extends \core\form\persistent {
     protected static $persistentclass = 'local_sitenotice\persistent\sitenotice';
 
     /** @var array Fields to remove from the persistent validation. */
-    protected static $foreignfields = array('perpetual');
+    protected static $foreignfields = array('perpetual', 'cohorts');
 
     public function definition () {
         $mform =& $this->_form;
@@ -67,10 +67,15 @@ class notice_form extends \core\form\persistent {
 
         $mform->setDefault('forcelogout', 0);
 
-        $audience = helper::built_audience_options();
+        $mform->addElement(
+            'autocomplete',
+            'cohorts',
+            get_string('notice:cohort', 'local_sitenotice'),
+            helper::built_cohorts_options(),
+            ['noselectionstring' => get_string('notice:cohort:all', 'local_sitenotice'), 'multiple' => true, 'id' => 'id_cohorts']
+        );
 
-        $mform->addElement('select', 'audience', get_string('notice:audience', 'local_sitenotice'), $audience);
-        $mform->setDefault('audience', 0);
+        $mform->setDefault('cohorts', 0);
 
         $options = array(
             'multiple' => false,

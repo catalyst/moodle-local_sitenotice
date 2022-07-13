@@ -43,7 +43,7 @@ If the config is enabled (and "notice deletion" is also allowed), when deleting 
 * Requires Acknowledgement: If enabled, the user will need to accept the notice before they can continue to use the LMS site.
 * Forece logout: If enabled, the user will be logged out of the site after closing the notice.
 If the user does not accept the notice, he/she will be logged out of the site.
-* Set up target audience (cohort) 
+* Set up target cohort(s). 
 
 ### Edit Notice (Requires "Allow notice update")
 * Go to Manage Notices: Site administration > Site Notice > Manage Notice

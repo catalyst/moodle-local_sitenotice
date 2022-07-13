@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_sitenotice'; // Full name of the plugin (used for diagnostics).
-$plugin->version = 2022062400;           // The current plugin version (Date: YYYYMMDDXX).
+$plugin->version = 2022071200;           // The current plugin version (Date: YYYYMMDDXX).
 $plugin->release = 2022062400;
 $plugin->requires = 2018051709;          // Requires this Moodle version.
 $plugin->supported = [39, 401];  // Available as of Moodle 3.9.0 or later.

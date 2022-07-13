@@ -30,16 +30,16 @@ class helper_test extends \advanced_testcase {
     /**
      * Test a list of cohorts is built properly.
      */
-    public function test_built_audience_options() {
+    public function test_built_cohort_options() {
         $this->resetAfterTest(true);
 
-        $expected = ['0' => get_string('notice:audience:all', 'local_sitenotice')];
+        $expected = [];
         for ($i = 1; $i <= 50; $i++) {
             $cohort = $this->getDataGenerator()->create_cohort();
             $expected[$cohort->id] = $cohort->name;
         }
 
-        $actual = helper::built_audience_options();
+        $actual = helper::built_cohorts_options();
 
         foreach ($expected as $id => $name) {
             $this->assertSame($actual[$id], $name);
@@ -71,6 +71,35 @@ class helper_test extends \advanced_testcase {
         $allnotices = sitenotice::get_all_notices();
         $actual = reset($allnotices);
         $this->assertStringContainsString($formdata->content, $actual->get('content'));
+    }
+
+    /**
+     * Test time interval format.
+     */
+    public function test_format_interval_time() {
+        // The interval is 1 day(s) 2 hour(s) 3 minute(s) 4 second(s).
+        $timeinterval = 93784;
+        $formatedtime = helper::format_interval_time($timeinterval);
+        // Assume the time format is '%a day(s), %h hour(s), %i minute(s) and %s second(s)'.
+        $this->assertStringContainsString('1 day(s), 2 hour(s), 3 minute(s) and 4 second(s)', $formatedtime);
+    }
+
+    /**
+     * Test cohorts options.
+     */
+    public function test_cohort_options() {
+        $this->resetAfterTest();
+
+        $options = helper::built_cohorts_options();
+        $this->assertEquals(0, count($options));
+
+        $this->getDataGenerator()->create_cohort();
+        $options = helper::built_cohorts_options();
+        $this->assertEquals(1, count($options));
+
+        $this->getDataGenerator()->create_cohort();
+        $options = helper::built_cohorts_options();
+        $this->assertEquals(2, count($options));
     }
 
 }

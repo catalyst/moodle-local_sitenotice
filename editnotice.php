@@ -65,12 +65,12 @@ if ($formdata = $mform->get_data()) {
     if (!$sitenotice) {
         // Create new notice.
         helper::create_new_notice($formdata);
-        redirect($managenoticepage);
     } else {
         // Update notice.
         helper::update_notice($sitenotice, $formdata);
-        redirect($managenoticepage);
     }
+
+    redirect($managenoticepage);
 } else if ($mform->is_cancelled()) {
     redirect($managenoticepage);
 }
@@ -103,15 +103,15 @@ switch ($action) {
         redirect($reportpage);
         break;
     case 'reset':
-        helper::reset_notice($noticeid);
+        helper::reset_notice($sitenotice);
         redirect($managenoticepage);
         break;
     case 'disable':
-        helper::disable_notice($noticeid);
+        helper::disable_notice($sitenotice);
         redirect($managenoticepage);
         break;
     case 'enable':
-        helper::enable_notice($noticeid);
+        helper::enable_notice($sitenotice);
         redirect($managenoticepage);
         break;
     case 'unconfirmeddelete':
@@ -131,7 +131,7 @@ switch ($action) {
         break;
     case 'confirmeddelete':
         if (get_config('local_sitenotice', 'allow_delete')) {
-            helper::delete_notice($noticeid);
+            helper::delete_notice($sitenotice);
             redirect($managenoticepage);
         } else {
             redirect($managenoticepage, get_string('notification:nodeleteallowed', 'local_sitenotice'));

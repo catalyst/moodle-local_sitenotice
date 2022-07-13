@@ -53,8 +53,8 @@ class sitenotice_test extends \advanced_testcase {
         set_config('cleanup_deleted_notice', $cleanup, 'local_sitenotice');
 
         foreach ($formdata as $data) {
-            if (property_exists($data, 'audience')) {
-                $data->audience = $this->getDataGenerator()->create_cohort()->id;
+            if (property_exists($data, 'cohorts')) {
+                $data->cohorts = $this->getDataGenerator()->create_cohort()->id;
             }
             helper::create_new_notice($data);
         }
@@ -91,8 +91,8 @@ class sitenotice_test extends \advanced_testcase {
         $this->setAdminUser();
 
         foreach ($formdata as $data) {
-            if (property_exists($data, 'audience')) {
-                $data->audience = $this->getDataGenerator()->create_cohort()->id;
+            if (property_exists($data, 'cohorts')) {
+                $data->cohorts = [$this->getDataGenerator()->create_cohort()->id];
             }
             helper::create_new_notice($data);
         }
@@ -124,8 +124,8 @@ class sitenotice_test extends \advanced_testcase {
         $this->setAdminUser();
 
         foreach ($formdata as $data) {
-            if (property_exists($data, 'audience')) {
-                $data->audience = $this->getDataGenerator()->create_cohort()->id;
+            if (property_exists($data, 'cohorts')) {
+                $data->cohorts = [$this->getDataGenerator()->create_cohort()->id];
             }
             helper::create_new_notice($data);
         }
@@ -151,19 +151,6 @@ class sitenotice_test extends \advanced_testcase {
     }
 
     /**
-     * Test audience options.
-     */
-    public function test_audience_options() {
-        $this->getDataGenerator()->create_cohort();
-        $options = helper::built_audience_options();
-        $this->assertEquals(2, count($options));
-
-        $this->getDataGenerator()->create_cohort();
-        $options = helper::built_audience_options();
-        $this->assertEquals(3, count($options));
-    }
-
-    /**
      * Test user notice interaction.
      *
      * @dataProvider generic_provider()
@@ -173,8 +160,8 @@ class sitenotice_test extends \advanced_testcase {
 
         $this->setAdminUser();
         foreach ($formdata as $data) {
-            if (property_exists($data, 'audience')) {
-                $data->audience = $this->getDataGenerator()->create_cohort()->id;
+            if (property_exists($data, 'cohorts')) {
+                $data->cohorts = [$this->getDataGenerator()->create_cohort()->id];
             }
             helper::create_new_notice($data);
         }
@@ -202,9 +189,12 @@ class sitenotice_test extends \advanced_testcase {
         $notice = reset($usernotices);
         $this->assertEquals('Notice 1', $notice->get('title'));
 
+        $cohorts1 = $cohortnotice1->get('cohorts');
+        $cohorts2 = $cohortnotice2->get('cohorts');
+
         // Add user 1 to cohorts of cohort notice 1 and cohort notice 2, there will be 3 notices for the user.
-        cohort_add_member($cohortnotice1->get('audience'), $user1->id);
-        cohort_add_member($cohortnotice2->get('audience'), $user1->id);
+        cohort_add_member(reset($cohorts1), $user1->id);
+        cohort_add_member(reset($cohorts2), $user1->id);
         $usernotices = helper::retrieve_user_notices();
         $this->assertEquals(3, count($usernotices));
 
@@ -240,8 +230,8 @@ class sitenotice_test extends \advanced_testcase {
     public function test_user_hlink_interact($formdata) {
         $this->setAdminUser();
         foreach ($formdata as $data) {
-            if (property_exists($data, 'audience')) {
-                $data->audience = $this->getDataGenerator()->create_cohort()->id;
+            if (property_exists($data, 'cohorts')) {
+                $data->cohorts = [$this->getDataGenerator()->create_cohort()->id];
             }
             helper::create_new_notice($data);
         }
@@ -264,16 +254,6 @@ class sitenotice_test extends \advanced_testcase {
         $this->assertEquals(2, count($userlinks));
     }
 
-    /**
-     * Test time interval format.
-     */
-    public function test_format_interval_time() {
-        // The interval is 1 day(s) 2 hour(s) 3 minute(s) 4 second(s).
-        $timeinterval = 93784;
-        $formatedtime = helper::format_interval_time($timeinterval);
-        // Assume the time format is '%a day(s), %h hour(s), %i minute(s) and %s second(s)'.
-        $this->assertStringContainsString('1 day(s), 2 hour(s), 3 minute(s) and 4 second(s)', $formatedtime);
-    }
 
     /**
      * Test course completion option.
@@ -353,13 +333,13 @@ class sitenotice_test extends \advanced_testcase {
                     (object)[
                         'title' => 'Cohort Notice 1',
                         'content' => 'Cohort Notice 1 <a href="www.example5.com">Link 5</a> <a href="www.example6.com">Link 6</a>',
-                        'audience' => null,
+                        'cohorts' => '',
                         'perpetual' => 1,
                     ],
                     (object)[
                         'title' => 'Cohort Notice 2',
                         'content' => 'Cohort Notice 2 <a href="www.example7.com">Link 7</a> <a href="www.example8.com">Link 8</a>',
-                        'audience' => null,
+                        'cohorts' => '',
                         'perpetual' => 1,
                     ]
                 ]
