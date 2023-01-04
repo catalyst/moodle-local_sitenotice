@@ -1,4 +1,4 @@
-![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/catalyst/moodle-local_sitenotice/ci/MOODLE_39_STABLE)
+![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/catalyst/moodle-local_sitenotice/ci.yml?branch=MOODLE_39_STABLE)
 
 # Site Notice
 This plugin displays notices to users.
