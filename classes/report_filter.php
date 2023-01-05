@@ -14,6 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+
+namespace local_sitenotice;
+
+use local_sitenotice\form\active_filter_form;
+use local_sitenotice\form\add_filter_form;
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot.'/user/filters/date.php');
+
 /**
  * For filtering the notice report
  * @package local_sitenotice
@@ -21,21 +31,46 @@
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace local_sitenotice;
-defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->dirroot.'/user/filters/date.php');
-use local_sitenotice\form\active_filter_form;
-use local_sitenotice\form\add_filter_form;
-
 class report_filter {
+
+    /**
+     * User data.
+     * @var \user_filter_date[]
+     */
     private $filterfields;
+
+    /**
+     * Custom data.
+     * @var \user_filter_date[][]
+     */
     private $customdata;
+
+    /**
+     * Base URL.
+     * @var
+     */
     private $baseurl;
+
+    /**
+     * Filter form.
+     * @var \local_sitenotice\form\add_filter_form
+     */
     private $addfilterform;
+
+    /**
+     * Active filter form.
+     * @var \local_sitenotice\form\active_filter_form
+     */
     private $activefilterform;
 
+    /**
+     * Constructor.
+     *
+     * @param string $baseurl Base URL.
+     * @param string $tablealias Table alias.
+     *
+     * @throws \coding_exception
+     */
     public function __construct($baseurl, $tablealias = '') {
         $tablealias = $tablealias ? $tablealias . "." : '';
         $this->filterfields = [

@@ -154,6 +154,7 @@ class sitenotice_test extends \advanced_testcase {
      * Test user notice interaction.
      *
      * @dataProvider generic_provider()
+     * @param array $formdata Data to test on.
      */
     public function test_user_notice($formdata) {
         global $USER;
@@ -226,6 +227,7 @@ class sitenotice_test extends \advanced_testcase {
      * Test user link interaction
      *
      * @dataProvider generic_provider()
+     * @param array $formdata Data to test on.
      */
     public function test_user_hlink_interact($formdata) {
         $this->setAdminUser();

@@ -38,7 +38,8 @@ class acknowledgement extends persistent {
     const ACTION_ACKNOWLEDGED = 1;
 
     /**
-     * @inheritdoc
+     * Returns a list of properties.
+     * @return array[]
      */
     protected static function define_properties() {
         return [
@@ -80,8 +81,8 @@ class acknowledgement extends persistent {
 
     /**
      * Delete acknowledgement related to a notice.
-     * @param $noticeid notice id
-     * @throws \dml_exception
+     *
+     * @param int $noticeid notice id
      */
     public static function delete_notice_acknowledgement($noticeid) {
         global $DB;

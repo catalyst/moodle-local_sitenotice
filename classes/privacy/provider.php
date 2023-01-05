@@ -38,7 +38,10 @@ class provider implements
     \core_privacy\local\request\core_userlist_provider {
 
     /**
-     * @inheritDoc
+     * Gets contexts for user.
+     *
+     * @param int $userid user ID.
+     * @return \core_privacy\local\request\contextlist
      */
     public static function get_contexts_for_userid(int $userid): contextlist {
         $contextlist = new contextlist();
@@ -58,7 +61,9 @@ class provider implements
     }
 
     /**
-     * @inheritDoc
+     * Exports user data.
+     *
+     * @param \core_privacy\local\request\approved_contextlist $contextlist Context list.
      */
     public static function export_user_data(approved_contextlist $contextlist) {
         global $DB;
@@ -102,7 +107,9 @@ class provider implements
     }
 
     /**
-     * @inheritDoc
+     * Delete all data for users in provided context.
+     *
+     * @param \context $context Context.
      */
     public static function delete_data_for_all_users_in_context(\context $context) {
         global $DB;
@@ -117,7 +124,9 @@ class provider implements
     }
 
     /**
-     * @inheritDoc
+     * Delete data for a user.
+     *
+     * @param \core_privacy\local\request\approved_contextlist $contextlist Context list.
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
         global $DB;
@@ -139,7 +148,9 @@ class provider implements
     }
 
     /**
-     * @inheritDoc
+     * Gets users in a context.
+     *
+     * @param \core_privacy\local\request\userlist $userlist user list.
      */
     public static function get_users_in_context(userlist $userlist) {
         $context = $userlist->get_context();
@@ -160,7 +171,9 @@ class provider implements
     }
 
     /**
-     * @inheritDoc
+     * Delete data for users.
+     *
+     * @param \core_privacy\local\request\approved_userlist $userlist User list.
      */
     public static function delete_data_for_users(approved_userlist $userlist) {
         global $DB;
@@ -176,16 +189,19 @@ class provider implements
     }
 
     /**
-     * @inheritDoc
+     * Returns metadata.
+     *
+     * @param \core_privacy\local\metadata\collection $collection Collection.
+     * @return \core_privacy\local\metadata\collection
      */
     public static function get_metadata(collection $collection): collection {
         $collection->add_database_table(
             'local_sitenotice_ack', [
                 'userid' => 'privacy:metadata:userid',
-                'userid' => 'privacy:metadata:username',
-                'userid' => 'privacy:metadata:firstname',
-                'userid' => 'privacy:metadata:lastname',
-                'userid' => 'privacy:metadata:idnumber',
+                'username' => 'privacy:metadata:username',
+                'firstname' => 'privacy:metadata:firstname',
+                'lastname' => 'privacy:metadata:lastname',
+                'idnumber' => 'privacy:metadata:idnumber',
             ],
             'privacy:metadata:local_sitenotice_ack'
         );

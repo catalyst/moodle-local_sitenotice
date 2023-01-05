@@ -26,20 +26,35 @@ namespace local_sitenotice\event;
  */
 class sitenotice_enabled extends \core\event\base {
 
+    /**
+     * Init.
+     */
     protected function init() {
         $this->data['objecttable'] = 'local_sitenotice';
         $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }
 
+    /**
+     * Gets description.
+     * @return string
+     */
     public function get_description() {
         return "The user with id '$this->relateduserid' enabled the notice with id '$this->objectid'";
     }
 
+    /**
+     * Gets name.
+     * @return \lang_string|string
+     */
     public static function get_name() {
         return get_string('event:enable', 'local_sitenotice');
     }
 
+    /**
+     * Gets URL.
+     * @return \moodle_url
+     */
     public function get_url() {
         return new \moodle_url('/local/sitenotice/managenotice.php');
     }

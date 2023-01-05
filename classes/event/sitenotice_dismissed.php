@@ -26,20 +26,35 @@ namespace local_sitenotice\event;
  */
 class sitenotice_dismissed extends \core\event\base {
 
+    /**
+     * Init.
+     */
     protected function init() {
         $this->data['objecttable'] = 'local_sitenotice';
         $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }
 
+    /**
+     * Description.
+     * @return string
+     */
     public function get_description() {
         return "The user with id '$this->relateduserid' dismissed the notice with id '$this->objectid'";
     }
 
+    /**
+     * Gets name.
+     * @return \lang_string|string
+     */
     public static function get_name() {
         return get_string('event:dismiss', 'local_sitenotice');
     }
 
+    /**
+     * Gets URL.
+     * @return \moodle_url
+     */
     public function get_url() {
         return new \moodle_url('/local/sitenotice/managenotice.php');
     }

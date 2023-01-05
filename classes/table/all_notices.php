@@ -14,17 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Table to show list of existing notices.
- * @package local_sitenotice
- * @author  Nathan Nguyen <nathannguyen@catalyst-au.net>
- * @copyright  Catalyst IT
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 namespace local_sitenotice\table;
-
-defined('MOODLE_INTERNAL') || die();
-require_once($CFG->libdir . '/tablelib.php');
 
 use local_sitenotice\persistent\sitenotice;
 use table_sql;
@@ -33,11 +23,22 @@ use local_sitenotice\helper;
 use moodle_url;
 use html_writer;
 
+defined('MOODLE_INTERNAL') || die();
+require_once($CFG->libdir . '/tablelib.php');
+
+/**
+ * Table to show list of existing notices.
+ * @package local_sitenotice
+ * @author  Nathan Nguyen <nathannguyen@catalyst-au.net>
+ * @copyright  Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class all_notices extends table_sql implements renderable {
 
     /**
      * all_notices constructor.
-     * @param string$uniqueid table unique id
+     *
+     * @param string $uniqueid table unique id
      * @param \moodle_url $url base url
      * @param int $page current page
      * @param int $perpage number of records per page
