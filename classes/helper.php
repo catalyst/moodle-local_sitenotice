@@ -14,19 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Helper class to create, retrieve, manage notices
- * @package local_sitenotice
- * @author  Nathan Nguyen <nathannguyen@catalyst-au.net>
- * @copyright  Catalyst IT
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 namespace local_sitenotice;
-
-defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->dirroot.'/cohort/lib.php');
-require_once($CFG->dirroot.'/lib/completionlib.php');
 
 use \local_sitenotice\persistent\sitenotice;
 use \local_sitenotice\persistent\noticelink;
@@ -34,12 +22,25 @@ use \local_sitenotice\persistent\linkhistory;
 use \local_sitenotice\persistent\acknowledgement;
 use \local_sitenotice\persistent\noticeview;
 
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot.'/cohort/lib.php');
+require_once($CFG->dirroot.'/lib/completionlib.php');
+
+/**
+ * Helper class to create, retrieve, manage notices
+ *
+ * @package local_sitenotice
+ * @author  Nathan Nguyen <nathannguyen@catalyst-au.net>
+ * @copyright  Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class helper {
 
     /**
      * Perform all required manipulations with content.
      *
-     * @param \local_sitenotice\persistent\sitenotice|\core\persistent $sitenotice
+     * @param \local_sitenotice\persistent\sitenotice $sitenotice Notice.
      */
     public static function process_content(sitenotice $sitenotice) {
         $draftitemid = file_get_submitted_draft_itemid('content');
@@ -298,7 +299,8 @@ class helper {
 
     /**
      * Get a notice
-     * @param $noticeid notice id
+     *
+     * @param int $noticeid notice id
      * @return bool|\stdClass
      */
     public static function retrieve_notice($noticeid) {
@@ -417,8 +419,9 @@ class helper {
 
     /**
      * Record the latest interaction with the notice of a user.
-     * @param sitentice $notice
-     * @param $action dismissed or acknowledged
+     *
+     * @param \local_sitenotice\persistent\sitenotice $notice Notice instance.
+     * @param string $action Action.
      */
     private static function add_to_viewed_notices(sitenotice $notice, $action) {
         global $USER;
@@ -431,7 +434,8 @@ class helper {
      * Create new acknowledgement record.
      *
      * @param sitenotice $notice
-     * @param $action dismissed or acknowledged
+     * @param string $action dismissed or acknowledged
+     *
      * @return \core\persistent
      */
     private static function create_new_acknowledge_record(sitenotice $notice, $action) {
@@ -534,10 +538,8 @@ class helper {
 
     /**
      * Track user interaction with the hyperlink
-     * @param $linkid link ID
+     * @param int $linkid link ID
      * @return array
-     * @throws \coding_exception
-     * @throws \core\invalid_persistent_exception
      */
     public static function track_link($linkid) {
         global $USER;
@@ -554,9 +556,9 @@ class helper {
 
     /**
      * Format date interval.
-     * @param $time
+     *
+     * @param string $time Time.
      * @return string
-     * @throws \coding_exception
      */
     public static function format_interval_time($time) {
         // Datetime for 01/01/1970.
@@ -569,9 +571,9 @@ class helper {
 
     /**
      * Format boolean value
-     * @param $value boolean
+     *
+     * @param bool $value boolean
      * @return string
-     * @throws \coding_exception
      */
     public static function format_boolean($value) {
         if ($value) {
@@ -584,10 +586,8 @@ class helper {
     /**
      * Get audience name from the audience options.
      *
-     * @param $cohortid Cohort id
-     *
+     * @param int $cohortid Cohort id
      * @return mixed
-     * @throws \coding_exception
      */
     public static function get_cohort_name($cohortid) {
         if ($cohortid == 0) {

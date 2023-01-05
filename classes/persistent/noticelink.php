@@ -32,7 +32,8 @@ class noticelink extends persistent {
     const TABLE = 'local_sitenotice_hlinks';
 
     /**
-     * @inheritdoc
+     * Returns a list of properties.
+     * @return array[]
      */
     protected static function define_properties() {
         return [
@@ -53,9 +54,11 @@ class noticelink extends persistent {
 
     /**
      * Get links belong to the notice
-     * @param $noticeid notice ID
+     *
+     * @param int $noticeid notice ID
      * @param string $sort field to sort
      * @param string $order sort order
+     *
      * @return array
      */
     public static function get_notice_link_records($noticeid, $sort = 'id', $order = 'ASC') {
@@ -70,9 +73,8 @@ class noticelink extends persistent {
 
     /**
      * Delete a list of hyperlinks.
-     * @param $linkids array of link ids
-     * @throws \coding_exception
-     * @throws \dml_exception
+     *
+     * @param array $linkids array of link ids
      */
     public static function delete_links($linkids) {
         global $DB;
@@ -84,8 +86,8 @@ class noticelink extends persistent {
 
     /**
      * Delete links belong to a notice.
-     * @param $noticeid notice id
-     * @throws \dml_exception
+     *
+     * @param int $noticeid notice id
      */
     public static function delete_notice_links($noticeid) {
         global $DB;
@@ -94,10 +96,9 @@ class noticelink extends persistent {
 
     /**
      * Create new link
-     * @param $data link data
+     *
+     * @param \stdClass $data link data
      * @return persistent
-     * @throws \coding_exception
-     * @throws \core\invalid_persistent_exception
      */
     public static function create_new_link($data) {
         $linkpersistent = self::get_record([

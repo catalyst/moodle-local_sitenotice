@@ -14,6 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+
+namespace local_sitenotice\form;
+
+use local_sitenotice\helper;
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->libdir . '/formslib.php');
+
 /**
  * Form to create new notice
  * @package local_sitenotice
@@ -21,15 +30,6 @@
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace local_sitenotice\form;
-
-defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->libdir . '/formslib.php');
-
-use local_sitenotice\helper;
-
 class notice_form extends \core\form\persistent {
 
     /** @var string Persistent class name. */
@@ -38,6 +38,9 @@ class notice_form extends \core\form\persistent {
     /** @var array Fields to remove from the persistent validation. */
     protected static $foreignfields = array('perpetual', 'cohorts');
 
+    /**
+     * Form definition.
+     */
     public function definition () {
         $mform =& $this->_form;
 
@@ -110,6 +113,10 @@ class notice_form extends \core\form\persistent {
         $mform->addGroup($buttonarray, 'buttonar', '', ' ', false);
     }
 
+    /**
+     * Returns a default data.
+     * @return \stdClass
+     */
     protected function get_default_data() {
         $data = parent::get_default_data();
         $data->perpetual = $data->timestart == 0 && $data->timeend == 0;

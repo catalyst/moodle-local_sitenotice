@@ -32,7 +32,9 @@ class sitenotice extends persistent {
     const TABLE = 'local_sitenotice';
 
     /**
-     * @inheritdoc
+     * Returns a list of properties.
+     *
+     * @return array[]
      */
     protected static function define_properties() {
         return [

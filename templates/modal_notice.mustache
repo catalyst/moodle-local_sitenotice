@@ -14,17 +14,39 @@
     You should have received a copy of the GNU General Public License
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
+{{!
+    @template local_sitenotice/modal_notice
 
+    Template for modal pop up.
+
+    Context variables required for this template:
+      * classes
+      * uniqid
+      * headerclasses
+      * header
+      * title
+      * body
+      * footer
+
+    Example context (json):
+    {
+        "classes": "classes",
+        "uniqid": "uniqid",
+        "headerclasses": "headerclasses",
+        "header": "header",
+        "title": "title",
+        "body": "body",
+        "footer": "footer"
+    }
+}}
 
 <div class="modal moodle-has-zindex" data-region="modal-container" aria-hidden="true" role="dialog">
     <div class="modal-dialog sitenotice {{$classes}}{{/classes}}" role="document" data-region="modal" aria-labelledby="{{uniqid}}-modal-title" tabindex="0">
         <div class="modal-content">
             <div class="modal-header {{$headerclasses}}{{headerclasses}}{{/headerclasses}}" data-region="header">
-
                 {{$header}}
                     <h5 id="{{uniqid}}-modal-title" class="modal-title" data-region="title">{{$title}}{{title}}{{/title}}</h5>
                 {{/header}}
-
             </div>
             <div class="modal-body" data-region="body">
                 {{$body}}

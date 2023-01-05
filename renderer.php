@@ -14,19 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- *
- * @package local_sitenotice
- * @author  Nathan Nguyen <nathannguyen@catalyst-au.net>
- * @copyright  Catalyst IT
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 
 defined('MOODLE_INTERNAL') || die();
+
 use local_sitenotice\table\dismissed_notice;;
 use local_sitenotice\table\acknowledged_notice;;
 use local_sitenotice\table\all_notices;;
 
+/**
+ * Plugin's renderer.
+ *
+ * @package   local_sitenotice
+ * @author    Nathan Nguyen <nathannguyen@catalyst-au.net>
+ * @copyright Catalyst IT
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class local_sitenotice_renderer extends plugin_renderer_base {
 
     /**
@@ -44,7 +46,7 @@ class local_sitenotice_renderer extends plugin_renderer_base {
 
     /**
      * Render table.
-     * @param dismissed_notice $table dismissed notice table
+     * @param acknowledged_notice $table acknowledged notice table
      * @return false|string
      */
     public function render_acknowledged_notice(acknowledged_notice $table) {
@@ -57,7 +59,7 @@ class local_sitenotice_renderer extends plugin_renderer_base {
 
     /**
      * Render table.
-     * @param dismissed_notice $table dismissed notice table
+     * @param all_notices $table all notice table
      * @return false|string
      */
     public function render_all_notices(all_notices $table) {

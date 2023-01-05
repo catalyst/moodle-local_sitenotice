@@ -14,35 +14,50 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace local_sitenotice\table;
+
+use table_sql;
+use renderable;
+use local_sitenotice\persistent\acknowledgement;
+
+defined('MOODLE_INTERNAL') || die();
+require_once($CFG->libdir . '/tablelib.php');
+
 /**
  * Table to show list of users who dismissed a notice.
+ *
  * @package local_sitenotice
  * @author  Nathan Nguyen <nathannguyen@catalyst-au.net>
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace local_sitenotice\table;
-
-defined('MOODLE_INTERNAL') || die();
-require_once($CFG->libdir . '/tablelib.php');
-use table_sql;
-use renderable;
-use local_sitenotice\persistent\acknowledgement;
-
 class dismissed_notice extends table_sql implements renderable {
-    // Notice id.
+    /**
+     * Notice id.
+     * @var string
+     */
     protected $noticeid = '';
 
-    // Table alias for standard log.
+    /**
+     * Table alias.
+     */
     const TABLE_ALIAS = 'dis';
 
-    // Days (in seconds) different between  1 January 1900 and 1 January 1970.
+    /**
+     * Days (in seconds) different between  1 January 1900 and 1 January 1970.
+     */
     const DAY_SECS_SPREADSHEET_DIFF = 25569;
 
     /**
      * Construct table with headers.
-     * @param $uniqueid
-     * @throws \coding_exception
+     *
+     * @param string $uniqueid id of the table.
+     * @param \moodle_url $url base url.
+     * @param array $filters  filter.
+     * @param string $download download file format.
+     * @param int $page current page.
+     * @param int $perpage  number of record per page.
+     * @param int $noticeid notice id.
      */
     public function __construct($uniqueid, \moodle_url $url, $filters = [], $download = '',
                                 $page = 0, $perpage = 20, $noticeid) {
@@ -69,7 +84,6 @@ class dismissed_notice extends table_sql implements renderable {
 
     /**
      * Table columns and corresponding headers.
-     * @throws \coding_exception
      */
     protected function define_table_columns() {
         $cols = array(
@@ -93,8 +107,8 @@ class dismissed_notice extends table_sql implements renderable {
 
     /**
      * Define table configuration.
+     *
      * @param \moodle_url $url
-     * @throws \coding_exception
      */
     protected function define_table_configs(\moodle_url $url) {
         // Set table url.
@@ -111,6 +125,7 @@ class dismissed_notice extends table_sql implements renderable {
 
     /**
      * Get sql query
+     *
      * @param bool $count whether count or get records.
      * @return array
      */
@@ -138,6 +153,7 @@ class dismissed_notice extends table_sql implements renderable {
 
     /**
      * Get filter sql
+     *
      * @return array
      */
     protected function get_filters_sql_and_params() {
@@ -153,9 +169,9 @@ class dismissed_notice extends table_sql implements renderable {
 
     /**
      * Get data.
+     *
      * @param int $pagesize number of records to fetch
      * @param bool $useinitialsbar initial bar
-     * @throws \dml_exception
      */
     public function query_db($pagesize, $useinitialsbar = true) {
         global $DB;
@@ -180,7 +196,7 @@ class dismissed_notice extends table_sql implements renderable {
 
     /**
      * Custom time column.
-     * @param $row dismissed notice record
+     * @param \stdClass $row dismissed notice record
      * @return string
      */
     protected function col_timecreated($row) {
@@ -194,7 +210,7 @@ class dismissed_notice extends table_sql implements renderable {
     /**
      * Custom time for spreadsheet date time.
      *
-     * @param $row dismissed notice record
+     * @param \stdClass $row dismissed notice record
      * @return string
      */
     protected function col_timecreated_spreadsheet($row) {

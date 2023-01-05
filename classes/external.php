@@ -14,6 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+use local_sitenotice\helper;
+use local_sitenotice\persistent\sitenotice;
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once("$CFG->libdir/externallib.php");
+
 /**
  * Webservice functions
  * @package local_sitenotice
@@ -21,15 +28,13 @@
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
-require_once("$CFG->libdir/externallib.php");
-use local_sitenotice\helper;
-use local_sitenotice\persistent\sitenotice;
-
 class local_sitenotice_external extends external_api {
 
+    /**
+     * Parameters.
+     *
+     * @return \external_function_parameters
+     */
     public static function dismiss_notice_parameters() {
         return new external_function_parameters (
             array(
@@ -38,15 +43,33 @@ class local_sitenotice_external extends external_api {
         );
     }
 
+    /**
+     * Dismisses notice.
+     *
+     * @param int $noticeid Notice ID.
+     * @return array
+     */
     public static function dismiss_notice($noticeid) {
         $params = self::validate_parameters(self::dismiss_notice_parameters(),
             array('noticeid' => $noticeid));
 
+        $result = [
+            'status' => 0,
+            'redirecturl' => '',
+        ];
+
         if ($notice = sitenotice::get_record(['id' => $params['noticeid']])) {
-            return helper::dismiss_notice($notice);
+            $result = helper::dismiss_notice($notice);
         }
+
+        return $result;
     }
 
+    /**
+     * Return parameters.
+     *
+     * @return \external_single_structure
+     */
     public static function dismiss_notice_returns() {
         return new external_single_structure(
             array(
@@ -56,6 +79,11 @@ class local_sitenotice_external extends external_api {
         );
     }
 
+    /**
+     * Parameters.
+     *
+     * @return \external_function_parameters
+     */
     public static function acknowledge_notice_parameters() {
         return new external_function_parameters (
             array(
@@ -64,15 +92,33 @@ class local_sitenotice_external extends external_api {
         );
     }
 
+    /**
+     * Acknowledge notice.
+     *
+     * @param int $noticeid Notice ID.
+     * @return []
+     */
     public static function acknowledge_notice($noticeid) {
         $params = self::validate_parameters(self::acknowledge_notice_parameters(),
             array('noticeid' => $noticeid));
 
+        $result = [
+            'status' => 0,
+            'redirecturl' => '',
+        ];
+
         if ($notice = sitenotice::get_record(['id' => $params['noticeid']])) {
-            return helper::acknowledge_notice($notice);
+            $result = helper::acknowledge_notice($notice);
         }
+
+        return $result;
     }
 
+    /**
+     * Return parameters.
+     *
+     * @return \external_single_structure
+     */
     public static function acknowledge_notice_returns() {
         return new external_single_structure(
             array(
@@ -82,6 +128,10 @@ class local_sitenotice_external extends external_api {
         );
     }
 
+    /**
+     * Incoming params.
+     * @return \external_function_parameters
+     */
     public static function track_link_parameters() {
         return new external_function_parameters (
             array(
@@ -90,11 +140,22 @@ class local_sitenotice_external extends external_api {
         );
     }
 
+    /**
+     * Track link.
+     *
+     * @param int $linkid Link ID.
+     * @return array
+     */
     public static function track_link($linkid) {
         $params = self::validate_parameters(self::track_link_parameters(), array('linkid' => $linkid));
         return helper::track_link($params['linkid']);
     }
 
+    /**
+     * Return parameters.
+     *
+     * @return \external_single_structure
+     */
     public static function track_link_returns() {
         return new external_single_structure(
             array(
@@ -104,10 +165,21 @@ class local_sitenotice_external extends external_api {
         );
     }
 
+    /**
+     * Incoming params.
+     *
+     * @return \external_function_parameters
+     */
     public static function get_notices_parameters() {
         return new external_function_parameters([]);
     }
 
+    /**
+     * Gets a list of notices.                                                                      local/sitenotice/tests/sitenotice_test.php
+
+     *
+     * @return array
+     */
     public static function get_notices() {
         $result = array();
         $result['status'] = true;
@@ -123,6 +195,11 @@ class local_sitenotice_external extends external_api {
         return $result;
     }
 
+    /**
+     * Return parameters.
+     *
+     * @return \external_single_structure
+     */
     public static function get_notices_returns() {
         return new external_single_structure(
             array(

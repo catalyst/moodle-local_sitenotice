@@ -31,7 +31,9 @@ class noticeview extends persistent {
     const TABLE = 'local_sitenotice_lastview';
 
     /**
-     * @inheritdoc
+     * Returns a list of properties.
+     *
+     * @return array[]
      */
     protected static function define_properties() {
         return [
@@ -61,8 +63,10 @@ class noticeview extends persistent {
 
     /**
      * Purge related caches.
+     *
+     * @param string $key Cache key.
      */
-    protected function purge_cache($key): void {
+    protected function purge_cache(string $key): void {
         self::get_cache()->delete($key);
     }
 
@@ -97,8 +101,11 @@ class noticeview extends persistent {
 
     /**
      * Record the latest user interaction with the notice.
+     *
      * @param int $noticeid notice id
+     * @param int $userid user id
      * @param int $action user interaction
+     *
      * @return persistent|false|noticeview
      */
     public static function add_notice_view($noticeid, $userid, $action) {
@@ -120,8 +127,8 @@ class noticeview extends persistent {
 
     /**
      * Delete views related to a notice.
+     *
      * @param int $noticeid notice id
-     * @throws \dml_exception
      */
     public static function delete_notice_view($noticeid) {
         global $DB;

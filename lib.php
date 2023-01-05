@@ -16,6 +16,7 @@
 
 /**
  * Inject to every page.
+ *
  * @package local_sitenotice
  * @author  Nathan Nguyen <nathannguyen@catalyst-au.net>
  * @copyright  Catalyst IT
@@ -24,6 +25,11 @@
 
 use local_sitenotice\helper;
 
+/**
+ * A callback to extend navigation.
+ *
+ * @param \global_navigation $navigation Navigation instance.
+ */
 function local_sitenotice_extend_navigation(global_navigation $navigation) {
     global $PAGE;
 

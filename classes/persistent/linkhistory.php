@@ -32,7 +32,8 @@ class linkhistory extends persistent {
     const TABLE = 'local_sitenotice_hlinks_his';
 
     /**
-     * @inheritdoc
+     * Returns a list of properties.
+     * @return array[]
      */
     protected static function define_properties() {
         return [
@@ -49,9 +50,8 @@ class linkhistory extends persistent {
 
     /**
      * Delete history of the links
-     * @param $linkids array of link ids
-     * @throws \coding_exception
-     * @throws \dml_exception
+     *
+     * @param array $linkids array of link ids
      */
     public static function delete_link_history($linkids) {
         global $DB;
@@ -63,10 +63,12 @@ class linkhistory extends persistent {
 
     /**
      * Count how many time a user click on a link.
-     * @param $userid
-     * @param $noticeid
+     *
+     * @param int $userid user ID.
+     * @param int $noticeid notice ID.
+     * @param int $linkid Link id.
+     *
      * @return array
-     * @throws \dml_exception
      */
     public static function count_clicked_links($userid, $noticeid, $linkid = 0) {
         global $DB;
