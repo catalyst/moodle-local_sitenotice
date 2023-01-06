@@ -24,6 +24,11 @@ Feature: Users are forcibly logged out after closing a notice
     Then I should see "closing this will log you out"
     And I click on "sitenotice-closebtn" "button"
     Then I should see "Log in"
+    And I log in as "bilbo"
+    And I am on site homepage
+    Then I should see "closing this will log you out"
+    And I click on "sitenotice-closebtn" "button"
+    Then I should see "Log in"
     And I log in as "admin"
     Then I should see "closing this will log you out"
     And I click on "sitenotice-closebtn" "button"
@@ -35,6 +40,11 @@ Feature: Users are forcibly logged out after closing a notice
       | title         | content                        | forcelogout | reqack |
       | Logout notice | closing this will log you out  | 1           | 1      |
     When I log in as "bilbo"
+    And I am on site homepage
+    Then I should see "closing this will log you out"
+    And I click on "sitenotice-closebtn" "button"
+    Then I should see "Log in"
+    And I log in as "bilbo"
     And I am on site homepage
     Then I should see "closing this will log you out"
     And I click on "sitenotice-closebtn" "button"
@@ -55,6 +65,10 @@ Feature: Users are forcibly logged out after closing a notice
     And I click on "sitenotice-modal-ackcheckbox" "checkbox"
     And I click on "sitenotice-acceptbtn" "button"
     Then I should see "Log in"
+    And I log in as "bilbo"
+    And I am on site homepage
+    Then I should see "You are logged in as Bilbo Baggins"
+    And I log out
     And I log in as "admin"
     Then I should see "closing this will log you out"
     And I click on "sitenotice-modal-ackcheckbox" "checkbox"
