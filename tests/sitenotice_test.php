@@ -314,6 +314,112 @@ class sitenotice_test extends \advanced_testcase {
     }
 
     /**
+     * Test user see required notice after dismissing it.
+     */
+    public function test_retrieve_user_notices_when_dismissed_one_that_requires_acknowledgement() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $formdata = (object)[
+            'title' => 'Notice 1',
+            'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>',
+            'perpetual' => 1,
+            'reqack' => 1,
+        ];
+
+        helper::create_new_notice($formdata);
+        $allnotices = sitenotice::get_all_notices();
+        $notice = array_shift($allnotices);
+
+        // Must see 1 notice.
+        $this->assertCount(1, helper::retrieve_user_notices());
+
+        // After notice is dismissed, should still see 1 as it's required.
+        $this->setAdminUser();
+        helper::dismiss_notice($notice);
+        $this->assertCount(1, helper::retrieve_user_notices());
+    }
+
+    /**
+     * Test user see required notice after dismissing, and then acknowledged it.
+     */
+    public function test_retrieve_user_notices_when_dismiss_and_then_acknowledged() {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $formdata = (object)[
+            'title' => 'Notice 1',
+            'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>',
+            'perpetual' => 1,
+            'reqack' => 1,
+        ];
+
+        helper::create_new_notice($formdata);
+        $allnotices = sitenotice::get_all_notices();
+        $notice = array_shift($allnotices);
+
+        // Must see 1 notice.
+        $this->assertCount(1, helper::retrieve_user_notices());
+
+        // After notice is dismissed, should still see 1 as it's required.
+        helper::dismiss_notice($notice);
+        // User should be logged out after dismissing.
+        $this->setAdminUser();
+        $this->assertCount(1, helper::retrieve_user_notices());
+
+        // After notice is acknowledged, should still see 0.
+        helper::acknowledge_notice($notice);
+        $this->assertCount(0, helper::retrieve_user_notices());
+
+        // Logout user and log in again. Still shouldn't require to see the notice.
+        $this->setUser();
+        $this->setAdminUser();
+        $this->assertCount(0, helper::retrieve_user_notices());
+    }
+
+    /**
+     * Test user see required notice when forcelogout logout.
+     */
+    public function test_retrieve_user_notices_when_force_logout() {
+        global $USER;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $formdata = (object)[
+            'title' => 'Notice 1',
+            'content' => 'Notice 1 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 2</a>',
+            'perpetual' => 1,
+            'reqack' => 0,
+            'forcelogout' => 1,
+        ];
+
+        helper::create_new_notice($formdata);
+        $allnotices = sitenotice::get_all_notices();
+        $notice = array_shift($allnotices);
+
+        // Admin must see 1 notice.
+        $this->assertCount(1, helper::retrieve_user_notices());
+        helper::dismiss_notice($notice);
+        // Admin shouldn't be logged out.
+        $this->assertNotEmpty($USER->username);
+        // After notice is dismissed, admin shouldb't see it anymore.
+        $this->assertCount(0, helper::retrieve_user_notices());
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        // After notice is dismissed, should still see 1 as it's required.
+        helper::dismiss_notice($notice);
+        // User should be logged out.
+        $this->assertTrue(!isset($USER->username));
+
+        // Login again and check we still see the notice.
+        $this->setUser($user);
+        $this->assertCount(1, helper::retrieve_user_notices());
+    }
+
+    /**
      * Generic data provider to set up multiple tests.
      *
      * @return array

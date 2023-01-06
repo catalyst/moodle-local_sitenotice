@@ -341,13 +341,16 @@ class helper {
                 continue;
             }
             $notice = $notices[$noticeid];
+            $dissmised = $data['action'] == acknowledgement::ACTION_DISMISSED;
             if (
                 // Notice has been updated/reset/enabled.
                 $data['timeviewed'] < $notice->get('timemodified')
                 // The reset interval has been past.
                 || (($notice->get('resetinterval') > 0) && ($data['timeviewed'] + $notice->get('resetinterval') < time()))
                 // The previous action is 'dismiss', so still require acknowledgement.
-                || ($data['action'] === acknowledgement::ACTION_DISMISSED && $notice->get('reqack') == true)) {
+                || ($dissmised && $notice->get('reqack') == true)
+                // The action is 'dismiss' and forced to be logged out, still show it (admins are special).
+                || ($dissmised && $notice->get('forcelogout') == true) && !is_siteadmin()) {
                 unset($USER->viewednotices[$noticeid]);
             }
         }
@@ -652,7 +655,7 @@ class helper {
             // The reset interval has been past.
             || (($notice->resetinterval > 0) && ($latestview->timemodified + $notice->resetinterval < time()))
             // The previous action is 'dismiss', so still require acknowledgement.
-            || ($latestview->action === acknowledgement::ACTION_DISMISSED && $notice->reqack == true)) {
+            || ($latestview->action == acknowledgement::ACTION_DISMISSED && $notice->reqack == true)) {
             return false;
         }
         $USER->viewednotices[$notice->id] = ['timeviewed' => $latestview->timemodified, 'action' => $latestview->action];
