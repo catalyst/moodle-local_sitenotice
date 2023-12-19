@@ -73,7 +73,7 @@ class linkhistory extends persistent {
     public static function count_clicked_links($userid, $noticeid, $linkid = 0) {
         global $DB;
         $params = [];
-        if ($linkid > 0) {
+        if ($linkid > 0 && is_numeric($linkid)) {
             $wheresql = "WHERE h.userid = :userid AND l.noticeid = :noticeid AND h.hlinkid = :hlinkid";
             $params = ['hlinkid' => $linkid];
         } else {
