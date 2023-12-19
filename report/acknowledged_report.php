@@ -57,8 +57,8 @@ if (empty($notice)) {
 $filter = new report_filter($thispage, \local_sitenotice\table\acknowledged_notice::TABLE_ALIAS);
 list($filtersql, $params) = $filter->get_sql_filter();
 
-$table = new acknowledged_notice('acknowledged_notice_table', $thispage, ['filtersql' => $filtersql, 'params' => $params],
-    $download, $page, 20, $notice->id);
+$table = new acknowledged_notice('acknowledged_notice_table', $thispage, $notice->id, ['filtersql' => $filtersql, 'params' => $params],
+    $download, $page, 20);
 
 if ($table->is_downloading()) {
     \core\session\manager::write_close();

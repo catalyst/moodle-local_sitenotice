@@ -29,6 +29,8 @@ class helper_test extends \advanced_testcase {
 
     /**
      * Test a list of cohorts is built properly.
+     *
+     * @covers ::built_cohorts_options
      */
     public function test_built_cohort_options() {
         $this->resetAfterTest(true);
@@ -48,6 +50,8 @@ class helper_test extends \advanced_testcase {
 
     /**
      * Test that we can have full HTML in a notice content.
+     *
+     * @covers ::get_all_notices
      */
     public function test_can_have_html_in_notice_content() {
         $this->resetAfterTest();
@@ -75,6 +79,8 @@ class helper_test extends \advanced_testcase {
 
     /**
      * Test time interval format.
+     *
+     * @covers ::format_interval_time
      */
     public function test_format_interval_time() {
         // The interval is 1 day(s) 2 hour(s) 3 minute(s) 4 second(s).
@@ -86,6 +92,8 @@ class helper_test extends \advanced_testcase {
 
     /**
      * Test cohorts options.
+     *
+     * @covers ::built_cohorts_options
      */
     public function test_cohort_options() {
         $this->resetAfterTest();
