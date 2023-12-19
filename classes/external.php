@@ -175,8 +175,7 @@ class local_sitenotice_external extends external_api {
     }
 
     /**
-     * Gets a list of notices.                                                                      local/sitenotice/tests/sitenotice_test.php
-
+     * Gets a list of notices.
      *
      * @return array
      */

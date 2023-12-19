@@ -53,14 +53,14 @@ class dismissed_notice extends table_sql implements renderable {
      *
      * @param string $uniqueid id of the table.
      * @param \moodle_url $url base url.
+     * @param int $noticeid notice id.
      * @param array $filters  filter.
      * @param string $download download file format.
      * @param int $page current page.
      * @param int $perpage  number of record per page.
-     * @param int $noticeid notice id.
      */
-    public function __construct($uniqueid, \moodle_url $url, $filters = [], $download = '',
-                                $page = 0, $perpage = 20, $noticeid) {
+    public function __construct($uniqueid, \moodle_url $url, $noticeid, $filters = [], $download = '',
+                                $page = 0, $perpage = 20) {
         parent::__construct($uniqueid);
 
         $this->set_attribute('class', 'local_sitenotice dismissed_notices');

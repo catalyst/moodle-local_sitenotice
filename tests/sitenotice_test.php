@@ -41,6 +41,7 @@ class sitenotice_test extends \advanced_testcase {
     /**
      * Test notice creation.
      *
+     * @covers ::create_new_notice
      * @dataProvider create_notices_provider
      * @param array $formdata Array of form data to create notices
      * @param bool $allowdeletion Whether or not to allow deletion of notices
@@ -84,6 +85,7 @@ class sitenotice_test extends \advanced_testcase {
     /**
      * Test set reset notice.
      *
+     * @covers ::reset_notices
      * @dataProvider generic_provider()
      * @param array $formdata Array of form data to create notices
      */
@@ -117,6 +119,7 @@ class sitenotice_test extends \advanced_testcase {
     /**
      * Test enable/disable notice.
      *
+     * @covers ::test_enable_notices
      * @dataProvider generic_provider()
      * @param array $formdata Array of form data to create notices
      */
@@ -153,6 +156,7 @@ class sitenotice_test extends \advanced_testcase {
     /**
      * Test user notice interaction.
      *
+     * @covers ::test_user_notice
      * @dataProvider generic_provider()
      * @param array $formdata Data to test on.
      */
@@ -226,6 +230,7 @@ class sitenotice_test extends \advanced_testcase {
     /**
      * Test user link interaction
      *
+     * @covers ::user_hlink_interact
      * @dataProvider generic_provider()
      * @param array $formdata Data to test on.
      */
@@ -259,6 +264,8 @@ class sitenotice_test extends \advanced_testcase {
 
     /**
      * Test course completion option.
+     *
+     * @covers ::retrieve_user_notices
      */
     public function test_user_required_completion() {
         global $DB;
@@ -266,7 +273,8 @@ class sitenotice_test extends \advanced_testcase {
 
         $formdata = new \stdClass();
         $formdata->title = "Course Notice 1";
-        $formdata->content = "Course Notice 1 <a href=\"www.examplecourse1.com\">Link Course 1</a> <a href=\"www.examplecourse2.com\">Link Course 2</a>";
+        $formdata->content = "Course Notice 1 <a href=\"www.examplecourse1.com\">Link Course 1</a>" .
+            " <a href=\"www.examplecourse2.com\">Link Course 2</a>";
 
         // Create a course with completion enabled.
         $course = $this->getDataGenerator()->create_course(array('enablecompletion' => 1));
@@ -315,6 +323,8 @@ class sitenotice_test extends \advanced_testcase {
 
     /**
      * Test user see required notice after dismissing it.
+     *
+     * @covers ::retrieve_user_notices
      */
     public function test_retrieve_user_notices_when_dismissed_one_that_requires_acknowledgement() {
         $this->resetAfterTest();
@@ -342,6 +352,8 @@ class sitenotice_test extends \advanced_testcase {
 
     /**
      * Test user see required notice after dismissing, and then acknowledged it.
+     *
+     * @covers ::retrieve_user_notices
      */
     public function test_retrieve_user_notices_when_dismiss_and_then_acknowledged() {
         $this->resetAfterTest();
@@ -379,6 +391,8 @@ class sitenotice_test extends \advanced_testcase {
 
     /**
      * Test user see required notice when forcelogout logout.
+     *
+     * @covers ::retrieve_user_notices
      */
     public function test_retrieve_user_notices_when_force_logout() {
         global $USER;
@@ -530,8 +544,12 @@ class sitenotice_test extends \advanced_testcase {
                     'titles' => ['Notice 1', 'Notice 2', 'Notice 3'],
                     'linkcounts' => [2, 2, 2],
                     'linktexts' => [['Link 1', 'Link 2'], ['Link 1', 'Link 4'], ['Link 1', 'Link 4']],
-                    'linkurls' => [['www.example1.com', 'www.example2.com'], ['www.example1.com', 'www.example2.com'], ['www.example1.com', 'www.example2.com']]
-                ]
+                    'linkurls' => [
+                        ['www.example1.com', 'www.example2.com'],
+                        ['www.example1.com', 'www.example2.com'],
+                        ['www.example1.com', 'www.example2.com'],
+                    ],
+                ],
             ],
             'two basic notices and one notice with expiry in the past' => [
                 'formdata' => [
