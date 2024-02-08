@@ -61,7 +61,7 @@ class noticelink extends persistent {
      *
      * @return array
      */
-    public static function get_notice_link_records($noticeid, $sort = 'id', $order = 'ASC') {
+    public static function get_notice_link_records(int $noticeid, string $sort = 'id', string $order = 'ASC') {
         $persistents = self::get_records(['noticeid' => $noticeid], $sort, $order);
         $result = [];
         foreach ($persistents as $persistent) {
@@ -76,7 +76,7 @@ class noticelink extends persistent {
      *
      * @param array $linkids array of link ids
      */
-    public static function delete_links($linkids) {
+    public static function delete_links(array $linkids) {
         global $DB;
         if (!empty($linkids)) {
             list($linkidssql, $param) = $DB->get_in_or_equal($linkids, SQL_PARAMS_NAMED);
@@ -89,7 +89,7 @@ class noticelink extends persistent {
      *
      * @param int $noticeid notice id
      */
-    public static function delete_notice_links($noticeid) {
+    public static function delete_notice_links(int $noticeid) {
         global $DB;
         $DB->delete_records(static::TABLE, ['noticeid' => $noticeid]);
     }
@@ -100,7 +100,7 @@ class noticelink extends persistent {
      * @param \stdClass $data link data
      * @return persistent
      */
-    public static function create_new_link($data) {
+    public static function create_new_link(\stdClass $data) {
         $linkpersistent = self::get_record([
             'noticeid' => $data->noticeid,
             'text' => $data->text,

@@ -71,7 +71,7 @@ class report_filter {
      *
      * @throws \coding_exception
      */
-    public function __construct($baseurl, $tablealias = '') {
+    public function __construct(string $baseurl, string $tablealias = '') {
         $tablealias = $tablealias ? $tablealias . "." : '';
         $this->filterfields = [
             "timecreated" => new \user_filter_date('time', get_string('time'), false, "{$tablealias}timecreated"),

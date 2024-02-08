@@ -84,7 +84,7 @@ class acknowledgement extends persistent {
      *
      * @param int $noticeid notice id
      */
-    public static function delete_notice_acknowledgement($noticeid) {
+    public static function delete_notice_acknowledgement(int $noticeid) {
         global $DB;
         $DB->delete_records(static::TABLE, ['noticeid' => $noticeid]);
     }

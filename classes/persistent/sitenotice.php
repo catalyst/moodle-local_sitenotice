@@ -191,7 +191,7 @@ class sitenotice extends persistent {
      * @throws \coding_exception
      * @throws \core\invalid_persistent_exception
      */
-    public static function create_new_notice($data) {
+    public static function create_new_notice(\stdClass $data) {
         if (isset($data->cohorts) && is_array($data->cohorts)) {
             $data->cohorts = implode(',', $data->cohorts);
         } else {
@@ -210,7 +210,7 @@ class sitenotice extends persistent {
      * @throws \coding_exception
      * @throws \core\invalid_persistent_exception
      */
-    public static function update_notice_content(sitenotice $persistent, $content) {
+    public static function update_notice_content(sitenotice $persistent, string $content) {
         $persistent->set('content', $content);
         return $persistent->update();
     }
@@ -223,7 +223,7 @@ class sitenotice extends persistent {
      * @throws \coding_exception
      * @throws \core\invalid_persistent_exception
      */
-    public static function update_notice_data(sitenotice $persistent, $data) {
+    public static function update_notice_data(sitenotice $persistent, \stdClass $data) {
         if (isset($data->cohorts) && is_array($data->cohorts)) {
             $data->cohorts = implode(',', $data->cohorts);
         } else {

@@ -108,7 +108,7 @@ class noticeview extends persistent {
      *
      * @return persistent|false|noticeview
      */
-    public static function add_notice_view($noticeid, $userid, $action) {
+    public static function add_notice_view(int $noticeid, int $userid, int $action) {
         $persistent = self::get_record(['noticeid' => $noticeid, 'userid' => $userid]);
         if (!empty($persistent)) {
             $persistent->set('action', $action);
@@ -130,7 +130,7 @@ class noticeview extends persistent {
      *
      * @param int $noticeid notice id
      */
-    public static function delete_notice_view($noticeid) {
+    public static function delete_notice_view(int $noticeid) {
         global $DB;
         $DB->delete_records(static::TABLE, ['noticeid' => $noticeid]);
     }

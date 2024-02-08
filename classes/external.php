@@ -49,7 +49,7 @@ class local_sitenotice_external extends external_api {
      * @param int $noticeid Notice ID.
      * @return array
      */
-    public static function dismiss_notice($noticeid) {
+    public static function dismiss_notice(int $noticeid) {
         $params = self::validate_parameters(self::dismiss_notice_parameters(),
             array('noticeid' => $noticeid));
 
@@ -98,7 +98,7 @@ class local_sitenotice_external extends external_api {
      * @param int $noticeid Notice ID.
      * @return []
      */
-    public static function acknowledge_notice($noticeid) {
+    public static function acknowledge_notice(int $noticeid) {
         $params = self::validate_parameters(self::acknowledge_notice_parameters(),
             array('noticeid' => $noticeid));
 
@@ -146,7 +146,7 @@ class local_sitenotice_external extends external_api {
      * @param int $linkid Link ID.
      * @return array
      */
-    public static function track_link($linkid) {
+    public static function track_link(int $linkid) {
         $params = self::validate_parameters(self::track_link_parameters(), array('linkid' => $linkid));
         return helper::track_link($params['linkid']);
     }

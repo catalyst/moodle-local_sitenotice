@@ -65,7 +65,7 @@ class helper {
      * @throws \core\invalid_persistent_exception
      * @throws \required_capability_exception
      */
-    public static function create_new_notice($data) {
+    public static function create_new_notice(\stdClass $data) {
         self::check_manage_capability();
         // Create new notice.
         self::sanitise_data($data);
@@ -93,7 +93,7 @@ class helper {
      * @throws \dml_exception
      * @throws \required_capability_exception
      */
-    public static function update_notice(sitenotice $sitenotice, $data) {
+    public static function update_notice(sitenotice $sitenotice, \stdClass $data) {
         self::check_manage_capability();
         if (!get_config('local_sitenotice', 'allow_update')) {
             return;
@@ -135,7 +135,7 @@ class helper {
      * @param string $content notice content
      * @return string
      */
-    private static function update_hyperlinks(sitenotice $notice, $content): string {
+    private static function update_hyperlinks(sitenotice $notice, string $content): string {
         // Replace file URLs before processing.
         $content = file_rewrite_pluginfile_urls($content, 'pluginfile.php',
             \context_system::instance()->id, 'local_sitenotice', 'content', $notice->get('id'));
@@ -303,7 +303,7 @@ class helper {
      * @param int $noticeid notice id
      * @return bool|\stdClass
      */
-    public static function retrieve_notice($noticeid) {
+    public static function retrieve_notice(int $noticeid) {
         $sitenotice = sitenotice::get_record(['id' => $noticeid]);
         if ($sitenotice) {
             return $sitenotice->to_record();
@@ -426,7 +426,7 @@ class helper {
      * @param \local_sitenotice\persistent\sitenotice $notice Notice instance.
      * @param string $action Action.
      */
-    private static function add_to_viewed_notices(sitenotice $notice, $action) {
+    private static function add_to_viewed_notices(sitenotice $notice, string $action) {
         global $USER;
         // Add to viewed notices.
         $noticeview = noticeview::add_notice_view($notice->get('id'), $USER->id, $action);
@@ -441,7 +441,7 @@ class helper {
      *
      * @return \core\persistent
      */
-    private static function create_new_acknowledge_record(sitenotice $notice, $action) {
+    private static function create_new_acknowledge_record(sitenotice $notice, string $action) {
         global $USER;
 
         // New record.
@@ -544,7 +544,7 @@ class helper {
      * @param int $linkid link ID
      * @return array
      */
-    public static function track_link($linkid) {
+    public static function track_link(int $linkid) {
         global $USER;
         $data = new \stdClass();
         $data->hlinkid = $linkid;
@@ -563,7 +563,7 @@ class helper {
      * @param string $time Time.
      * @return string
      */
-    public static function format_interval_time($time) {
+    public static function format_interval_time(string $time) {
         // Datetime for 01/01/1970.
         $datefrom = new \DateTime("@0");
         // Datetime for 01/01/1970 after the specified time (in seconds).
@@ -578,7 +578,7 @@ class helper {
      * @param bool $value boolean
      * @return string
      */
-    public static function format_boolean($value) {
+    public static function format_boolean(bool $value) {
         if ($value) {
             return get_string('booleanformat:true', 'local_sitenotice');
         } else {
@@ -592,7 +592,7 @@ class helper {
      * @param int $cohortid Cohort id
      * @return mixed
      */
-    public static function get_cohort_name($cohortid) {
+    public static function get_cohort_name(int $cohortid) {
         if ($cohortid == 0) {
             return get_string('notice:cohort:all', 'local_sitenotice');
         }
@@ -607,7 +607,7 @@ class helper {
      * @return mixed
      * @throws \coding_exception
      */
-    public static function get_course_name($courseid) {
+    public static function get_course_name(int $courseid) {
         global $DB;
 
         if ($courseid == 0) {

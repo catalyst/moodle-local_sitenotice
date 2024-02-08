@@ -53,7 +53,7 @@ class linkhistory extends persistent {
      *
      * @param array $linkids array of link ids
      */
-    public static function delete_link_history($linkids) {
+    public static function delete_link_history(array $linkids) {
         global $DB;
         if (!empty($linkids)) {
             list($linkidssql, $param) = $DB->get_in_or_equal($linkids, SQL_PARAMS_NAMED);
@@ -70,7 +70,7 @@ class linkhistory extends persistent {
      *
      * @return array
      */
-    public static function count_clicked_links($userid, $noticeid, $linkid = 0) {
+    public static function count_clicked_links(int $userid, int $noticeid, int $linkid = 0) {
         global $DB;
         $params = [];
         if ($linkid > 0 && is_numeric($linkid)) {
