@@ -16,6 +16,7 @@
 
 namespace local_sitenotice\table;
 
+use local_sitenotice\persistent\noticelink;
 use table_sql;
 use renderable;
 use local_sitenotice\helper;
@@ -103,7 +104,7 @@ class acknowledged_notice extends table_sql implements renderable {
                 'idnumber' => get_string('idnumber'),
             );
             // Add each hyperlink as a header.
-            $hlinks = helper::retrieve_notice_links($this->noticeid);
+            $hlinks = noticelink::get_notice_link_records($this->noticeid);
             foreach ($hlinks as $link) {
                 $cols[$link->id] = "$link->text ($link->link)";
             }
