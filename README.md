@@ -1,4 +1,4 @@
-![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/catalyst/moodle-local_sitenotice/ci.yml?branch=MOODLE_403_STABLE)
+[![ci](https://github.com/catalyst/moodle-local_sitenotice/actions/workflows/ci.yml/badge.svg?branch=MOODLE_403_STABLE)](https://github.com/catalyst/moodle-local_sitenotice/actions/workflows/ci.yml)
 
 # Site Notice
 This plugin displays notices to users.
@@ -98,3 +98,4 @@ to this plugin please contact us:
 
 https://www.catalyst-au.net/contact-us
 
+<img alt="Catalyst IT" src="https://cdn.rawgit.com/CatalystIT-AU/moodle-auth_saml2/MOODLE_39_STABLE/pix/catalyst-logo.svg" width="400">
