@@ -91,7 +91,7 @@ class dismissed_notice extends table_sql implements renderable {
             'username' => get_string('username'),
             'firstname' => get_string('firstname'),
             'lastname' => get_string('lastname'),
-            'idnumber' => get_string('idnumber')
+            'idnumber' => get_string('idnumber'),
         );
 
         if ($this->is_downloading()) {

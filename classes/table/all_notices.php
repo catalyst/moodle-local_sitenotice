@@ -35,6 +35,9 @@ require_once($CFG->libdir . '/tablelib.php');
  */
 class all_notices extends table_sql implements renderable {
 
+    /** @var int */
+    protected $page;
+
     /**
      * all_notices constructor.
      *

@@ -47,7 +47,7 @@ $PAGE->requires->js_call_amd('local_sitenotice/notice_form', 'init', array());
 $sitenotice = sitenotice::get_record(['id' => $noticeid]);
 $customdata = [
     'persistent' => $sitenotice,
-    'id' => $noticeid
+    'id' => $noticeid,
 ];
 $mform = new notice_form($thispage, $customdata);
 

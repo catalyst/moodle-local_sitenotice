@@ -29,7 +29,7 @@ $capabilities = array(
 
     'local/sitenotice:manage' => array(
         'captype' => 'write',
-        'contextlevel' => CONTEXT_SYSTEM
+        'contextlevel' => CONTEXT_SYSTEM,
     ),
 
 );

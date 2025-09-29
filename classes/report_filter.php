@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 namespace local_sitenotice;
 
 use local_sitenotice\form\active_filter_form;
@@ -47,7 +46,7 @@ class report_filter {
 
     /**
      * Base URL.
-     * @var
+     * @var string
      */
     private $baseurl;
 

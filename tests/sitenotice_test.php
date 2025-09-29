@@ -34,7 +34,7 @@ class sitenotice_test extends \advanced_testcase {
      * Initial set up.
      */
     protected function setUp(): void {
-        parent::setup();
+        parent::setUp();
         $this->resetAfterTest(true);
     }
 
@@ -445,7 +445,7 @@ class sitenotice_test extends \advanced_testcase {
      *
      * @return array
      */
-    public function generic_provider() {
+    public function generic_provider(): array {
         return [
             'formdata' => [
                 [
@@ -470,9 +470,9 @@ class sitenotice_test extends \advanced_testcase {
                         'content' => 'Cohort Notice 2 <a href="www.example7.com">Link 7</a> <a href="www.example8.com">Link 8</a>',
                         'cohorts' => '',
                         'perpetual' => 1,
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -498,8 +498,8 @@ class sitenotice_test extends \advanced_testcase {
                     'titles' => ['Notice 1'],
                     'linkcounts' => [2],
                     'linktexts' => [['Link 1', 'Link 2']],
-                    'linkurls' => [['www.example1.com', 'www.example2.com']]
-                ]
+                    'linkurls' => [['www.example1.com', 'www.example2.com']],
+                ],
             ],
             'two basic notices with deletion not allowed' => [
                 'formdata' => [
@@ -521,8 +521,8 @@ class sitenotice_test extends \advanced_testcase {
                     'titles' => ['Notice 1', 'Notice 2'],
                     'linkcounts' => [2, 2],
                     'linktexts' => [['Link 1', 'Link 2'], ['Link 1', 'Link 4']],
-                    'linkurls' => [['www.example1.com', 'www.example2.com'], ['www.example1.com', 'www.example2.com']]
-                ]
+                    'linkurls' => [['www.example1.com', 'www.example2.com'], ['www.example1.com', 'www.example2.com']],
+                ],
             ],
             'two basic notices and one notice with expiry in the future' => [
                 'formdata' => [
@@ -541,7 +541,7 @@ class sitenotice_test extends \advanced_testcase {
                         'content' => 'Notice 3 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 4</a>',
                         'perpetual' => 0,
                         'timestart' => time() + HOURSECS,
-                        'timeend' => time() + DAYSECS
+                        'timeend' => time() + DAYSECS,
                     ],
                 ],
                 'allowdeletion' => false,
@@ -551,8 +551,8 @@ class sitenotice_test extends \advanced_testcase {
                     'titles' => ['Notice 1', 'Notice 2', 'Notice 3'],
                     'linkcounts' => [2, 2, 2],
                     'linktexts' => [['Link 1', 'Link 2'], ['Link 1', 'Link 4'], ['Link 1', 'Link 4']],
-                    'linkurls' => [['www.example1.com', 'www.example2.com'], ['www.example1.com', 'www.example2.com'], ['www.example1.com', 'www.example2.com']]
-                ]
+                    'linkurls' => [['www.example1.com', 'www.example2.com'], ['www.example1.com', 'www.example2.com'], ['www.example1.com', 'www.example2.com']],
+                ],
             ],
             'two basic notices and one notice with expiry in the past' => [
                 'formdata' => [
@@ -571,7 +571,7 @@ class sitenotice_test extends \advanced_testcase {
                         'content' => 'Notice 3 <a href="www.example1.com">Link 1</a> <a href="www.example2.com">Link 4</a>',
                         'perpetual' => 0,
                         'timestart' => time() - DAYSECS,
-                        'timeend' => time() - HOURSECS
+                        'timeend' => time() - HOURSECS,
                     ],
                 ],
                 'allowdeletion' => false,
@@ -581,8 +581,8 @@ class sitenotice_test extends \advanced_testcase {
                     'titles' => ['Notice 1', 'Notice 2'],
                     'linkcounts' => [2, 2],
                     'linktexts' => [['Link 1', 'Link 2'], ['Link 1', 'Link 4']],
-                    'linkurls' => [['www.example1.com', 'www.example2.com'], ['www.example1.com', 'www.example2.com']]
-                ]
+                    'linkurls' => [['www.example1.com', 'www.example2.com'], ['www.example1.com', 'www.example2.com']],
+                ],
             ],
             'one basic notice with deletion allowed and cleanup disabled' => [
                 'formdata' => [
@@ -599,8 +599,8 @@ class sitenotice_test extends \advanced_testcase {
                     'titles' => ['Notice 1'],
                     'linkcounts' => [2],
                     'linktexts' => [['Link 1', 'Link 2']],
-                    'linkurls' => [['www.example1.com', 'www.example2.com']]
-                ]
+                    'linkurls' => [['www.example1.com', 'www.example2.com']],
+                ],
             ],
             'two basic notices with deletion allowed and cleanup disabled' => [
                 'formdata' => [
@@ -622,8 +622,8 @@ class sitenotice_test extends \advanced_testcase {
                     'titles' => ['Notice 1', 'Notice 2'],
                     'linkcounts' => [2, 2],
                     'linktexts' => [['Link 1', 'Link 2'], ['Link 1', 'Link 4']],
-                    'linkurls' => [['www.example1.com', 'www.example2.com'], ['www.example1.com', 'www.example2.com']]
-                ]
+                    'linkurls' => [['www.example1.com', 'www.example2.com'], ['www.example1.com', 'www.example2.com']],
+                ],
             ],
             'one basic notice with deletion allowed and cleanup enabled' => [
                 'formdata' => [
@@ -640,8 +640,8 @@ class sitenotice_test extends \advanced_testcase {
                     'titles' => ['Notice 1'],
                     'linkcounts' => [2],
                     'linktexts' => [['Link 1', 'Link 2']],
-                    'linkurls' => [['www.example1.com', 'www.example2.com']]
-                ]
+                    'linkurls' => [['www.example1.com', 'www.example2.com']],
+                ],
             ],
             'two basic notices with deletion allowed and cleanup enabled' => [
                 'formdata' => [
@@ -663,9 +663,9 @@ class sitenotice_test extends \advanced_testcase {
                     'titles' => ['Notice 1', 'Notice 2'],
                     'linkcounts' => [2, 2],
                     'linktexts' => [['Link 1', 'Link 2'], ['Link 1', 'Link 4']],
-                    'linkurls' => [['www.example1.com', 'www.example2.com'], ['www.example1.com', 'www.example2.com']]
-                ]
-            ]
+                    'linkurls' => [['www.example1.com', 'www.example2.com'], ['www.example1.com', 'www.example2.com']],
+                ],
+            ],
         ];
     }
 }

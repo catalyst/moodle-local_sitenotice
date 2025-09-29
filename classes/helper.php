@@ -16,11 +16,11 @@
 
 namespace local_sitenotice;
 
-use \local_sitenotice\persistent\sitenotice;
-use \local_sitenotice\persistent\noticelink;
-use \local_sitenotice\persistent\linkhistory;
-use \local_sitenotice\persistent\acknowledgement;
-use \local_sitenotice\persistent\noticeview;
+use local_sitenotice\persistent\sitenotice;
+use local_sitenotice\persistent\noticelink;
+use local_sitenotice\persistent\linkhistory;
+use local_sitenotice\persistent\acknowledgement;
+use local_sitenotice\persistent\noticeview;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -143,7 +143,7 @@ class helper {
         // Extract hyperlinks from the content of the notice, which is then used for link clicked tracking.
         $dom = new \DOMDocument();
         $content = format_text($content, FORMAT_HTML, ['noclean' => true]);
-        $content = mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8' );
+        $content = mb_encode_numericentity($content, [0x80, 0x10FFFF, 0, ~0], 'UTF-8');
         $dom->loadHTML($content);
         // Current links in the notice.
         $currentlinks = noticelink::get_notice_link_records($notice->get('id'));
@@ -675,7 +675,7 @@ class helper {
             'maxfiles' => -1, // Unlimited files.
             'context' => \context_system::instance(),
             'trusttext' => true,
-            'class' => 'noticecontent'
+            'class' => 'noticecontent',
         ];
     }
 }
