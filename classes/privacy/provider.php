@@ -52,7 +52,7 @@ class provider implements
 
         $params = [
             'contextuser'   => CONTEXT_USER,
-            'userid'        => $userid
+            'userid'        => $userid,
         ];
 
         $contextlist->add_from_sql($sql, $params);

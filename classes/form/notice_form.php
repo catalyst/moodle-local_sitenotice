@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 namespace local_sitenotice\form;
 
 use local_sitenotice\helper;
@@ -41,7 +40,7 @@ class notice_form extends \core\form\persistent {
     /**
      * Form definition.
      */
-    public function definition () {
+    public function definition() {
         $mform =& $this->_form;
 
         $mform->addElement('hidden', 'id', 0);

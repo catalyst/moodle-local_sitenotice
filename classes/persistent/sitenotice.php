@@ -48,7 +48,7 @@ class sitenotice extends persistent {
             ],
             'contentformat' => array(
                 'type' => PARAM_INT,
-                'default' => FORMAT_HTML
+                'default' => FORMAT_HTML,
             ),
             'cohorts' => [
                 'type' => PARAM_RAW,
@@ -73,12 +73,12 @@ class sitenotice extends persistent {
             'timestart' => [
                 'type' => PARAM_INT,
                 'null' => NULL_NOT_ALLOWED,
-                'default' => 0
+                'default' => 0,
             ],
             'timeend' => [
                 'type' => PARAM_INT,
                 'null' => NULL_NOT_ALLOWED,
-                'default' => 0
+                'default' => 0,
             ],
             'enabled' => [
                 'type' => PARAM_INT,

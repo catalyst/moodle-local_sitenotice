@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Cache details.
  *
@@ -28,9 +27,9 @@ defined('MOODLE_INTERNAL') || die();
 
 $definitions = [
     'enabled_notices' => [
-        'mode' => cache_store::MODE_APPLICATION
+        'mode' => cache_store::MODE_APPLICATION,
     ],
     'notice_view' => [
-        'mode' => cache_store::MODE_APPLICATION
-    ]
+        'mode' => cache_store::MODE_APPLICATION,
+    ],
 ];

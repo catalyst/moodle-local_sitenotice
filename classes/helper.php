@@ -16,11 +16,11 @@
 
 namespace local_sitenotice;
 
-use \local_sitenotice\persistent\sitenotice;
-use \local_sitenotice\persistent\noticelink;
-use \local_sitenotice\persistent\linkhistory;
-use \local_sitenotice\persistent\acknowledgement;
-use \local_sitenotice\persistent\noticeview;
+use local_sitenotice\persistent\sitenotice;
+use local_sitenotice\persistent\noticelink;
+use local_sitenotice\persistent\linkhistory;
+use local_sitenotice\persistent\acknowledgement;
+use local_sitenotice\persistent\noticeview;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -711,7 +711,7 @@ class helper {
             'maxfiles' => -1, // Unlimited files.
             'context' => \context_system::instance(),
             'trusttext' => true,
-            'class' => 'noticecontent'
+            'class' => 'noticecontent',
         ];
     }
 }
