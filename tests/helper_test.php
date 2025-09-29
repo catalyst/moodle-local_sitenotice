@@ -73,6 +73,15 @@ class helper_test extends \advanced_testcase {
         $allnotices = sitenotice::get_all_notices();
         $actual = reset($allnotices);
         $this->assertStringContainsString($formdata->content, $actual->get('content'));
+
+        // Test for some special UTF-8 characters. HTML reserved characters must be converted in the form.
+        $formdata->content = '<p>Héllo 😃 world &amp; café</p>';
+        $expected = '<p>H&eacute;llo &#128515; world &amp; caf&eacute;</p>';
+        helper::update_notice($sitenotice, $formdata);
+
+        $allnotices = sitenotice::get_all_notices();
+        $actual = reset($allnotices);
+        $this->assertStringContainsString($expected, $actual->get('content'));
     }
 
     /**

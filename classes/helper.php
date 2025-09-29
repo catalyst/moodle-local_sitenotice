@@ -143,7 +143,7 @@ class helper {
         // Extract hyperlinks from the content of the notice, which is then used for link clicked tracking.
         $dom = new \DOMDocument();
         $content = format_text($content, FORMAT_HTML, ['noclean' => true]);
-        $content = mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8' );
+        $content = self::html_entities_utf8($content);
         $dom->loadHTML($content);
         // Current links in the notice.
         $currentlinks = noticelink::get_notice_link_records($notice->get('id'));
@@ -172,6 +172,42 @@ class helper {
         // New content of the notice (included link ids).
         $newcontent = $dom->saveHTML();
         return $newcontent;
+    }
+
+    /**
+     * Converts special multibyte UTF-8 characters in HTML content to HTML entities.
+     *
+     * - Latin-1 accented characters (é, à, ü, etc.) are converted to named entities (&eacute;, &agrave;, &uuml;, etc.).
+     * - Other non-ASCII characters, such as emojis, are converted to numeric entities (😃 → &#128515;).
+     * - ASCII characters (a-z, 0-9, punctuation) are left unchanged.
+     * - Existing HTML tags and already-encoded entities (like &amp;) are preserved.
+     *
+     * This function is intended as a lightweight replacement for the deprecated
+     * mb_convert_encoding(..., 'HTML-ENTITIES', 'UTF-8'), focusing only on
+     * converting visible characters without affecting HTML structure.
+     *
+     * @param string $html The HTML string to convert.
+     * @return string The HTML string with special characters converted to entities.
+     */
+    private static function html_entities_utf8(string $html): string {
+        // Map only Latin-1 characters that have named entities.
+        static $map = null;
+        if ($map === null) {
+            $map = get_html_translation_table(HTML_ENTITIES, ENT_NOQUOTES | ENT_HTML5, 'UTF-8');
+        }
+
+        return preg_replace_callback(
+            '/[\xC2-\xF4][\x80-\xBF]+/', // match multibyte UTF-8 characters
+            function ($m) use ($map) {
+                $char = $m[0];
+                if (isset($map[$char])) {
+                    return $map[$char]; // é → &eacute;
+                }
+                $codepoint = \IntlChar::ord($char);
+                return '&#' . $codepoint . ';'; // emoji → &#128515;
+            },
+            $html
+        );
     }
 
     /**
