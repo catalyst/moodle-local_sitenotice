@@ -49,6 +49,7 @@ $string['notice:activefrom'] = 'Active from';
 $string['notice:activefrom_help'] = 'The time and date from which the message will be active .';
 $string['notice:cohort'] = 'Cohort';
 $string['notice:cohort:all'] = 'All users';
+$string['notice:cohort:deleted'] = 'Deleted cohort';
 $string['notice:enable'] = 'Enable notice';
 $string['notice:expiry'] = 'Expiry';
 $string['notice:expiry_help'] = 'The time and date the messages expires and will not be shown to users anymore.';

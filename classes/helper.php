@@ -598,7 +598,8 @@ class helper {
         }
 
         $cohorts = self::built_cohorts_options();
-        return $cohorts[$cohortid];
+        // Cohort may have been deleted or moved to a context no longer visible.
+        return $cohorts[$cohortid] ?? get_string('notice:cohort:deleted', 'local_sitenotice');
     }
 
     /**
