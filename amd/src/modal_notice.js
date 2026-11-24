@@ -86,7 +86,7 @@ define(['jquery', 'core/notification', 'core/modal', 'core/key_codes', 'core/str
             setRequiredAcknowledgement = function(reqack) {
                 var modal = this;
                 if (reqack == 1) {
-                    str.get_string('modal:checkboxtext', 'local_sitenotice').then(function(langString) {
+                    str.getString('modal:checkboxtext', 'local_sitenotice').then(function(langString) {
                         var body = modal.getBody();
                         var checkboxdiv = $("<div>", {});
                         var ackcheckbox = $("<input>", {type: "checkbox", id: SELECTORS.ACK_CHECKBOX});
@@ -99,7 +99,7 @@ define(['jquery', 'core/notification', 'core/modal', 'core/key_codes', 'core/str
                         acceptbutton.show();
                         acceptbutton.attr('disabled', true);
                         // Tooltip for disabled box.
-                        modal.getFooter().find(SELECTORS.TOOL_TIP_WRAPPER).tooltip();
+                        modal.turnonToolTip();
                     }).catch(Notification.exception);
                 } else {
                     this.getFooter().find(SELECTORS.ACCEPT_BUTTON).css('display', 'none');
@@ -107,17 +107,21 @@ define(['jquery', 'core/notification', 'core/modal', 'core/key_codes', 'core/str
             };
 
             /**
-             * Turn off tool tip
+             * Turn off tool tip.
+             *
+             * A native title attribute is used rather than the Bootstrap tooltip jQuery plugin,
+             * because Moodle 5.0+ ships Bootstrap 5 which no longer provides the Bootstrap 4 jQuery API.
              */
             turnoffToolTip = function() {
-                this.getFooter().find(SELECTORS.TOOL_TIP_WRAPPER).tooltip('disable');
+                this.getFooter().find(SELECTORS.TOOL_TIP_WRAPPER).removeAttr('title');
             };
 
             /**
-             * Turn on tool tip
+             * Turn on tool tip.
              */
             turnonToolTip = function() {
-                this.getFooter().find(SELECTORS.TOOL_TIP_WRAPPER).tooltip('enable');
+                var wrapper = this.getFooter().find(SELECTORS.TOOL_TIP_WRAPPER);
+                wrapper.attr('title', wrapper.attr('data-title'));
             };
 
             /**

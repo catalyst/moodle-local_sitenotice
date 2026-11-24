@@ -14,7 +14,7 @@ define(['jquery', 'core/modal_cancel', 'core/str'],
                 var clickedLink = $(e.currentTarget);
                 var content = clickedLink.attr('data-noticecontent');
                 return ModalCancel.create({
-                    title: str.get_string('notice:content', 'local_sitenotice'),
+                    title: str.getString('notice:content', 'local_sitenotice'),
                     body: content,
                     large: true
                 })
