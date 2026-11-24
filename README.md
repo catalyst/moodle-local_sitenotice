@@ -18,7 +18,7 @@ This plugin displays notices to users.
 | Moodle version   | Branch            |
 |------------------|-------------------|
 | Moodle 3.9 - 4.1 | MOODLE_39_STABLE  |
-| Moodle 4.3+      | MOODLE_403_STABLE |
+| Moodle 4.3 - 5.3 | MOODLE_403_STABLE |
 
 ## Configuration 
 
