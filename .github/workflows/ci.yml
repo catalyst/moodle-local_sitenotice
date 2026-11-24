@@ -7,7 +7,6 @@ jobs:
   ci:
     uses: catalyst/catalyst-moodle-workflows/.github/workflows/ci.yml@main
     with:
-      disable_phpcpd: true
       disable_grunt: true
     secrets:
-      moodle_org_token: ${{ secrets.MOODLE_ORG_TOKEN }}
+      MOODLE_MARKETPLACE_TOKEN: ${{ secrets.MOODLE_MARKETPLACE_TOKEN }}

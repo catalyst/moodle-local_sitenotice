@@ -27,7 +27,10 @@ use local_sitenotice\persistent\linkhistory;
  * @author     Nathan Nguyen <nathannguyen@catalyst-au.net>
  * @copyright  Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
+ * @covers \local_sitenotice\helper
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(helper::class)]
 class sitenotice_test extends \advanced_testcase {
 
     /**
@@ -41,14 +44,13 @@ class sitenotice_test extends \advanced_testcase {
     /**
      * Test notice creation.
      *
-     * @covers \local_sitenotice\helper::create_new_notice
-     *
      * @dataProvider create_notices_provider
      * @param array $formdata Array of form data to create notices
      * @param bool $allowdeletion Whether or not to allow deletion of notices
      * @param bool $cleanup Whether or not to clean up extra link data after notice deletion
      * @param array $expected Array of expected testcase results
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('create_notices_provider')]
     public function test_create_notices(array $formdata, bool $allowdeletion, bool $cleanup, array $expected) {
         $this->setAdminUser();
         set_config('allow_delete', $allowdeletion, 'local_sitenotice');
@@ -86,11 +88,10 @@ class sitenotice_test extends \advanced_testcase {
     /**
      * Test set reset notice.
      *
-     * @covers \local_sitenotice\helper::reset_notice
-     *
-     * @dataProvider generic_provider()
+     * @dataProvider generic_provider
      * @param array $formdata Array of form data to create notices
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('generic_provider')]
     public function test_reset_notices(array $formdata) {
         $this->setAdminUser();
 
@@ -121,12 +122,10 @@ class sitenotice_test extends \advanced_testcase {
     /**
      * Test enable/disable notice.
      *
-     * @covers \local_sitenotice\helper::enable_notice
-     * @covers \local_sitenotice\helper::disable_notice
-     *
-     * @dataProvider generic_provider()
+     * @dataProvider generic_provider
      * @param array $formdata Array of form data to create notices
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('generic_provider')]
     public function test_enable_notices(array $formdata) {
         $this->setAdminUser();
 
@@ -160,13 +159,10 @@ class sitenotice_test extends \advanced_testcase {
     /**
      * Test user notice interaction.
      *
-     * @covers \local_sitenotice\helper::dismiss_notice
-     * @covers \local_sitenotice\helper::acknowledge_notice
-     * @covers \local_sitenotice\helper::reset_notice
-     *
-     * @dataProvider generic_provider()
+     * @dataProvider generic_provider
      * @param array $formdata Data to test on.
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('generic_provider')]
     public function test_user_notice($formdata) {
         global $USER;
 
@@ -237,11 +233,10 @@ class sitenotice_test extends \advanced_testcase {
     /**
      * Test user link interaction
      *
-     * @covers \local_sitenotice\helper::track_link
-     *
-     * @dataProvider generic_provider()
+     * @dataProvider generic_provider
      * @param array $formdata Data to test on.
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('generic_provider')]
     public function test_user_hlink_interact($formdata) {
         $this->setAdminUser();
         foreach ($formdata as $data) {
@@ -272,8 +267,6 @@ class sitenotice_test extends \advanced_testcase {
 
     /**
      * Test course completion option.
-     *
-     * @covers \local_sitenotice\helper::retrieve_user_notices
      */
     public function test_user_required_completion() {
         global $DB;
@@ -330,8 +323,6 @@ class sitenotice_test extends \advanced_testcase {
 
     /**
      * Test user see required notice after dismissing it.
-     *
-     * @covers \local_sitenotice\helper::retrieve_user_notices
      */
     public function test_retrieve_user_notices_when_dismissed_one_that_requires_acknowledgement() {
         $this->resetAfterTest();
@@ -359,8 +350,6 @@ class sitenotice_test extends \advanced_testcase {
 
     /**
      * Test user see required notice after dismissing, and then acknowledged it.
-     *
-     * @covers \local_sitenotice\helper::retrieve_user_notices
      */
     public function test_retrieve_user_notices_when_dismiss_and_then_acknowledged() {
         $this->resetAfterTest();
@@ -398,8 +387,6 @@ class sitenotice_test extends \advanced_testcase {
 
     /**
      * Test user see required notice when forcelogout logout.
-     *
-     * @covers \local_sitenotice\helper::retrieve_user_notices
      */
     public function test_retrieve_user_notices_when_force_logout() {
         global $USER;
@@ -445,7 +432,7 @@ class sitenotice_test extends \advanced_testcase {
      *
      * @return array
      */
-    public function generic_provider(): array {
+    public static function generic_provider(): array {
         return [
             'formdata' => [
                 [
@@ -481,7 +468,7 @@ class sitenotice_test extends \advanced_testcase {
      *
      * @return array
      */
-    public function create_notices_provider(): array {
+    public static function create_notices_provider(): array {
         return [
             'one basic notice with deletion not allowed' => [
                 'formdata' => [
@@ -491,7 +478,7 @@ class sitenotice_test extends \advanced_testcase {
                         'perpetual' => 1,
                     ],
                 ],
-                'allowdeltion' => false,
+                'allowdeletion' => false,
                 'cleanup' => false,
                 'expected' => [
                     'noticecount' => 1,
@@ -592,7 +579,7 @@ class sitenotice_test extends \advanced_testcase {
                         'perpetual' => 1,
                     ],
                 ],
-                'allowdeltion' => true,
+                'allowdeletion' => true,
                 'cleanup' => false,
                 'expected' => [
                     'noticecount' => 1,
@@ -633,7 +620,7 @@ class sitenotice_test extends \advanced_testcase {
                         'perpetual' => 1,
                     ],
                 ],
-                'allowdeltion' => true,
+                'allowdeletion' => true,
                 'cleanup' => true,
                 'expected' => [
                     'noticecount' => 1,

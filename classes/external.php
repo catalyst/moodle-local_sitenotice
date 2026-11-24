@@ -14,12 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_value;
 use local_sitenotice\helper;
 use local_sitenotice\persistent\sitenotice;
 
 defined('MOODLE_INTERNAL') || die();
-
-require_once("$CFG->libdir/externallib.php");
 
 /**
  * Webservice functions
@@ -33,7 +35,7 @@ class local_sitenotice_external extends external_api {
     /**
      * Parameters.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function dismiss_notice_parameters(): external_function_parameters {
         return new external_function_parameters (
@@ -68,7 +70,7 @@ class local_sitenotice_external extends external_api {
     /**
      * Return parameters.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function dismiss_notice_returns(): external_single_structure {
         return new external_single_structure(
@@ -82,7 +84,7 @@ class local_sitenotice_external extends external_api {
     /**
      * Parameters.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function acknowledge_notice_parameters(): external_function_parameters {
         return new external_function_parameters (
@@ -117,7 +119,7 @@ class local_sitenotice_external extends external_api {
     /**
      * Return parameters.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function acknowledge_notice_returns(): external_single_structure {
         return new external_single_structure(
@@ -130,7 +132,7 @@ class local_sitenotice_external extends external_api {
 
     /**
      * Incoming params.
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function track_link_parameters(): external_function_parameters {
         return new external_function_parameters (
@@ -154,7 +156,7 @@ class local_sitenotice_external extends external_api {
     /**
      * Return parameters.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function track_link_returns(): external_single_structure {
         return new external_single_structure(
@@ -168,7 +170,7 @@ class local_sitenotice_external extends external_api {
     /**
      * Incoming params.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function get_notices_parameters() {
         return new external_function_parameters([]);
@@ -198,7 +200,7 @@ class local_sitenotice_external extends external_api {
     /**
      * Return parameters.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function get_notices_returns(): external_single_structure {
         return new external_single_structure(

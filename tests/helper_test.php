@@ -27,6 +27,7 @@ use local_sitenotice\persistent\sitenotice;
  *
  * @covers \local_sitenotice\helper
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(helper::class)]
 class helper_test extends \advanced_testcase {
 
     /**
